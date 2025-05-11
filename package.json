@@ -1,0 +1,28 @@
+{
+  "name": "express-server",
+  "version": "1.0.0",
+  "description": "Simple Express server",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "axios": "^1.9.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^4.17.1",
+    "firebase-admin": "^12.7.0",
+    "node-cron": "^3.0.3",
+    "pdfkit": "^0.17.1",
+    "puppeteer": "^24.8.2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "sharp": "^0.34.1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
