@@ -231,6 +231,34 @@ function renderGalleryPage(projectName, images) {
   });
 }
 
+// Process and render the overview page
+function renderOverviewPage(projectData, firstImage) {
+  const template = loadTemplate('overview');
+  
+  // Determine configurations text
+  const configurationsText = projectData.configurations && projectData.configurations.length > 0
+    ? projectData.configurations.join(', ')
+    : 'N/A';
+  
+  // Determine first image URL if available
+  const imageUrl = firstImage || 'placeholder-image.jpg';
+  
+  return template({
+    PROJECT_NAME: projectData.projectName || "Unnamed Project",
+    DEVELOPER:projectData.developerName || "---", // Replace with actual data if available
+    STAGE: projectData.status || "--",
+    CURRENT_PRICE: projectData.currentPrice ||"--", // Replace with actual data if available
+    CONFIGURATIONS: configurationsText,
+    LAUNCH_DATE: projectData.launchDate || "---",
+    HANDOVER_DATE: projectData.handOverDate || "---", 
+    ASSET_TYPE: projectData.assetType || "--",
+    WATER_SOURCE: projectData.waterSource || "--",
+    MICROMARKET: projectData.mircomarket || "--",
+    ZONE: projectData.area ||"--", // Replace with actual data if available
+    PROPERTY_IMAGE: imageUrl
+  });
+}
+
 // Basic route
 app.get("/", (req, res) => {
   res.send("Hello World!");
@@ -655,15 +683,23 @@ app.get("/download-pdf", async (req, res) => {
 
     // Render each page from the templates
     const coverHtml = renderCoverPage(projectData);
+    const disclaimerHtml = fs.readFileSync(
+      path.join(__dirname, "templates", "disclaimer.html"),
+      "utf8"
+    );
+
+    // Extract first image for overview page if available
+    let firstImageUrl = null;
+    if (processedImages.length > 0) {
+      firstImageUrl = processedImages[0];
+    }
+
+    const overviewHtml = renderOverviewPage(projectData, firstImageUrl);
     const detailsHtml = renderDetailsPage(projectData);
     const specsHtml = renderSpecsPage(projectData);
     const supplyAndDemandHtml = renderSupplyAndDemandPage(projectData);
     const pricingHtml = renderPricingPage(projectData);
     const galleryHtml = renderGalleryPage(projectName, processedImages);
-    const disclaimerHtml = fs.readFileSync(
-      path.join(__dirname, "templates", "disclaimer.html"),
-      "utf8"
-    );
 
     // Try a completely different approach - generate individual PDFs for each page and then merge them
     try {
@@ -732,74 +768,6 @@ app.get("/download-pdf", async (req, res) => {
           </body>
         </html>
       `;
-      const detailsPageHtml = `
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <meta charset="UTF-8">
-            <style>
-              body, html {
-                margin: 0;
-                padding: 0;
-                height: 100vh;
-                width: 100%;
-                overflow: hidden;
-                background-color: #f9f9f9;
-              }
-              /* Landscape-specific styling */
-              @page {
-                size: A4 landscape;
-                margin: 0;
-              }
-              .content-wrapper {
-                padding: 40px;
-                max-width: 100%;
-                overflow-x: hidden;
-              }
-            </style>
-          </head>
-          <body>
-            <div class="content-wrapper">
-              ${detailsHtml}
-            </div>
-          </body>
-        </html>
-      `;
-      
-      const specsPageHtml = `
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <meta charset="UTF-8">
-            <style>
-              body, html {
-                margin: 0;
-                padding: 0;
-                height: 100vh;
-                width: 100%;
-                overflow: hidden;
-                background-color: #f9f9f9;
-              }
-              /* Landscape-specific styling */
-              @page {
-                size: A4 landscape;
-                margin: 0;
-              }
-              .content-wrapper {
-                padding: 40px;
-                max-width: 100%;
-                overflow-x: hidden;
-              }
-            </style>
-          </head>
-          <body>
-            <div class="content-wrapper">
-              ${specsHtml}
-            </div>
-          </body>
-        </html>
-      `;
-      
       const supplyAndDemandPageHtml = `
         <!DOCTYPE html>
         <html>
@@ -867,7 +835,107 @@ app.get("/download-pdf", async (req, res) => {
           </body>
         </html>
       `;
+      const overviewPageHtml = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="UTF-8">
+            <style>
+              body, html {
+                margin: 0;
+                padding: 0;
+                height: 100vh;
+                width: 100%;
+                overflow: hidden;
+                background-color: #f9f9f9;
+              }
+              /* Landscape-specific styling */
+              @page {
+                size: A4 landscape;
+                margin: 0;
+              }
+              .content-wrapper {
+                padding: 0;
+                max-width: 100%;
+                overflow-x: hidden;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="content-wrapper">
+              ${overviewHtml}
+            </div>
+          </body>
+        </html>
+      `;
       
+      const detailsPageHtml = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="UTF-8">
+            <style>
+              body, html {
+                margin: 0;
+                padding: 0;
+                height: 100vh;
+                width: 100%;
+                overflow: hidden;
+                background-color: #f9f9f9;
+              }
+              /* Landscape-specific styling */
+              @page {
+                size: A4 landscape;
+                margin: 0;
+              }
+              .content-wrapper {
+                padding: 40px;
+                max-width: 100%;
+                overflow-x: hidden;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="content-wrapper">
+              ${detailsHtml}
+            </div>
+          </body>
+        </html>
+      `;
+      
+      const specsPageHtml = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="UTF-8">
+            <style>
+              body, html {
+                margin: 0;
+                padding: 0;
+                height: 100vh;
+                width: 100%;
+                overflow: hidden;
+                background-color: #f9f9f9;
+              }
+              /* Landscape-specific styling */
+              @page {
+                size: A4 landscape;
+                margin: 0;
+              }
+              .content-wrapper {
+                padding: 40px;
+                max-width: 100%;
+                overflow-x: hidden;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="content-wrapper">
+              ${specsHtml}
+            </div>
+          </body>
+        </html>
+      `;  
       const galleryPageHtml = processedImages.length > 0 ? `
         <!DOCTYPE html>
         <html>
@@ -915,14 +983,15 @@ app.get("/download-pdf", async (req, res) => {
         fs.mkdirSync(pagesDir);
       }
       
-      fs.writeFileSync(path.join(pagesDir, 'cover.html'), coverPageHtml);
-      fs.writeFileSync(path.join(pagesDir, 'disclaimer.html'), disclaimerPageHtml);
-      fs.writeFileSync(path.join(pagesDir, 'details.html'), detailsPageHtml);
-      fs.writeFileSync(path.join(pagesDir, 'specs.html'), specsPageHtml);
-      fs.writeFileSync(path.join(pagesDir, 'supplyAndDemand.html'), supplyAndDemandPageHtml);
-      fs.writeFileSync(path.join(pagesDir, 'pricing.html'), pricingPageHtml);
+      fs.writeFileSync(path.join(pagesDir, 'cover.html'), coverHtml);
+      fs.writeFileSync(path.join(pagesDir, 'disclaimer.html'), disclaimerHtml);
+      fs.writeFileSync(path.join(pagesDir, 'overview.html'), overviewHtml);
+      fs.writeFileSync(path.join(pagesDir, 'details.html'), detailsHtml);
+      fs.writeFileSync(path.join(pagesDir, 'specs.html'), specsHtml);
+      fs.writeFileSync(path.join(pagesDir, 'supplyAndDemand.html'), supplyAndDemandHtml);
+      fs.writeFileSync(path.join(pagesDir, 'pricing.html'), pricingHtml);
       if (galleryPageHtml) {
-        fs.writeFileSync(path.join(pagesDir, 'gallery.html'), galleryPageHtml);
+        fs.writeFileSync(path.join(pagesDir, 'gallery.html'), galleryHtml);
       }
       
       // Generate PDFs for each page
@@ -992,7 +1061,7 @@ app.get("/download-pdf", async (req, res) => {
         });
         pdfFilenames.push(supplyAndDemandPdfPath);
         await supplyAndDemandPage.close();
-
+        
         // Generate PDF for pricing page
         const pricingPdfPath = path.join(pagesDir, 'pricing.pdf');
         const pricingPage = await browser.newPage();
@@ -1012,7 +1081,27 @@ app.get("/download-pdf", async (req, res) => {
         });
         pdfFilenames.push(pricingPdfPath);
         await pricingPage.close();
-        
+
+        // Generate PDF for overview page
+        const overviewPdfPath = path.join(pagesDir, 'overview.pdf');
+        const overviewPage = await browser.newPage();
+        await overviewPage.goto(`file://${path.join(pagesDir, 'overview.html')}`, { waitUntil: 'networkidle0' });
+        await overviewPage.pdf({
+          path: overviewPdfPath,
+          format: 'A4',
+          landscape: true,
+          printBackground: true,
+          margin: {
+            top: "0.4in",
+            right: "0.4in",
+            bottom: "0.4in",
+            left: "0.4in"
+          },
+          preferCSSPageSize: true
+        });
+        pdfFilenames.push(overviewPdfPath);
+        await overviewPage.close();
+
         // Generate PDF for details page
         const detailsPdfPath = path.join(pagesDir, 'details.pdf');
         const detailsPage = await browser.newPage();
@@ -1052,7 +1141,6 @@ app.get("/download-pdf", async (req, res) => {
         });
         pdfFilenames.push(specsPdfPath);
         await specsPage.close();
-        
         
         // Generate PDF for gallery page (if exists)
         if (galleryPageHtml) {
@@ -1125,6 +1213,8 @@ app.get("/download-pdf", async (req, res) => {
           // Clean up the HTML files
           try {
             fs.unlinkSync(path.join(pagesDir, 'cover.html'));
+            fs.unlinkSync(path.join(pagesDir, 'disclaimer.html'));
+            fs.unlinkSync(path.join(pagesDir, 'overview.html'));
             fs.unlinkSync(path.join(pagesDir, 'details.html'));
             fs.unlinkSync(path.join(pagesDir, 'specs.html'));
             fs.unlinkSync(path.join(pagesDir, 'supplyAndDemand.html'));
@@ -1132,7 +1222,6 @@ app.get("/download-pdf", async (req, res) => {
             if (galleryPageHtml) {
               fs.unlinkSync(path.join(pagesDir, 'gallery.html'));
             }
-            fs.unlinkSync(path.join(pagesDir, 'disclaimer.html'));
           } catch (err) {
             console.error("Error cleaning up HTML files:", err);
           }

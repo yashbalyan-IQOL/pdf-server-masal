@@ -135,34 +135,27 @@
     
     .decoration {
       position: absolute;
+      top:20%;
+      right: -20%;
       z-index: -1;
     }
-    
-    .decoration-top-right {
+    .decoration-image{
       top: 120px;
-      right: -100px;
-      width: 200px;
-      height: 120px;
-      background-color: #e8a745;
-      border-radius: 50px;
-      transform: rotate(-20deg);
+      right: -70%;
+      width: 700px;
+      height: 700px;
+      transform: rotate(20deg);
+      overflow: hidden;
     }
     
-    .decoration-bottom-right {
-      bottom: 50px;
-      right: -60px;
-      width: 250px;
-      height: 150px;
-      background-color: #e8a745;
-      border-radius: 80px;
-      transform: rotate(30deg);
-    }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="decoration decoration-top-right"></div>
-    <div class="decoration decoration-bottom-right"></div>
+    <div class="decoration decoration-top-right">
+      <img src="../assets/icons/supply/dic.png" alt="" class="decoration-image">
+    </div>
+    
     
     <div class="header">
       <h1>Price, Demand & Supply of Cities</h1>
