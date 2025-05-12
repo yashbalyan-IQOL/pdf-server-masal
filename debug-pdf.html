@@ -1,0 +1,991 @@
+
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="UTF-8">
+          <style>
+            /* Set specific page size and properties */
+            @page {
+              size: A4 portrait;
+              margin: 0;
+            }
+            @page :first {
+              margin: 0;
+            }
+            /* Ensure content fits */
+            html {
+              zoom: 0.95;
+            }
+            body {
+              margin: 0;
+              padding: 0;
+              width: 100%;
+              height: 100%;
+              flex-direction: column;
+              font-family: Arial, sans-serif;
+            }
+            /* Force each page to be on a new page */
+            .page {
+              page-break-after: always !important;
+              page-break-inside: avoid !important;
+              page-break-before: auto;
+              height: 100vh;
+              width: 100%;
+              position: relative;
+              box-sizing: border-box;
+              display: block;
+              overflow: hidden;
+              break-after: page;
+            }
+            /* Ensure last page doesn't have a page break after */
+            .page:last-child {
+              page-break-after: auto;
+              break-after: auto;
+            }
+            .cover-page {
+              background-color: #2c3e50;
+              color: white;
+            }
+            .content-page {
+              background-color: #f9f9f9;
+              padding: 40px;
+              box-sizing: border-box;
+            }
+            /* Force page breaks */
+            .page-break {
+              page-break-before: always !important;
+              page-break-after: auto;
+              margin-top: 20px;
+              margin-bottom: 20px;
+              display: block;
+              height: 1px;
+              clear: both;
+              background-color: transparent;
+              break-before: page;
+              visibility: hidden;
+              border: none;
+            }
+            /* Wrapper for page content */
+            .page-content, .cover-content {
+              width: 100%;
+              height: 100%;
+              position: relative;
+              overflow: hidden;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="page cover-page">
+            
+      <div class="cover-content">
+        <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Real Estate Investment Report</title>
+    <style>
+      body, html {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100vh;
+        background-color: #2c3e50;
+        font-family: 'Arial', sans-serif;
+        color: white;
+        overflow: hidden;
+      }
+      .container {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: hidden;
+      }
+      .blueprint-bg {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 70%;
+        height: 70%;
+        opacity: 0.15;
+        z-index: 1;
+        background-color: rgba(0,0,0,0.2);
+        background-image: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+                          linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);
+        background-size: 20px 20px, 20px 20px;
+      }
+      .content {
+        z-index: 2;
+        position: relative;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 50px;
+        box-sizing: border-box;
+      }
+      .logo {
+        font-size: 18px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-bottom: 80px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba(255,255,255,0.3);
+        width: fit-content;
+      }
+      .title-section {
+        margin-bottom: 50px;
+      }
+      .label {
+        color: #3498db;
+        font-size: 18px;
+        margin-bottom: 15px;
+        font-weight: 500;
+      }
+      .title {
+        font-size: 54px;
+        font-weight: bold;
+        text-transform: uppercase;
+        margin-bottom: 20px;
+        line-height: 1.2;
+      }
+      .subtitle {
+        font-size: 28px;
+        opacity: 0.8;
+        margin-bottom: 15px;
+        font-weight: 300;
+        color: #3498db;
+      }
+      .project {
+        font-size: 48px;
+        font-weight: 700;
+        margin-bottom: 25px;
+        line-height: 1.2;
+        text-transform: capitalize;
+        color: #fff;
+        border-left: 5px solid #3498db;
+        padding-left: 20px;
+      }
+      .date {
+        font-size: 18px;
+        font-weight: light;
+        margin-top: 8px;
+        color: rgba(255,255,255,0.7);
+      }
+      .footer {
+        margin-top: auto;
+        font-size: 14px;
+        opacity: 0.7;
+        display: flex;
+        justify-content: space-between;
+      }
+      .separator {
+        width: 50px;
+        height: 5px;
+        background-color: #3498db;
+        margin: 20px 0;
+      }
+      .design-element {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 120px;
+        height: 120px;
+        border-top: 3px solid #3498db;
+        border-left: 3px solid #3498db;
+        opacity: 0.7;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="blueprint-bg"></div>
+      <div class="design-element"></div>
+      <div class="content">
+        <div class="logo">TruEstate</div>
+        
+        <div class="title-section">
+          <div class="label">EXCLUSIVE</div>
+          <div class="title">PROPERTY REPORT</div>
+          <div class="separator"></div>
+          <div class="subtitle">Investment Analysis</div>
+        </div>
+        
+        <div class="project">[object Object]</div>
+        <div class="date">Report Generated: 05/12/2025</div>
+        
+        <div class="footer">
+          <div>CONFIDENTIAL INVESTMENT DOCUMENT</div>
+          <div>TruEstate Research Team</div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+      </div>
+    
+          </div>
+          
+          <hr class="page-break"/>
+          
+          <div class="page content-page">
+            
+      <div class="page-content">
+        <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Property Details</title>
+    <style>
+      body {
+        font-family: 'Arial', sans-serif;
+        padding: 40px;
+        color: #333;
+        background-color: #f9f9f9;
+      }
+      h1 {
+        color: #2c3e50;
+        border-bottom: 2px solid #3498db;
+        padding-bottom: 10px;
+        font-size: 28px;
+        text-transform: uppercase;
+      }
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      .property-title {
+        font-size: 24px;
+        color: #2c3e50;
+      }
+      .rera-approval {
+        color: #27ae60;
+        font-weight: bold;
+        padding: 5px 10px;
+        border-radius: 4px;
+        background-color: #e8f8f0;
+        border: 1px solid #27ae60;
+      }
+      .section {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        padding: 20px;
+        margin-bottom: 30px;
+      }
+      .section-title {
+        font-size: 18px;
+        font-weight: bold;
+        color: #2c3e50;
+        margin-bottom: 15px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+      }
+      .property-info {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+      }
+      .property {
+        margin-bottom: 10px;
+      }
+      .property-name {
+        font-weight: bold;
+        color: #7f8c8d;
+        display: block;
+        margin-bottom: 3px;
+        font-size: 12px;
+        text-transform: uppercase;
+      }
+      .property-value {
+        font-size: 16px;
+        color: #2c3e50;
+      }
+      .amenities-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px;
+      }
+      .amenity {
+        background-color: #edf2f7;
+        padding: 8px 12px;
+        border-radius: 20px;
+        font-size: 14px;
+        color: #4a5568;
+      }
+      .config-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-top: 10px;
+      }
+      .config {
+        background-color: #e3f2fd;
+        border: 1px solid #bbdefb;
+        padding: 10px 15px;
+        border-radius: 6px;
+        font-size: 15px;
+        color: #1565c0;
+        font-weight: bold;
+      }
+      .location-map {
+        width: 100%;
+        height: 300px;
+        background-color: #eee;
+        border-radius: 8px;
+        margin-top: 15px;
+        border: 1px solid #ddd;
+      }
+      .status-tag {
+        display: inline-block;
+        background-color: #ff9800;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 14px;
+        text-transform: uppercase;
+      }
+      .footer {
+        text-align: center;
+        margin-top: 40px;
+        color: #95a5a6;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>signature tulips uptown</h1>
+        <div class="rera-approval">RERA Approved</div>
+    </div>
+    
+    <div class="section">
+      <div class="section-title">Project Overview</div>
+      <div class="property-info">
+        <div class="property">
+          <span class="property-name">Project Status</span>
+          <span class="property-value">
+            <span class="status-tag">under construction</span>
+          </span>
+        </div>
+        <div class="property">
+          <span class="property-name">Asset Type</span>
+          <span class="property-value">PLOT</span>
+        </div>
+        <div class="property">
+          <span class="property-name">Area</span>
+          <span class="property-value">east</span>
+        </div>
+        <div class="property">
+          <span class="property-name">Project Land Area</span>
+          <span class="property-value">15.5 sqft</span>
+        </div>
+        <div class="property">
+          <span class="property-name">Launch Date</span>
+          <span class="property-value">9/2023</span>
+        </div>
+        <div class="property">
+          <span class="property-name">Possession Date</span>
+          <span class="property-value">2026</span>
+        </div>
+        <div class="property">
+          <span class="property-name">Total Units</span>
+          <span class="property-value">182</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="section">
+      <div class="section-title">Configurations</div>
+      <div class="config-container">
+          <div class="config">2400sqft</div>
+          <div class="config">1800sqft</div>
+          <div class="config">2000sqft</div>
+          <div class="config">1350sqft</div>
+          <div class="config">1600sqft</div>
+          <div class="config">1200sqft</div>
+          <div class="config">1500sqft</div>
+      </div>
+    </div>
+    
+    <div class="section">
+      <div class="section-title">Amenities</div>
+      <div class="amenities-container">
+          <div class="property-value">No amenities available</div>
+      </div>
+    </div>
+    
+    <div class="section">
+      <div class="section-title">Location & Details</div>
+      <div class="property">
+        <span class="property-name">Address</span>
+        <span class="property-value">N/A</span>
+      </div>
+      <div class="property">
+        <span class="property-name">Water Source</span>
+        <span class="property-value">BoreWell</span>
+      </div>
+      <div class="property">
+        <span class="property-name">RERA ID</span>
+        <span class="property-value">PRM/KA/RERA/1251/446/PR/020923/006236</span>
+      </div>
+      <div class="property">
+        <span class="property-name">Acknowledgement</span>
+        <span class="property-value">N/A</span>
+      </div>
+      <div class="property">
+        <span class="property-name">Approval Authority</span>
+        <span class="property-value">BMRDA - Bangalore Metropolitan Region Development Authority</span>
+      </div>
+      <div class="property">
+        <span class="property-name">Handover Date</span>
+        <span class="property-value">5/2026</span>
+      </div>
+      <div class="property">
+        <span class="property-name">Coordinates</span>
+        <span class="property-value">Lat: , Long: </span>
+      </div>
+      <div class="location-map">
+        <img src="https://maps.googleapis.com/maps/api/staticmap?center=,&zoom=15&size=600x300&maptype=roadmap&markers=color:red%7C,&key=YOUR_API_KEY" width="100%" height="100%" alt="Property location map">
+      </div>
+    </div>
+    
+    <div class="section">
+      <div class="section-title">Legal Information</div>
+      <div class="property-info">
+        <div class="property">
+          <span class="property-name">Title Cleared</span>
+          <span class="property-value">N/A</span>
+        </div>
+        <div class="property">
+          <span class="property-name">Khata Type</span>
+          <span class="property-value">N/A</span>
+        </div>
+        <div class="property">
+          <span class="property-name">Litigation</span>
+          <span class="property-value">No</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer">
+      This document was generated on 12/05/2025 and contains property information as recorded in our database. 
+      Last Updated: Unknown
+    </div>
+  </body>
+</html> 
+      </div>
+    
+          </div>
+          
+          <hr class="page-break"/>
+          
+          <div class="page content-page">
+            
+      <div class="page-content">
+        <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Property Specifications</title>
+    <style>
+      body {
+        font-family: 'Arial', sans-serif;
+        padding: 40px;
+        color: #333;
+        background-color: #f9f9f9;
+      }
+      h1 {
+        color: #2c3e50;
+        border-bottom: 2px solid #3498db;
+        padding-bottom: 10px;
+        font-size: 28px;
+        text-transform: uppercase;
+        margin-bottom: 30px;
+      }
+      .section {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        padding: 20px;
+        margin-bottom: 30px;
+      }
+      .section-title {
+        font-size: 18px;
+        font-weight: bold;
+        color: #2c3e50;
+        margin-bottom: 15px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+      }
+      .specs-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+      }
+      .specs-table th {
+        background-color: #f7f9fa;
+        text-align: left;
+        padding: 12px 15px;
+        border-bottom: 1px solid #e1e4e8;
+        color: #7f8c8d;
+        font-weight: normal;
+        font-size: 14px;
+        text-transform: uppercase;
+      }
+      .specs-table td {
+        padding: 12px 15px;
+        border-bottom: 1px solid #e1e4e8;
+      }
+      .specs-table tr:last-child td {
+        border-bottom: none;
+      }
+      .specs-table tr:nth-child(even) {
+        background-color: #fafafa;
+      }
+      .specs-category {
+        font-weight: bold;
+        color: #2c3e50;
+        padding: 15px;
+        background-color: #edf2f7;
+        border-top: 1px solid #e1e4e8;
+        border-bottom: 1px solid #e1e4e8;
+      }
+      .specs-value {
+        font-weight: bold;
+        color: #3498db;
+      }
+      .footer {
+        text-align: center;
+        margin-top: 40px;
+        color: #95a5a6;
+        font-size: 12px;
+      }
+      .subheading {
+        color: #7f8c8d;
+        font-size: 16px;
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>signature tulips uptown - Technical Specifications</h1>
+    <div class="subheading">Detailed technical specifications and construction details</div>
+    
+    <div class="section">
+      <div class="section-title">Construction Specifications</div>
+      <table class="specs-table">
+        <tr>
+          <th>Feature</th>
+          <th>Specification</th>
+        </tr>
+        <tr>
+          <td>Structure</td>
+          <td>RCC framed structure with seismic considerations</td>
+        </tr>
+        <tr>
+          <td>External Walls</td>
+          <td>Concrete blocks with weather-resistant exterior finish</td>
+        </tr>
+        <tr>
+          <td>Internal Walls</td>
+          <td>Solid concrete block partitions with smooth finish</td>
+        </tr>
+        <tr>
+          <td>Flooring</td>
+          <td>Vitrified tiles in living areas, anti-skid ceramic in wet areas</td>
+        </tr>
+        <tr>
+          <td>Windows</td>
+          <td>UPVC framed windows with appropriate glazing</td>
+        </tr>
+        <tr>
+          <td>Doors</td>
+          <td>Engineered wooden doors with quality hardware</td>
+        </tr>
+        <tr>
+          <td>Painting</td>
+          <td>Premium emulsion paint for internal walls, exterior grade paint outside</td>
+        </tr>
+      </table>
+    </div>
+    
+    <div class="section">
+      <div class="section-title">Property Details</div>
+      <table class="specs-table">
+        <tr>
+          <th>Detail</th>
+          <th>Information</th>
+        </tr>
+        <tr>
+          <td>Total Units</td>
+          <td>182</td>
+        </tr>
+        <tr>
+          <td>Tower Units</td>
+          <td>N/A</td>
+        </tr>
+        <tr>
+          <td>Land Area</td>
+          <td>15.5 sqft</td>
+        </tr>
+        <tr>
+          <td>Unit Sizes</td>
+          <td>Various configurations available</td>
+        </tr>
+        <tr>
+          <td>Approved By</td>
+          <td>BMRDA - Bangalore Metropolitan Region Development Authority</td>
+        </tr>
+        <tr>
+          <td>Handover Date</td>
+          <td>5/2026</td>
+        </tr>
+      </table>
+    </div>
+    
+    <div class="section">
+      <div class="section-title">Amenities Features</div>
+      <div class="amenities-list">
+          <div>No amenities information available</div>
+      </div>
+    </div>
+    
+    <div class="footer">
+      This document is subject to change. All specifications mentioned are indicative and subject to final design.
+    </div>
+  </body>
+</html> 
+      </div>
+    
+          </div>
+          
+          
+            <hr class="page-break"/>
+            
+            <div class="page content-page">
+              
+      <div class="page-content">
+        <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Property Gallery</title>
+    <style>
+      body {
+        font-family: 'Arial', sans-serif;
+        padding: 40px;
+        color: #333;
+        background-color: #f9f9f9;
+      }
+      h1 {
+        color: #2c3e50;
+        border-bottom: 2px solid #3498db;
+        padding-bottom: 10px;
+        font-size: 28px;
+        text-transform: uppercase;
+        text-align: center;
+        margin-bottom: 30px;
+      }
+      .gallery-intro {
+        text-align: center;
+        margin-bottom: 30px;
+        color: #7f8c8d;
+      }
+      .image-gallery {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 25px;
+        margin: 0 auto;
+      }
+      .image-container {
+        width: 100%;
+        background-color: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        position: relative;
+      }
+      .image-container img {
+        width: 100%;
+        height: auto;
+        display: block;
+        transition: transform 0.3s ease;
+      }
+      .image-label {
+        background-color: rgba(44, 62, 80, 0.8);
+        color: white;
+        padding: 8px 12px;
+        font-size: 14px;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+      }
+      .no-images {
+        text-align: center;
+        color: #95a5a6;
+        font-style: italic;
+        padding: 50px 0;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      }
+      .footer {
+        text-align: center;
+        margin-top: 40px;
+        color: #95a5a6;
+        font-size: 12px;
+        border-top: 1px solid #e0e0e0;
+        padding-top: 20px;
+      }
+      .copyright {
+        margin-top: 10px;
+        font-size: 11px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>signature tulips uptown - Gallery</h1>
+    
+    <div class="gallery-intro">
+      Visual showcase of this property development
+    </div>
+    
+    <div class="image-gallery">
+      <div class="image-container">
+        <img src="https://storage.googleapis.com/masal-db-6cc78.appspot.com/photos/Signature%20Tulips%20Uptown/Signature%20Tulips%20Uptown_image_1.webp?GoogleAccessId&#x3D;campeign-data-stream-masal%40masal-db-6cc78.iam.gserviceaccount.com&amp;Expires&#x3D;1747031245&amp;Signature&#x3D;gvz5IFGYsrl89BTSdvSldQkupuyTclpVN8ugqrJANXYlvMdFrvxzsBs3AFzhXVFocIXAkv4Vftj4%2FyFOQ2swqsKGs%2BcAkgdkQlvZ6hzfpxdtDCse0nLqfoVXquGmGk7awyeLdp8ri3Gj7NBYuZArpZbTrwByMmZZ9PhRV7s4O98%2B8wBw3kjCk7KzfUWmrYJdxCaHZgdrJJk8dicC8k4JmBtqQX%2BOIDz3PnKiVUeV7hyTebLSBc9DCx1VP28tR7fiBYqElmCC9X9Z%2FfP00vL4Nh4tB0bFQ11S3v6Vd9ZwIMqXYjN5Zb65KeDjWWx6rZE61UI7aD3WC3SFiXxkHFHCgA%3D%3D" alt="Property view" />
+        <div class="image-label">Property View 1</div>
+      </div>
+      <div class="image-container">
+        <img src="https://storage.googleapis.com/masal-db-6cc78.appspot.com/photos/Signature%20Tulips%20Uptown/Signature%20Tulips%20Uptown_image_10.webp?GoogleAccessId&#x3D;campeign-data-stream-masal%40masal-db-6cc78.iam.gserviceaccount.com&amp;Expires&#x3D;1747031245&amp;Signature&#x3D;e7nB8wOfZBbMmviMsgLisfeAwSIV8xhnn74LezS48KjOZ%2BfKua0WzDnB4s534VhEhA5qEEi4YE%2BjLNW%2FQvxL1U%2FXGfcGQdb11Xp3r0P4P0k1zEm8N0Yw4QFz4%2BnMAkoF6quJkCVERc%2BYVD86Au%2FHZm6IHuKpZxlEZW9Zlb0kbeiL0hhkQdcc%2Be2netKXpwuhaeIqzNq98erkdiI2ggqmRlVNQNc2xv4akSi4yrq1dd8TZuAIqzpssFfUgN%2FA22Cq0ILFZwu6sXrl6IluxqgVkn8rWsNsD0HtkN%2FQDrTk9BE2GlsXnu%2BwLCUezCW8J1x8NRJvzj8V7XuxUDNZmL5X0Q%3D%3D" alt="Property view" />
+        <div class="image-label">Property View 2</div>
+      </div>
+      <div class="image-container">
+        <img src="https://storage.googleapis.com/masal-db-6cc78.appspot.com/photos/Signature%20Tulips%20Uptown/Signature%20Tulips%20Uptown_image_11.webp?GoogleAccessId&#x3D;campeign-data-stream-masal%40masal-db-6cc78.iam.gserviceaccount.com&amp;Expires&#x3D;1747031245&amp;Signature&#x3D;XLMBtq2Fw529oDbhqbO8eJAJL1AzsIkhWJSdyxLR%2BKR%2BzYRWOkfuGCbq8Vcji4K04bp%2FVjLUq9EQZWjRWlgjhRHB8w3I%2F43hnlp94fFO9vsBbM8XS3W%2FTeX4KI%2Bv4c75bjIWe%2FMfmvuLtSiE%2BJ9q7Wc3A53w0%2B0A80l13CP91wt5X4lKWBbTtvhFS8lS35Qjoj1UlTc5fh%2BkKLQm2UpWkpq4%2Bi58w9UnLY3PLJ%2BdH9ZfFpqV53Cn6MCpTWFjlF5AIhNKTTgzZyBAS3awg7tZripBX%2BBx8n3gJWJUaEnalddmiEmJkTphkYkVSeE6R%2BS9neOYT%2Buhy7SegRCDG1cTew%3D%3D" alt="Property view" />
+        <div class="image-label">Property View 3</div>
+      </div>
+      <div class="image-container">
+        <img src="https://storage.googleapis.com/masal-db-6cc78.appspot.com/photos/Signature%20Tulips%20Uptown/Signature%20Tulips%20Uptown_image_12.webp?GoogleAccessId&#x3D;campeign-data-stream-masal%40masal-db-6cc78.iam.gserviceaccount.com&amp;Expires&#x3D;1747031245&amp;Signature&#x3D;hkQlJgAPKwfLEIvBba20ePxmFR3FfWrTL%2BouvHGEcXBbDXV9m7E4yhb25c8jFL8%2FedM4yuXckJ3i4oAdCw4jeyo0KkbyzGKnV3Inzob1IRRZ%2FFa7r39A0GjGZpFqhuqg1kdhVxwHa2ZG82aoxva3FbJ5JNP4DT9ExpM1xJuzv2M1uvTFogvYeyJkcSh2ZjusVsB%2BvlwZOKuvDU%2BVfcXstlWE1XPPg7Fmrwfr3BFMEToX2Wrmrj0WOOknLTyHHmTEqcveQh2Z1DoKV3jhM3P2wY3FqJ9F0dDmYwrudPJt%2BBNu7y%2Ba%2FciVSOuAlCqnl9kW5XJAnW1mjM%2FWNvtXjcoL8A%3D%3D" alt="Property view" />
+        <div class="image-label">Property View 4</div>
+      </div>
+      <div class="image-container">
+        <img src="https://storage.googleapis.com/masal-db-6cc78.appspot.com/photos/Signature%20Tulips%20Uptown/Signature%20Tulips%20Uptown_image_13.webp?GoogleAccessId&#x3D;campeign-data-stream-masal%40masal-db-6cc78.iam.gserviceaccount.com&amp;Expires&#x3D;1747031245&amp;Signature&#x3D;c8JYVbwJyvJP2rWh3yclGD5rmP64d5go%2F6RH67J1LKoTUZRQLqJOhCUN7boHDL6hDbBQMDKP9zgKnphdpUQkZ7jzlWn53H%2BencioilZYvSbsFosCWDFhSv%2FCtInyCjAkzf5nbl3t7u9y%2BnAY5yTP77fYCFazqU00C7bwHKI5xkTcfcoJlM7uJkhioCEpfNwbe%2BksrTEb1hDPefdLfGACw0nNTzGQhfxoTetHJksEWuYy2gG6QsgtGNNOXeTx1C0N9HrqEYhvtqaPXV5rEgXk8ViOgG3O04H4Ah%2F3OAr2ic5nV94P3gky21m2MPaodnCPsINKGnnykay%2F8kwhRnEUqg%3D%3D" alt="Property view" />
+        <div class="image-label">Property View 5</div>
+      </div>
+      <div class="image-container">
+        <img src="https://storage.googleapis.com/masal-db-6cc78.appspot.com/photos/Signature%20Tulips%20Uptown/Signature%20Tulips%20Uptown_image_14.webp?GoogleAccessId&#x3D;campeign-data-stream-masal%40masal-db-6cc78.iam.gserviceaccount.com&amp;Expires&#x3D;1747031245&amp;Signature&#x3D;HSMIUHM7xlN5MqVBNW%2FxDuI5rm4bZmrxs4EXs9EC4Jy8KrXF2x25I5WLrmCW3%2BRR9LOtJAFUIDMohRbh6AoloA2Io1Crthb0R9cKvxFrEYfu66%2BL47QyRzS2EOpDtHOQgeBFxDD9R511Mwy79pvZR7GKZgZ7cEq1NiZQ5BQeSLsqyPUd61eHg2wqAJ%2BYvkkNRs8SdoBz9yueGAiIW1DmUDRCLpENMVxpjpNPtc9CmFG7cneT7l8oSM4QPGyaEFFFnqcvzhnqAlJyNa5TRCwMkq9rV5F8i61P3TJESTzwfdHZUniB18J2pe%2FV1S0gZlu8j1BoBatZda20NOV1pAC9dg%3D%3D" alt="Property view" />
+        <div class="image-label">Property View 6</div>
+      </div>
+      <div class="image-container">
+        <img src="https://storage.googleapis.com/masal-db-6cc78.appspot.com/photos/Signature%20Tulips%20Uptown/Signature%20Tulips%20Uptown_image_15.webp?GoogleAccessId&#x3D;campeign-data-stream-masal%40masal-db-6cc78.iam.gserviceaccount.com&amp;Expires&#x3D;1747031245&amp;Signature&#x3D;vxdJckUhQPuhTAi1Vb9zdlz7wW6RvLX2qa%2FClIRbmF%2B%2FL%2FIDvXCJyKJw7SzQqvBGAQlX1k3Ggn45NWwTO%2BzUQW%2Fl8eHzEKxbYbViZN64RP7%2BMb5xzkoNnSHxfUS%2BZSfz0VvUrRVjRKJ3lMyZl7YVtzOcpZYFJGh%2B355%2FWpLxiM2U%2FP7XdQPuEtX%2Fu4cV2alc975N9WJBpd8t0my%2FWA7h3TDm01d1UvlPvQqIAfYd88sJcfWXdISzqrQPJ%2FKnxK4eXiRXA6JXVVeYeA6SDh5awXqF%2BOQHnAcQAjvEsZYCovh5c%2FsbB9BYwa0K7YicBriq3Mnd4ua2m0yMAT%2Fg9CSY8g%3D%3D" alt="Property view" />
+        <div class="image-label">Property View 7</div>
+      </div>
+      <div class="image-container">
+        <img src="https://storage.googleapis.com/masal-db-6cc78.appspot.com/photos/Signature%20Tulips%20Uptown/Signature%20Tulips%20Uptown_image_16.webp?GoogleAccessId&#x3D;campeign-data-stream-masal%40masal-db-6cc78.iam.gserviceaccount.com&amp;Expires&#x3D;1747031245&amp;Signature&#x3D;j0UTbQV%2Fg4YXyABFQFTLwBMLEo7mxqVE4U2%2FHLh31YiKWeV%2F5iMWdyqg8EQgxzbyCj64S3Pjk3vbttxppZqlH%2F3kxc%2FrKEsoLgTAb9t%2FerMr8jM1eNjdfHeTxLVa8oAjhfjrVaFgOmtKU8ofvmWSHc4XQmXu2rFKdnEgMG96AGVQt3%2F0bSiyQxnumIHEM4TDZ8usWKEDwpCv8SXpJT9aHOdRYczpH%2FpRv3Hb%2FqB1RpoJUhq5CMTRnG8CKv1SMxfKrQxQPpP8cuF%2FQAwvxWxLDdE6oxRcY%2BXxYn1H%2F%2FPHMIm3Wv8J0trzaHWe4s08rEAIp30CXZssEyqM1wD0Gpdn8w%3D%3D" alt="Property view" />
+        <div class="image-label">Property View 8</div>
+      </div>
+      <div class="image-container">
+        <img src="https://storage.googleapis.com/masal-db-6cc78.appspot.com/photos/Signature%20Tulips%20Uptown/Signature%20Tulips%20Uptown_image_17.webp?GoogleAccessId&#x3D;campeign-data-stream-masal%40masal-db-6cc78.iam.gserviceaccount.com&amp;Expires&#x3D;1747031245&amp;Signature&#x3D;ddmAy59A7gJmWPj1Aoi71EgdUZnQN14iWS71az%2B9rIWKyOILPNQRwBqcgrhzs%2F6qS4LTrqaGcKoz0QUTp26Zww9lToG09DyUhGs83VNgq8RXE9W%2FqWfLVXbgRLb%2Bkng%2BQO7Om7S1f8VsqLVork9IYJzQmNxRt7VCwulmeGhIA%2BNy20ElNB7NAw4U12ppx4mH%2B1l6CEOqMc6bL4LE63iCFO2nmrDrDEJCZjGYtoWqdUB1PNNyduOyrIteuIaPRWEYjNC6%2BkKVphs83Y3y0bURWR2RB%2FV3GRbyEWcDMErViR9BNx%2F7gfCaECcHGtWLpMSwJ0ekzbLuGj5tl6Yon7%2B0XQ%3D%3D" alt="Property view" />
+        <div class="image-label">Property View 9</div>
+      </div>
+      <div class="image-container">
+        <img src="https://storage.googleapis.com/masal-db-6cc78.appspot.com/photos/Signature%20Tulips%20Uptown/Signature%20Tulips%20Uptown_image_18.webp?GoogleAccessId&#x3D;campeign-data-stream-masal%40masal-db-6cc78.iam.gserviceaccount.com&amp;Expires&#x3D;1747031245&amp;Signature&#x3D;px7c3aJmlUDQgHxuNRK2ToUr6lsw9Fmd%2F10EkEWaUPk5G3JldePRVIxyEMP3q1ErJnmR2IvXmwnJMu2lorn1I7bZdHXKjEZNWb7ctSBRvZBjwyR7zcRrZsPtxlUSw9y2Shxg7lGcXRsiqwbCwuvlDQJUof7%2BaWa4%2FfqMb3JD1oCap5%2BlcN%2BA0nKYkujhWT70M2NXp0%2Bhfkq%2FyHXP3Q65%2F25kNp3rO1VyyAqhnFD7tpHqsQgjqltp%2FECpMXf2RB7Xs42JGqxsLE5DhQX%2F2e4%2BDlbnFkwhourB8vVnBlkmsB%2Be%2B3n6bUAzJWXMTrbD6xJYyaOIRkHRB9%2FHVXN7cPnW4g%3D%3D" alt="Property view" />
+        <div class="image-label">Property View 10</div>
+      </div>
+      <div class="image-container">
+        <img src="https://storage.googleapis.com/masal-db-6cc78.appspot.com/photos/Signature%20Tulips%20Uptown/Signature%20Tulips%20Uptown_image_19.webp?GoogleAccessId&#x3D;campeign-data-stream-masal%40masal-db-6cc78.iam.gserviceaccount.com&amp;Expires&#x3D;1747031245&amp;Signature&#x3D;oUEgY7OZOAiIOMtyAVGMVLdpv6aXMRF14srPgAAeZ3LPCvAHcOzb7IhZJk96fDqWeqtk4fBhwNoijuMYWOh5vKv42AXz7VMNFA3nzmUuQr%2FnRYz0cFa5bZ5cnB%2FXCnjnh1rWptoHQ%2Frusy8TVzLwRpmH1zKOG%2BuR5nF%2Fr8Rj7MjzDCYewkx9whspibCtyLZjmzvXotOwW3kxHtA%2Bq5EEiMGk9VBVfyZdAQ05Epmz%2BfCZn%2FLCLmPAUlAecmwM4R3O3hCUSjHBQc9LoI5iprLpLzHrm2vbW1bBhSE4sX8O%2FpzkU349BOIHt3DgJ3aIhevG3voq2iBECwCi9dHNfZubsQ%3D%3D" alt="Property view" />
+        <div class="image-label">Property View 11</div>
+      </div>
+      <div class="image-container">
+        <img src="https://storage.googleapis.com/masal-db-6cc78.appspot.com/photos/Signature%20Tulips%20Uptown/Signature%20Tulips%20Uptown_image_2.webp?GoogleAccessId&#x3D;campeign-data-stream-masal%40masal-db-6cc78.iam.gserviceaccount.com&amp;Expires&#x3D;1747031245&amp;Signature&#x3D;zVpoRLfhZ7zeak%2Fi6RFy8a5klwg%2FSgkX9ze%2Fpx0hUwsJb2sy5%2FZSpwkHwJAm4N3pKllRbxZYCigOFIoDpexLRLCx5XY1yxL8zLG6j8iVo%2BvO1RjAqniwfoN1qpGRG7cCA%2FHZ448ja6Gbh0WopPhHToIblSWGWVZcP6jVfWUanfxWhbf0Lhu%2F%2B9dwS1jb7hxjtSOchRQwlJ5ObuxVYqYHUAxKOCsrTJA1UCjSqS6KWDZYSkX7s8ETJORhQpGiyYdzyRcVRih33NTdq65wRbpbYS1rM%2BbEr95ilD6OovJt5YKIo90iSS%2BvR%2BPalYJmssbSUgoh4azmDaK%2FUCdx6Fc3Mw%3D%3D" alt="Property view" />
+        <div class="image-label">Property View 12</div>
+      </div>
+      <div class="image-container">
+        <img src="https://storage.googleapis.com/masal-db-6cc78.appspot.com/photos/Signature%20Tulips%20Uptown/Signature%20Tulips%20Uptown_image_3.webp?GoogleAccessId&#x3D;campeign-data-stream-masal%40masal-db-6cc78.iam.gserviceaccount.com&amp;Expires&#x3D;1747031245&amp;Signature&#x3D;Ua3QtY3dv8Q1RxUF0JXJ%2FMaQ3JacGwVvkgMvkDJoTaYk57VXMBo5aVuRYe4Hs3b7Tgef0Y%2FBk67XoQt1LGU27Oi4IKomhBahCueVDPxgLQxZSRFTiQV3%2BrgtUMpzOCJWt688GOW4QXw6wj%2F9tvniGNoE9o4JetzmWqTt5Re91bijecHs5JUyOxI1XB7GtLCB7XHdaZDSWP7M7id3j3T%2BmuLczsmL7yA7IAAiHU0x%2BCc17PWiDcggkmQ7DxcdsdsvWU%2FS%2Fq1v8oLi8875H7w2CXRUgJJk9g4P2fpSTL9pZABZrKBseHpky8VcXEbvldvJ90OzxxvpRjAFnbbray0qaQ%3D%3D" alt="Property view" />
+        <div class="image-label">Property View 13</div>
+      </div>
+      <div class="image-container">
+        <img src="https://storage.googleapis.com/masal-db-6cc78.appspot.com/photos/Signature%20Tulips%20Uptown/Signature%20Tulips%20Uptown_image_4.webp?GoogleAccessId&#x3D;campeign-data-stream-masal%40masal-db-6cc78.iam.gserviceaccount.com&amp;Expires&#x3D;1747031245&amp;Signature&#x3D;IIgRnQ6n4o8PYllGJ0%2FGqKuU1Sq9S7%2BAX00B55GzNrloDW9sK8k%2F4ITkREG1MCObP3wsR9fcIBZnCdO2HbXJrlI6QBkwGCfFr8%2BSVz3V%2BGjAa8E6RFn4KLb%2By9Zs33YoVPV7lE1FFKunAf8MbBIFRbDc%2BrDRrEzB2ZxeR17fL6MlFkMPXSg1iA5SZGfvjwEusfBzQOIHuHvj%2BWWo9SOVnckVgbGo11opXIaGy2gKLvdcA5hXJxigqXqCPhp2ERPqBpPK4lx7cXx5VA84FJrzDgAmlXz5ezfRt9t3wpjN7hMpyOoxp9cYb8JSvTfrRSV%2BR%2FxEs%2BRnSJv03seBRW61PA%3D%3D" alt="Property view" />
+        <div class="image-label">Property View 14</div>
+      </div>
+      <div class="image-container">
+        <img src="https://storage.googleapis.com/masal-db-6cc78.appspot.com/photos/Signature%20Tulips%20Uptown/Signature%20Tulips%20Uptown_image_5.webp?GoogleAccessId&#x3D;campeign-data-stream-masal%40masal-db-6cc78.iam.gserviceaccount.com&amp;Expires&#x3D;1747031245&amp;Signature&#x3D;wuWpMrAlIp%2FtvhVYhv6jDgSwUDSq85fynXUYXVRVQwnUwpEhzAOgs7EDyj2yTgtQYGjyyyDCn1oDgCPvi8aiENgBEZ34YBQ3QsToc4cAKe4cWMsVmvA%2FcPVDxEM7kQ%2BU2CfT%2BcG8LxcLaIV%2FkoWqSvaBOX56m2ZPd1IFy0j4OO57kZysCDOsTwbhzeqBTLuN3VYEgmJn%2BMa6mMZrZ0qe8T6VSWrVc9HSpHQ8aEj%2F%2BU54o44Yzb70jwcFEEiO6fcZFnOr6YfTBUiWMgFYe5vu948q6n97TCw3QDyRFjK2JCVhgE22Tqxzd17BsVTU0TZaJnmHNpLzuZ06VBPYNwPPmg%3D%3D" alt="Property view" />
+        <div class="image-label">Property View 15</div>
+      </div>
+      <div class="image-container">
+        <img src="https://storage.googleapis.com/masal-db-6cc78.appspot.com/photos/Signature%20Tulips%20Uptown/Signature%20Tulips%20Uptown_image_6.webp?GoogleAccessId&#x3D;campeign-data-stream-masal%40masal-db-6cc78.iam.gserviceaccount.com&amp;Expires&#x3D;1747031245&amp;Signature&#x3D;WFPdZx9SMpPuPY8c%2BxVtTPd3FnWQ60IDl4McxtauNBQIOzD8hz0BTOmQlkWCd4%2BikUZ%2Byn02jFmG8HaynzkmFoMIqzbl%2Fw6o5xM0AqziPfbQj6n2wsYNCadlwSJPG5cMIxhAJl8n5dDEWW2CICqryFas8t5DGqxzxYa3yo3QU42HPinnvPmZ9SytX3iLbShkhG6QWE3IIR7bNYrl2MKvSIsHLZryPs7oGhw6NWIpDNP%2BsR2Dms5ejoA6Z72yd6Rmc%2BQvVkj9Wt%2BDtWsN%2FdN8FT7MixT7uzA8V03oEzO5rZ7Xfy9Y1t2nI%2BD9g7mpFQFBNAmGLoECpNI5Vg2b564aug%3D%3D" alt="Property view" />
+        <div class="image-label">Property View 16</div>
+      </div>
+      <div class="image-container">
+        <img src="https://storage.googleapis.com/masal-db-6cc78.appspot.com/photos/Signature%20Tulips%20Uptown/Signature%20Tulips%20Uptown_image_7.webp?GoogleAccessId&#x3D;campeign-data-stream-masal%40masal-db-6cc78.iam.gserviceaccount.com&amp;Expires&#x3D;1747031245&amp;Signature&#x3D;LKReQzcdBpANbB7lWoZR362zAnkpOr7xdlmcQKSnQOZlR8WpXO7eXN66Ww9Ufn%2FIzE8j9S%2BPg0TaTVASytQLlV70b%2BtT%2Bs15fvlfuNyYz%2F0B%2Fomqk2H%2FMj1MEUzcNnApNy%2BnOUq9Ld9%2FT98ONeJoUpKMp9x0L8mMbUHBDYwq9%2BE03ksUubAy4FY0fMNLkhw%2B2Zz3W4czSvvuUl1gpd6AnvjlerDpuh6kvdjM%2FsAe%2B0kICGvEiyKBmJJFspAS%2FSV88D7oaW2vJ%2FJJ0zfNoOSFWzRCfYJB9Qyso5pomDyVRzAZxeJ3wjcky1E2nqyTMQea6VYwAqIgw3e0f4EJ59YoLg%3D%3D" alt="Property view" />
+        <div class="image-label">Property View 17</div>
+      </div>
+      <div class="image-container">
+        <img src="https://storage.googleapis.com/masal-db-6cc78.appspot.com/photos/Signature%20Tulips%20Uptown/Signature%20Tulips%20Uptown_image_8.webp?GoogleAccessId&#x3D;campeign-data-stream-masal%40masal-db-6cc78.iam.gserviceaccount.com&amp;Expires&#x3D;1747031245&amp;Signature&#x3D;mpUX9jMpqinlJ5G30g31B2SRdXP9P4h3EoQRFDyNRPvmlemJ01lGJhVRSE2Z1rL%2F7qJFzMKJGnKbSXfxRRKWYHv1obuq3OZRHqJ0dM2HyIeKiHlN9VaQT1sCCMaVO6ZjNVCdb0WGrRWi2WVO9l14VBokqdcTTPpFXgupM7RKtoJYqt6t9CCh6bqNo2Z5m674oZSXD4puKjiO19y4dcQnYIBj83YKBMZ9hhHwF%2BikppYkvkJC4jnOS5yrVDgEXgvzXd7f7kk5tUXdjJ71VLKbJTYtifkQddm4imE7iEh8ci1QkttiytimOrtQofx5%2Fjn%2Bjg5nL6OuTFQMfgbfw1jTKw%3D%3D" alt="Property view" />
+        <div class="image-label">Property View 18</div>
+      </div>
+      <div class="image-container">
+        <img src="https://storage.googleapis.com/masal-db-6cc78.appspot.com/photos/Signature%20Tulips%20Uptown/Signature%20Tulips%20Uptown_image_9.webp?GoogleAccessId&#x3D;campeign-data-stream-masal%40masal-db-6cc78.iam.gserviceaccount.com&amp;Expires&#x3D;1747031245&amp;Signature&#x3D;LaWa7yCM%2FzRyjrueX1hjJVm63aK9VpZqGTJQ8tyveOtk75A%2FMYkLhzW6xwEGh3pwENB260p5RZLcR2YpLUW5IJG8gMcowZurHrhPOm3FBvHhFgiucAVIrrk1%2Bvbg%2FS41S%2FIZxNVaxY41SKtfZIrxlmRriU8ICkTTXe2oe7XjbFkcnRuDuq48HDNXl71UHSYSOragv1fds3nm5GygqEgI5skEw%2Bqp8A30GIlrCpZcoq7gUI4aZ4Q%2FJaBei6lOrWQ6q6CjnWDkqQlblLJjQA30tutbfbEl2lVUEF2FVvYCBdefwCkn6P9sTvNYd0eYn6urhNOz3M8vjM%2FKADRehmfhIA%3D%3D" alt="Property view" />
+        <div class="image-label">Property View 19</div>
+      </div>
+    </div>
+    
+    
+    <div class="footer">
+      Images shown are representative and may be subject to change as the project progresses.
+      <div class="copyright">
+        © 2025 TruEstate. All rights reserved.
+      </div>
+    </div>
+  </body>
+</html> 
+      </div>
+    
+            </div>
+          
+          
+          <hr class="page-break"/>
+          
+          <div class="page content-page">
+            
+      <div class="page-content">
+        <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Disclaimer</title>
+    <style>
+      body {
+        font-family: 'Arial', sans-serif;
+        padding: 0;
+        margin: 0;
+        background-color: #f8f9fa;
+        color: #2c3e50;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
+      
+      .disclaimer-container {
+        width: 85%;
+        max-width: 1000px;
+        margin: 40px auto;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+      
+      .disclaimer-header {
+        background-color: #2c3e50;
+        color: white;
+        padding: 30px;
+        position: relative;
+      }
+      
+      .disclaimer-title {
+        font-size: 28px;
+        font-weight: bold;
+        margin: 0;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #3498db;
+        display: inline-block;
+      }
+      
+      .disclaimer-content {
+        padding: 30px;
+        line-height: 1.6;
+        font-size: 16px;
+        color: #34495e;
+      }
+      
+      .disclaimer-section {
+        margin-bottom: 20px;
+      }
+      
+      .disclaimer-footer {
+        background-color: #f1f2f6;
+        padding: 20px 30px;
+        font-size: 14px;
+        color: #7f8c8d;
+        border-top: 1px solid #e0e0e0;
+      }
+      
+      .note {
+        font-style: italic;
+        opacity: 0.8;
+      }
+      
+      .section-title {
+        font-weight: bold;
+        color: #2c3e50;
+        margin-bottom: 10px;
+        font-size: 18px;
+      }
+      
+      .highlight {
+        color: #e74c3c;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="disclaimer-container">
+      <div class="disclaimer-header">
+        <div class="disclaimer-title">Legal Disclaimer</div>
+      </div>
+      
+      <div class="disclaimer-content">
+        <div class="disclaimer-section">
+          <div class="section-title">Information Accuracy</div>
+          <p>
+            The information provided in this report is for informational purposes only and is based on data available at the time of generation. 
+            Please note that all project specifications, pricing, and timelines are subject to change as the project progresses. 
+            Any changes to regulatory requirements may affect the final details.
+          </p>
+        </div>
+        
+        <div class="disclaimer-section">
+          <div class="section-title">Not Financial Advice</div>
+          <p>
+            This document does not constitute legal, financial, or professional advice. 
+            <span class="highlight">Prospective investors are encouraged to consult with relevant professionals</span> before making any decisions based on the information shared. 
+            We recommend conducting your own due diligence and verifying all project details independently.
+          </p>
+        </div>
+        
+        <div class="disclaimer-section">
+          <div class="section-title">Limitation of Liability</div>
+          <p>
+            The developer and associated entities are not liable for any actions or decisions made based on the information contained in this document. 
+            By using this document, you acknowledge and agree to these terms.
+          </p>
+        </div>
+        
+        <div class="disclaimer-section note">
+          <p>
+            RERA approval status and all project details should be independently verified before making any investment decisions.
+            TruEstate provides this information as a service, and makes no warranties about the completeness, reliability, and accuracy of this information.
+          </p>
+        </div>
+      </div>
+      
+      <div class="disclaimer-footer">
+        This is a confidential document intended only for the recipient. Unauthorized reproduction or distribution is prohibited.
+      </div>
+    </div>
+  </body>
+</html>
+
+      </div>
+    
+          </div>
+        </body>
+      </html>
+    
