@@ -53,7 +53,7 @@ async function getSignedUrl(path) {
     const file = bucket.file(path);
     const [url] = await file.getSignedUrl({
       action: "read",
-      expires: Date.now() + 15 * 60 * 1000, // 15 minutes
+      expires: Date.now() + 7 * 24 * 60 * 60 * 1000, // URL expires in 7 days
     });
     console.log("Generated signed URL:", url);
     return url;
@@ -232,45 +232,23 @@ function renderSpecsPage(projectData) {
 
 // Process and render the supplyAndDemand page
 function renderSupplyAndDemandPage(projectData) {
-  const template = loadTemplate('supplyAndDemand');
-  
+  const template = loadTemplate("supplyAndDemand");
+
   return template({
     PROJECT_NAME: projectData.projectName || "Unnamed Project",
     CITY: projectData.area || "Bengaluru",
     DEMAND: "16%",
-    SUPPLY: "16%"
+    SUPPLY: "16%",
   });
 }
 
 // Process and render the pricing page
 function renderPricingPage(projectData) {
-  const template = loadTemplate('pricing');
-  
-  return template({
-    PROJECT_NAME: projectData.projectName || "Unnamed Project",
-    CITY: projectData.area || "Bengaluru"
-  });
-}
+  const template = loadTemplate("pricing");
 
-// Process and render the supplyAndDemand page
-function renderSupplyAndDemandPage(projectData) {
-  const template = loadTemplate('supplyAndDemand');
-  
   return template({
     PROJECT_NAME: projectData.projectName || "Unnamed Project",
     CITY: projectData.area || "Bengaluru",
-    DEMAND: "16%",
-    SUPPLY: "16%"
-  });
-}
-
-// Process and render the pricing page
-function renderPricingPage(projectData) {
-  const template = loadTemplate('pricing');
-  
-  return template({
-    PROJECT_NAME: projectData.projectName || "Unnamed Project",
-    CITY: projectData.area || "Bengaluru"
   });
 }
 
@@ -916,7 +894,7 @@ app.get("/download-pdf", async (req, res) => {
           </body>
         </html>
       `;
-      
+
       const supplyAndDemandPageHtml = `
         <!DOCTYPE html>
         <html>
@@ -950,7 +928,7 @@ app.get("/download-pdf", async (req, res) => {
           </body>
         </html>
       `;
-      
+
       const pricingPageHtml = `
         <!DOCTYPE html>
         <html>
@@ -984,8 +962,10 @@ app.get("/download-pdf", async (req, res) => {
           </body>
         </html>
       `;
-      
-      const galleryPageHtml = processedImages.length > 0 ? `
+
+      const galleryPageHtml =
+        processedImages.length > 0
+          ? `
         <!DOCTYPE html>
         <html>
           <head>
@@ -1023,25 +1003,31 @@ app.get("/download-pdf", async (req, res) => {
             </div>
           </body>
         </html>
-      ` : null;
-      
-      
+      `
+          : null;
+
       // Write the HTML files to disk
       const pagesDir = path.join(__dirname, "pages");
       if (!fs.existsSync(pagesDir)) {
         fs.mkdirSync(pagesDir);
       }
-      
-      fs.writeFileSync(path.join(pagesDir, 'cover.html'), coverPageHtml);
-      fs.writeFileSync(path.join(pagesDir, 'disclaimer.html'), disclaimerPageHtml);
-      fs.writeFileSync(path.join(pagesDir, 'details.html'), detailsPageHtml);
-      fs.writeFileSync(path.join(pagesDir, 'specs.html'), specsPageHtml);
-      fs.writeFileSync(path.join(pagesDir, 'supplyAndDemand.html'), supplyAndDemandPageHtml);
-      fs.writeFileSync(path.join(pagesDir, 'pricing.html'), pricingPageHtml);
+
+      fs.writeFileSync(path.join(pagesDir, "cover.html"), coverPageHtml);
+      fs.writeFileSync(
+        path.join(pagesDir, "disclaimer.html"),
+        disclaimerPageHtml
+      );
+      fs.writeFileSync(path.join(pagesDir, "details.html"), detailsPageHtml);
+      fs.writeFileSync(path.join(pagesDir, "specs.html"), specsPageHtml);
+      fs.writeFileSync(
+        path.join(pagesDir, "supplyAndDemand.html"),
+        supplyAndDemandPageHtml
+      );
+      fs.writeFileSync(path.join(pagesDir, "pricing.html"), pricingPageHtml);
       if (galleryPageHtml) {
         fs.writeFileSync(path.join(pagesDir, "gallery.html"), galleryPageHtml);
       }
-      
+
       // Generate PDFs for each page
       const browser = await puppeteer.launch({
         args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-gpu"],
@@ -1073,65 +1059,77 @@ app.get("/download-pdf", async (req, res) => {
         await coverPage.close();
 
         // Generate PDF for disclaimer page
-        const disclaimerPdfPath = path.join(pagesDir, 'disclaimer.pdf');
+        const disclaimerPdfPath = path.join(pagesDir, "disclaimer.pdf");
         const disclaimerPage = await browser.newPage();
-        await disclaimerPage.goto(`file://${path.join(pagesDir, 'disclaimer.html')}`, { waitUntil: 'networkidle0' });
+        await disclaimerPage.goto(
+          `file://${path.join(pagesDir, "disclaimer.html")}`,
+          { waitUntil: "networkidle0" }
+        );
         await disclaimerPage.pdf({
           path: disclaimerPdfPath,
-          format: 'A4',
+          format: "A4",
           landscape: true,
           printBackground: true,
           margin: {
             top: "0.4in",
             right: "0.4in",
             bottom: "0.4in",
-            left: "0.4in"
+            left: "0.4in",
           },
-          preferCSSPageSize: true
+          preferCSSPageSize: true,
         });
         pdfFilenames.push(disclaimerPdfPath);
         await disclaimerPage.close();
 
         // Generate PDF for supply and demand page
-        const supplyAndDemandPdfPath = path.join(pagesDir, 'supplyAndDemand.pdf');
+        const supplyAndDemandPdfPath = path.join(
+          pagesDir,
+          "supplyAndDemand.pdf"
+        );
         const supplyAndDemandPage = await browser.newPage();
-        await supplyAndDemandPage.goto(`file://${path.join(pagesDir, 'supplyAndDemand.html')}`, { waitUntil: 'networkidle0' });
+        await supplyAndDemandPage.goto(
+          `file://${path.join(pagesDir, "supplyAndDemand.html")}`,
+          { waitUntil: "networkidle0" }
+        );
         await supplyAndDemandPage.pdf({
           path: supplyAndDemandPdfPath,
-          format: 'A4',
+          format: "A4",
           landscape: true,
           printBackground: true,
           margin: {
             top: "0.4in",
             right: "0.4in",
             bottom: "0.4in",
-            left: "0.4in"
+            left: "0.4in",
           },
-          preferCSSPageSize: true
+          preferCSSPageSize: true,
         });
         pdfFilenames.push(supplyAndDemandPdfPath);
         await supplyAndDemandPage.close();
 
         // Generate PDF for pricing page
-        const pricingPdfPath = path.join(pagesDir, 'pricing.pdf');
+        const pricingPdfPath = path.join(pagesDir, "pricing.pdf");
         const pricingPage = await browser.newPage();
-        await pricingPage.goto(`file://${path.join(pagesDir, 'pricing.html')}`, { waitUntil: 'networkidle0' });
+        await pricingPage.goto(
+          `file://${path.join(pagesDir, "pricing.html")}`,
+          { waitUntil: "networkidle0" }
+        );
         await pricingPage.pdf({
           path: pricingPdfPath,
-          format: 'A4',
+          format: "A4",
           landscape: true,
           printBackground: true,
           margin: {
             top: "0.4in",
             right: "0.4in",
             bottom: "0.4in",
-            left: "0.4in"
+            left: "0.4in",
           },
-          preferCSSPageSize: true
+          preferCSSPageSize: true,
         });
         pdfFilenames.push(pricingPdfPath);
         await pricingPage.close();
-        
+
         // Generate PDF for details page
         const detailsPdfPath = path.join(pagesDir, "details.pdf");
         const detailsPage = await browser.newPage();
@@ -1176,8 +1174,7 @@ app.get("/download-pdf", async (req, res) => {
         });
         pdfFilenames.push(specsPdfPath);
         await specsPage.close();
-        
-        
+
         // Generate PDF for gallery page (if exists)
         if (galleryPageHtml) {
           const galleryPdfPath = path.join(pagesDir, "gallery.pdf");
@@ -1202,9 +1199,7 @@ app.get("/download-pdf", async (req, res) => {
           pdfFilenames.push(galleryPdfPath);
           await galleryPage.close();
         }
-        
-        
-        
+
         // Merge all PDFs
         const { PDFDocument } = require("pdf-lib");
 
@@ -1231,23 +1226,6 @@ app.get("/download-pdf", async (req, res) => {
         const mergedPdfBytes = await mergePDFs(pdfFilenames);
         fs.writeFileSync(filePath, mergedPdfBytes);
 
-        // Save the generated PDF to Firebase Storage
-        try {
-          await savePDFToFirebase(mergedPdfBytes, filename, projectId);
-        } catch (saveErr) {
-          console.error("Error saving generated PDF to Firebase:", saveErr);
-          // Continue even if saving fails
-        }
-
-        // Clean up the individual PDF files
-        pdfFilenames.forEach((pdfPath) => {
-          try {
-            fs.unlinkSync(pdfPath);
-          } catch (err) {
-            console.error(`Failed to delete temporary PDF: ${pdfPath}`, err);
-          }
-        });
-
         // Send the PDF as a download
         res.download(filePath, filename, (err) => {
           if (err) {
@@ -1255,11 +1233,11 @@ app.get("/download-pdf", async (req, res) => {
           }
           // Clean up the HTML files
           try {
-            fs.unlinkSync(path.join(pagesDir, 'cover.html'));
-            fs.unlinkSync(path.join(pagesDir, 'details.html'));
-            fs.unlinkSync(path.join(pagesDir, 'specs.html'));
-            fs.unlinkSync(path.join(pagesDir, 'supplyAndDemand.html'));
-            fs.unlinkSync(path.join(pagesDir, 'pricing.html'));
+            fs.unlinkSync(path.join(pagesDir, "cover.html"));
+            fs.unlinkSync(path.join(pagesDir, "details.html"));
+            fs.unlinkSync(path.join(pagesDir, "specs.html"));
+            fs.unlinkSync(path.join(pagesDir, "supplyAndDemand.html"));
+            fs.unlinkSync(path.join(pagesDir, "pricing.html"));
             if (galleryPageHtml) {
               fs.unlinkSync(path.join(pagesDir, "gallery.html"));
             }
@@ -1268,6 +1246,18 @@ app.get("/download-pdf", async (req, res) => {
             console.error("Error cleaning up HTML files:", err);
           }
         });
+
+        // Save to Firebase after sending the file
+        try {
+          const result = await savePDFToFirebase(
+            mergedPdfBytes,
+            filename,
+            projectId
+          );
+          console.log("PDF saved to Firebase:", result);
+        } catch (saveErr) {
+          console.error("Error saving to Firebase:", saveErr);
+        }
       } finally {
         await browser.close();
       }
@@ -1300,6 +1290,18 @@ app.get("/debug-cover", (req, res) => {
 // Helper function to save PDF to Firebase Storage
 async function savePDFToFirebase(pdfBuffer, filename, projectId) {
   try {
+    if (!projectId) {
+      return res.status(400).send("Project ID is required");
+    }
+
+    console.log("Fetching project data for ID:", projectId);
+
+    // Fetch project data from Firestore
+    const projectDoc = await db.collection("assetData").doc(projectId).get();
+
+    if (!projectDoc.exists) {
+      return res.status(404).send("Project not found");
+    }
     // Create a unique path for the PDF in Firebase Storage
     const pdfPath = `project-pdfs/${projectId}/${filename}`;
     const file = bucket.file(pdfPath);
@@ -1322,16 +1324,14 @@ async function savePDFToFirebase(pdfBuffer, filename, projectId) {
     });
 
     // Save the PDF metadata to Firestore
-    await db.collection("project-pdfs").doc(projectId).set(
-      {
+    const docRef = db.collection("assetData").doc(projectId);
+    await docRef.update({
+      pdfs: admin.firestore.FieldValue.arrayUnion({
         filename: filename,
         storagePath: pdfPath,
-        url: signedUrl,
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      },
-      { merge: true }
-    );
+        pdfURL: signedUrl,
+      }),
+    });
 
     return {
       url: signedUrl,
