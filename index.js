@@ -132,7 +132,7 @@ function loadTemplate(templateName) {
 
 // Process and render the cover page
 function renderCoverPage(projectData) {
-  const template = loadTemplate('cover');
+  const template = loadTemplate("cover");
   const currentDate = new Date();
   const formattedDate = currentDate.toLocaleDateString("en-US", {
     month: "2-digit",
@@ -142,7 +142,7 @@ function renderCoverPage(projectData) {
 
   return template({
     PROJECT_NAME: projectData.projectName || "Unnamed Project",
-    UPDATED_DATE: projectData.lastUpdated || formattedDate 
+    UPDATED_DATE: projectData.lastUpdated || formattedDate,
   });
 }
 
@@ -680,7 +680,7 @@ app.get("/download-pdf", async (req, res) => {
   try {
     console.log("Received PDF request");
     const projectId = req.query.projectId;
-    const debugMode = req.query.debug === 'true';
+    const debugMode = req.query.debug === "true";
     const viewOnly = req.query.view === "true"; // New parameter to control behavior
 
     if (!projectId) {
@@ -738,8 +738,8 @@ app.get("/download-pdf", async (req, res) => {
 
     // Try a completely different approach - generate individual PDFs for each page and then merge them
     try {
-      console.log('Attempting to generate PDF using multi-page approach...');
-      
+      console.log("Attempting to generate PDF using multi-page approach...");
+
       // Generate individual HTML files for each page
       const coverPageHtml = `
         <!DOCTYPE html>
@@ -770,7 +770,7 @@ app.get("/download-pdf", async (req, res) => {
           <body>${coverHtml}</body>
         </html>
       `;
-      
+
       const detailsPageHtml = `
         <!DOCTYPE html>
         <html>
@@ -804,7 +804,7 @@ app.get("/download-pdf", async (req, res) => {
           </body>
         </html>
       `;
-      
+
       const specsPageHtml = `
         <!DOCTYPE html>
         <html>
@@ -838,8 +838,10 @@ app.get("/download-pdf", async (req, res) => {
           </body>
         </html>
       `;
-      
-      const galleryPageHtml = processedImages.length > 0 ? `
+
+      const galleryPageHtml =
+        processedImages.length > 0
+          ? `
         <!DOCTYPE html>
         <html>
           <head>
@@ -877,8 +879,9 @@ app.get("/download-pdf", async (req, res) => {
             </div>
           </body>
         </html>
-      ` : null;
-      
+      `
+          : null;
+
       const disclaimerPageHtml = `
         <!DOCTYPE html>
         <html>
@@ -912,184 +915,204 @@ app.get("/download-pdf", async (req, res) => {
           </body>
         </html>
       `;
-      
+
       // Write the HTML files to disk
-      const pagesDir = path.join(__dirname, 'pages');
+      const pagesDir = path.join(__dirname, "pages");
       if (!fs.existsSync(pagesDir)) {
         fs.mkdirSync(pagesDir);
       }
-      
-      fs.writeFileSync(path.join(pagesDir, 'cover.html'), coverPageHtml);
-      fs.writeFileSync(path.join(pagesDir, 'details.html'), detailsPageHtml);
-      fs.writeFileSync(path.join(pagesDir, 'specs.html'), specsPageHtml);
+
+      fs.writeFileSync(path.join(pagesDir, "cover.html"), coverPageHtml);
+      fs.writeFileSync(path.join(pagesDir, "details.html"), detailsPageHtml);
+      fs.writeFileSync(path.join(pagesDir, "specs.html"), specsPageHtml);
       if (galleryPageHtml) {
-        fs.writeFileSync(path.join(pagesDir, 'gallery.html'), galleryPageHtml);
+        fs.writeFileSync(path.join(pagesDir, "gallery.html"), galleryPageHtml);
       }
-      fs.writeFileSync(path.join(pagesDir, 'disclaimer.html'), disclaimerPageHtml);
-      
+      fs.writeFileSync(
+        path.join(pagesDir, "disclaimer.html"),
+        disclaimerPageHtml
+      );
+
       // Generate PDFs for each page
       const browser = await puppeteer.launch({
-        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu']
+        args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-gpu"],
       });
-      
+
       try {
         const pdfFilenames = [];
-        
+
         // Generate PDF for cover page
-        const coverPdfPath = path.join(pagesDir, 'cover.pdf');
+        const coverPdfPath = path.join(pagesDir, "cover.pdf");
         const coverPage = await browser.newPage();
-        await coverPage.goto(`file://${path.join(pagesDir, 'cover.html')}`, { waitUntil: 'networkidle0' });
+        await coverPage.goto(`file://${path.join(pagesDir, "cover.html")}`, {
+          waitUntil: "networkidle0",
+        });
         await coverPage.pdf({
           path: coverPdfPath,
-          format: 'A4',
+          format: "A4",
           landscape: true,
           printBackground: true,
           margin: {
             top: "0.2in",
             right: "0.2in",
             bottom: "0.2in",
-            left: "0.2in"
+            left: "0.2in",
           },
-          preferCSSPageSize: true
+          preferCSSPageSize: true,
         });
         pdfFilenames.push(coverPdfPath);
         await coverPage.close();
-        
+
         // Generate PDF for details page
-        const detailsPdfPath = path.join(pagesDir, 'details.pdf');
+        const detailsPdfPath = path.join(pagesDir, "details.pdf");
         const detailsPage = await browser.newPage();
-        await detailsPage.goto(`file://${path.join(pagesDir, 'details.html')}`, { waitUntil: 'networkidle0' });
+        await detailsPage.goto(
+          `file://${path.join(pagesDir, "details.html")}`,
+          { waitUntil: "networkidle0" }
+        );
         await detailsPage.pdf({
           path: detailsPdfPath,
-          format: 'A4',
+          format: "A4",
           landscape: true,
           printBackground: true,
           margin: {
             top: "0.4in",
             right: "0.4in",
             bottom: "0.4in",
-            left: "0.4in"
+            left: "0.4in",
           },
-          preferCSSPageSize: true
+          preferCSSPageSize: true,
         });
         pdfFilenames.push(detailsPdfPath);
         await detailsPage.close();
-        
+
         // Generate PDF for specs page
-        const specsPdfPath = path.join(pagesDir, 'specs.pdf');
+        const specsPdfPath = path.join(pagesDir, "specs.pdf");
         const specsPage = await browser.newPage();
-        await specsPage.goto(`file://${path.join(pagesDir, 'specs.html')}`, { waitUntil: 'networkidle0' });
+        await specsPage.goto(`file://${path.join(pagesDir, "specs.html")}`, {
+          waitUntil: "networkidle0",
+        });
         await specsPage.pdf({
           path: specsPdfPath,
-          format: 'A4',
+          format: "A4",
           landscape: true,
           printBackground: true,
           margin: {
             top: "0.4in",
             right: "0.4in",
             bottom: "0.4in",
-            left: "0.4in"
+            left: "0.4in",
           },
-          preferCSSPageSize: true
+          preferCSSPageSize: true,
         });
         pdfFilenames.push(specsPdfPath);
         await specsPage.close();
-        
+
         // Generate PDF for gallery page (if exists)
         if (galleryPageHtml) {
-          const galleryPdfPath = path.join(pagesDir, 'gallery.pdf');
+          const galleryPdfPath = path.join(pagesDir, "gallery.pdf");
           const galleryPage = await browser.newPage();
-          await galleryPage.goto(`file://${path.join(pagesDir, 'gallery.html')}`, { waitUntil: 'networkidle0' });
+          await galleryPage.goto(
+            `file://${path.join(pagesDir, "gallery.html")}`,
+            { waitUntil: "networkidle0" }
+          );
           await galleryPage.pdf({
             path: galleryPdfPath,
-            format: 'A4',
+            format: "A4",
             landscape: true,
             printBackground: true,
             margin: {
               top: "0.4in",
               right: "0.4in",
               bottom: "0.4in",
-              left: "0.4in"
+              left: "0.4in",
             },
-            preferCSSPageSize: true
+            preferCSSPageSize: true,
           });
           pdfFilenames.push(galleryPdfPath);
           await galleryPage.close();
         }
-        
+
         // Generate PDF for disclaimer page
-        const disclaimerPdfPath = path.join(pagesDir, 'disclaimer.pdf');
+        const disclaimerPdfPath = path.join(pagesDir, "disclaimer.pdf");
         const disclaimerPage = await browser.newPage();
-        await disclaimerPage.goto(`file://${path.join(pagesDir, 'disclaimer.html')}`, { waitUntil: 'networkidle0' });
+        await disclaimerPage.goto(
+          `file://${path.join(pagesDir, "disclaimer.html")}`,
+          { waitUntil: "networkidle0" }
+        );
         await disclaimerPage.pdf({
           path: disclaimerPdfPath,
-          format: 'A4',
+          format: "A4",
           landscape: true,
           printBackground: true,
           margin: {
             top: "0.4in",
             right: "0.4in",
             bottom: "0.4in",
-            left: "0.4in"
+            left: "0.4in",
           },
-          preferCSSPageSize: true
+          preferCSSPageSize: true,
         });
         pdfFilenames.push(disclaimerPdfPath);
         await disclaimerPage.close();
-        
+
         // Merge all PDFs
-        const { PDFDocument } = require('pdf-lib');
-        
+        const { PDFDocument } = require("pdf-lib");
+
         async function mergePDFs(pdfPaths) {
           const mergedPdf = await PDFDocument.create();
-          
+
           for (const pdfPath of pdfPaths) {
             const pdfBytes = fs.readFileSync(pdfPath);
             const pdf = await PDFDocument.load(pdfBytes);
-            const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
-            copiedPages.forEach(page => mergedPdf.addPage(page));
+            const copiedPages = await mergedPdf.copyPages(
+              pdf,
+              pdf.getPageIndices()
+            );
+            copiedPages.forEach((page) => mergedPdf.addPage(page));
           }
-          
+
           const mergedPdfBytes = await mergedPdf.save();
           return mergedPdfBytes;
         }
-        
-        const filename = `${projectName.replace(/\s+/g, '_')}_Report.pdf`;
+
+        const filename = `${projectName.replace(/\s+/g, "_")}_Report.pdf`;
         const filePath = path.join(__dirname, filename);
-        
+
         const mergedPdfBytes = await mergePDFs(pdfFilenames);
         fs.writeFileSync(filePath, mergedPdfBytes);
-        
+
+        // Save the generated PDF to Firebase Storage
+        try {
+          await savePDFToFirebase(mergedPdfBytes, filename, projectId);
+        } catch (saveErr) {
+          console.error("Error saving generated PDF to Firebase:", saveErr);
+          // Continue even if saving fails
+        }
+
         // Clean up the individual PDF files
-        pdfFilenames.forEach(pdfPath => {
+        pdfFilenames.forEach((pdfPath) => {
           try {
             fs.unlinkSync(pdfPath);
           } catch (err) {
             console.error(`Failed to delete temporary PDF: ${pdfPath}`, err);
           }
         });
-        
+
         // Send the PDF as a download
         res.download(filePath, filename, (err) => {
           if (err) {
             console.error("Error sending file:", err);
           }
-          // Delete the file after download attempt
-          fs.unlink(filePath, (unlinkErr) => {
-            if (unlinkErr) {
-              console.error("Error deleting file:", unlinkErr);
-            }
-          });
-          
           // Clean up the HTML files
           try {
-            fs.unlinkSync(path.join(pagesDir, 'cover.html'));
-            fs.unlinkSync(path.join(pagesDir, 'details.html'));
-            fs.unlinkSync(path.join(pagesDir, 'specs.html'));
+            fs.unlinkSync(path.join(pagesDir, "cover.html"));
+            fs.unlinkSync(path.join(pagesDir, "details.html"));
+            fs.unlinkSync(path.join(pagesDir, "specs.html"));
             if (galleryPageHtml) {
-              fs.unlinkSync(path.join(pagesDir, 'gallery.html'));
+              fs.unlinkSync(path.join(pagesDir, "gallery.html"));
             }
-            fs.unlinkSync(path.join(pagesDir, 'disclaimer.html'));
+            fs.unlinkSync(path.join(pagesDir, "disclaimer.html"));
           } catch (err) {
             console.error("Error cleaning up HTML files:", err);
           }
@@ -1098,8 +1121,8 @@ app.get("/download-pdf", async (req, res) => {
         await browser.close();
       }
     } catch (pdfError) {
-      console.error('Error generating PDF:', pdfError);
-      res.status(500).send('Failed to generate PDF');
+      console.error("Error generating PDF:", pdfError);
+      res.status(500).send("Failed to generate PDF");
     }
   } catch (err) {
     console.error("Error generating PDF:", err);
@@ -1108,18 +1131,155 @@ app.get("/download-pdf", async (req, res) => {
 });
 
 // Simple route to view just the cover template
-app.get('/debug-cover', (req, res) => {
+app.get("/debug-cover", (req, res) => {
   try {
     const sampleData = {
       projectName: "Sample Test Project",
-      status: "Under Construction"
+      status: "Under Construction",
     };
-    
+
     const html = renderCoverPage(sampleData);
     res.send(html);
   } catch (err) {
-    console.error('Error rendering debug cover:', err);
-    res.status(500).send('Error rendering debug cover');
+    console.error("Error rendering debug cover:", err);
+    res.status(500).send("Error rendering debug cover");
+  }
+});
+
+// Helper function to save PDF to Firebase Storage
+async function savePDFToFirebase(pdfBuffer, filename, projectId) {
+  try {
+    // Create a unique path for the PDF in Firebase Storage
+    const pdfPath = `project-pdfs/${projectId}/${filename}`;
+    const file = bucket.file(pdfPath);
+
+    // Upload the PDF buffer to Firebase Storage
+    await file.save(pdfBuffer, {
+      metadata: {
+        contentType: "application/pdf",
+        metadata: {
+          projectId: projectId,
+          generatedAt: new Date().toISOString(),
+        },
+      },
+    });
+
+    // Get a signed URL for the uploaded PDF
+    const [signedUrl] = await file.getSignedUrl({
+      action: "read",
+      expires: Date.now() + 7 * 24 * 60 * 60 * 1000, // URL expires in 7 days
+    });
+
+    // Save the PDF metadata to Firestore
+    await db.collection("project-pdfs").doc(projectId).set(
+      {
+        filename: filename,
+        storagePath: pdfPath,
+        url: signedUrl,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      },
+      { merge: true }
+    );
+
+    return {
+      url: signedUrl,
+      path: pdfPath,
+    };
+  } catch (error) {
+    console.error("Error saving PDF to Firebase:", error);
+    throw error;
+  }
+}
+
+// Test route to generate and save PDF to Firebase
+app.get("/test-save-pdf", async (req, res) => {
+  try {
+    const projectId = req.query.projectId;
+
+    if (!projectId) {
+      return res.status(400).send("Project ID is required");
+    }
+
+    // Fetch project data from Firestore
+    const projectDoc = await db.collection("assetData").doc(projectId).get();
+
+    if (!projectDoc.exists) {
+      return res.status(404).send("Project not found");
+    }
+
+    const projectData = projectDoc.data();
+    const projectName = projectData.projectName || "Unnamed Project";
+
+    // Generate PDF (using your existing PDF generation logic)
+    const browser = await puppeteer.launch({
+      args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-gpu"],
+    });
+
+    try {
+      const page = await browser.newPage();
+
+      // Set viewport for better rendering
+      await page.setViewport({
+        width: 1200,
+        height: 1600,
+        deviceScaleFactor: 1,
+      });
+
+      // Create a simple test PDF content
+      const testContent = `
+        <html>
+          <head>
+            <style>
+              body { font-family: Arial, sans-serif; padding: 20px; }
+              h1 { color: #333; }
+            </style>
+          </head>
+          <body>
+            <h1>${projectName}</h1>
+            <p>Test PDF generated at: ${new Date().toLocaleString()}</p>
+            <p>Project ID: ${projectId}</p>
+            <p>Status: ${projectData.status || "N/A"}</p>
+            <p>Location: ${projectData.location || "N/A"}</p>
+          </body>
+        </html>
+      `;
+
+      await page.setContent(testContent);
+
+      // Generate PDF buffer
+      const pdfBuffer = await page.pdf({
+        format: "A4",
+        printBackground: true,
+        margin: {
+          top: "0.4in",
+          right: "0.4in",
+          bottom: "0.4in",
+          left: "0.4in",
+        },
+      });
+
+      // Generate filename
+      const timestamp = new Date().getTime();
+      const filename = `${projectName.replace(/\s+/g, "_")}_${timestamp}.pdf`;
+
+      // Save PDF to Firebase
+      const result = await savePDFToFirebase(pdfBuffer, filename, projectId);
+
+      res.json({
+        message: "PDF generated and saved successfully",
+        url: result.url,
+        path: result.path,
+      });
+    } finally {
+      await browser.close();
+    }
+  } catch (error) {
+    console.error("Error in test-save-pdf route:", error);
+    res.status(500).json({
+      error: "Failed to generate and save PDF",
+      details: error.message,
+    });
   }
 });
 
