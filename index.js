@@ -8,9 +8,19 @@ const fs = require("fs");
 const puppeteer = require("puppeteer");
 const path = require("path");
 const Handlebars = require("handlebars");
+const cors = require("cors");
 
 const app = express();
 const port = 3000;
+
+// Configure CORS
+app.use(
+  cors({
+    origin: "*", // Allow all origins
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 // Middleware to parse JSON bodies
 app.use(express.json());
@@ -43,7 +53,7 @@ async function getSignedUrl(path) {
     const file = bucket.file(path);
     const [url] = await file.getSignedUrl({
       action: "read",
-      expires: Date.now() + 15 * 60 * 1000, // 15 minutes
+      expires: Date.now() + 7 * 24 * 60 * 60 * 1000, // URL expires in 7 days
     });
     console.log("Generated signed URL:", url);
     return url;
@@ -55,84 +65,102 @@ async function getSignedUrl(path) {
 
 // Helper function to extract all images from nested objects
 function extractImagesFromNestedObjects(obj, imageList = []) {
-  if (!obj || typeof obj !== 'object') return imageList;
-  
+  if (!obj || typeof obj !== "object") return imageList;
+
   // Check if the current object is an array
   if (Array.isArray(obj)) {
     // If it's an images array, add all items to the image list
-    if (obj.length > 0 && typeof obj[0] === 'string' && (
-        obj[0].includes('firebasestorage.googleapis.com') || 
-        obj[0].includes('http') && (
-          obj[0].endsWith('.jpg') || 
-          obj[0].endsWith('.jpeg') || 
-          obj[0].endsWith('.png') || 
-          obj[0].endsWith('.webp')
-        )
-      )) {
+    if (
+      obj.length > 0 &&
+      typeof obj[0] === "string" &&
+      (obj[0].includes("firebasestorage.googleapis.com") ||
+        (obj[0].includes("http") &&
+          (obj[0].endsWith(".jpg") ||
+            obj[0].endsWith(".jpeg") ||
+            obj[0].endsWith(".png") ||
+            obj[0].endsWith(".webp"))))
+    ) {
       imageList.push(...obj);
     } else {
       // If it's some other array, process each item recursively
-      obj.forEach(item => extractImagesFromNestedObjects(item, imageList));
+      obj.forEach((item) => extractImagesFromNestedObjects(item, imageList));
     }
   } else {
     // Process each key in the object
     for (const key in obj) {
       const value = obj[key];
-      
+
       // If the key is 'images' and the value is an array of strings, add them to the image list
-      if (key === 'images' && Array.isArray(value) && value.length > 0 && typeof value[0] === 'string') {
+      if (
+        key === "images" &&
+        Array.isArray(value) &&
+        value.length > 0 &&
+        typeof value[0] === "string"
+      ) {
         imageList.push(...value);
-      } 
+      }
       // If the key contains 'image' or 'photo' and the value is a string URL, add it to the image list
-      else if ((key.includes('image') || key.includes('photo') || key.includes('img')) && 
-               typeof value === 'string' && 
-               (value.includes('http') || value.includes('firebasestorage'))) {
+      else if (
+        (key.includes("image") ||
+          key.includes("photo") ||
+          key.includes("img")) &&
+        typeof value === "string" &&
+        (value.includes("http") || value.includes("firebasestorage"))
+      ) {
         imageList.push(value);
       }
       // If the value is an object or array, process it recursively
-      else if (value && typeof value === 'object') {
+      else if (value && typeof value === "object") {
         extractImagesFromNestedObjects(value, imageList);
       }
     }
   }
-  
+
   return imageList;
 }
 
 // Load and compile templates
 function loadTemplate(templateName) {
-  const templatePath = path.join(__dirname, 'templates', `${templateName}.html`);
-  const templateSource = fs.readFileSync(templatePath, 'utf8');
+  const templatePath = path.join(
+    __dirname,
+    "templates",
+    `${templateName}.html`
+  );
+  const templateSource = fs.readFileSync(templatePath, "utf8");
   return Handlebars.compile(templateSource);
 }
 
 // Process and render the cover page
 function renderCoverPage(projectData) {
-  const template = loadTemplate('cover');
+  const template = loadTemplate("cover");
   const currentDate = new Date();
-  const formattedDate = currentDate.toLocaleDateString('en-US', {
-    month: '2-digit',
-    day: '2-digit',
-    year: 'numeric'
+  const formattedDate = currentDate.toLocaleDateString("en-US", {
+    month: "2-digit",
+    day: "2-digit",
+    year: "numeric",
   });
-  
+
   return template({
     PROJECT_NAME: projectData.projectName || "Unnamed Project",
-    UPDATED_DATE: projectData.lastUpdated || formattedDate 
+    UPDATED_DATE: projectData.lastUpdated || formattedDate,
   });
 }
 
 // Process and render the details page
 function renderDetailsPage(projectData) {
-  const template = loadTemplate('details');
-  
+  const template = loadTemplate("details");
+
   return template({
     PROJECT_NAME: projectData.projectName || "Unnamed Project",
     IS_RERA_APPROVED: projectData.isReraApproved === "Approved",
     STATUS: projectData.status || "N/A",
-    ASSET_TYPE: projectData.assetType ? projectData.assetType.toUpperCase() : "N/A",
+    ASSET_TYPE: projectData.assetType
+      ? projectData.assetType.toUpperCase()
+      : "N/A",
     AREA: projectData.area || "N/A",
-    PROJECT_LAND_AREA: projectData.projectLandArea ? `${projectData.projectLandArea} sqft` : "N/A",
+    PROJECT_LAND_AREA: projectData.projectLandArea
+      ? `${projectData.projectLandArea} sqft`
+      : "N/A",
     LAUNCH_DATE: projectData.launchDate || "N/A",
     POSSESSION_DATE: projectData.possession || "N/A",
     TOTAL_UNITS: projectData.totalUnits || "N/A",
@@ -147,87 +175,126 @@ function renderDetailsPage(projectData) {
     HAS_COORDINATES: projectData.lat && projectData.long,
     LAT: projectData.lat,
     LONG: projectData.long,
-    TITLE_CLEARED: projectData.isTitleCleared !== null ? projectData.isTitleCleared : "N/A",
+    TITLE_CLEARED:
+      projectData.isTitleCleared !== null ? projectData.isTitleCleared : "N/A",
     KHATA_TYPE: projectData.khataType !== null ? projectData.khataType : "N/A",
-    LITIGATION: projectData.litigation !== null ? (projectData.litigation ? "Yes" : "No") : "N/A",
+    LITIGATION:
+      projectData.litigation !== null
+        ? projectData.litigation
+          ? "Yes"
+          : "No"
+        : "N/A",
     GENERATION_DATE: new Date().toLocaleDateString(),
-    LAST_UPDATED: projectData.lastUpdated 
-      ? new Date(projectData.lastUpdated * 1000).toLocaleDateString() 
-      : "Unknown"
+    LAST_UPDATED: projectData.lastUpdated
+      ? new Date(projectData.lastUpdated * 1000).toLocaleDateString()
+      : "Unknown",
   });
 }
 
 // Process and render the specs page
 function renderSpecsPage(projectData) {
-  const template = loadTemplate('specifications');
-  
+  const template = loadTemplate("specifications");
+
   // Default values for construction specifications if not available
   const specs = {
     STRUCTURE_SPEC: "RCC framed structure with seismic considerations",
     WALLS_SPEC: "Concrete blocks with weather-resistant exterior finish",
     INTERNAL_WALLS_SPEC: "Solid concrete block partitions with smooth finish",
-    FLOORING_SPEC: "Vitrified tiles in living areas, anti-skid ceramic in wet areas",
+    FLOORING_SPEC:
+      "Vitrified tiles in living areas, anti-skid ceramic in wet areas",
     WINDOWS_SPEC: "UPVC framed windows with appropriate glazing",
     DOORS_SPEC: "Engineered wooden doors with quality hardware",
-    PAINTING_SPEC: "Premium emulsion paint for internal walls, exterior grade paint outside"
+    PAINTING_SPEC:
+      "Premium emulsion paint for internal walls, exterior grade paint outside",
   };
-  
+
   return template({
     PROJECT_NAME: projectData.projectName || "Unnamed Project",
     STRUCTURE_SPEC: projectData.structureSpec || specs.STRUCTURE_SPEC,
     WALLS_SPEC: projectData.wallsSpec || specs.WALLS_SPEC,
-    INTERNAL_WALLS_SPEC: projectData.internalWallsSpec || specs.INTERNAL_WALLS_SPEC,
+    INTERNAL_WALLS_SPEC:
+      projectData.internalWallsSpec || specs.INTERNAL_WALLS_SPEC,
     FLOORING_SPEC: projectData.flooringSpec || specs.FLOORING_SPEC,
     WINDOWS_SPEC: projectData.windowsSpec || specs.WINDOWS_SPEC,
     DOORS_SPEC: projectData.doorsSpec || specs.DOORS_SPEC,
     PAINTING_SPEC: projectData.paintingSpec || specs.PAINTING_SPEC,
     TOTAL_UNITS: projectData.totalUnits || "N/A",
     TOWER_UNITS: projectData.towerUnits || "N/A",
-    PROJECT_LAND_AREA: projectData.projectLandArea ? `${projectData.projectLandArea} sqft` : "N/A",
+    PROJECT_LAND_AREA: projectData.projectLandArea
+      ? `${projectData.projectLandArea} sqft`
+      : "N/A",
     UNIT_SIZES: projectData.unitSizes || "Various configurations available",
     APPROVAL_AUTHORITY: projectData.approvalAuthority || "N/A",
     HANDOVER_DATE: projectData.handOverDate || "N/A",
-    AMENITIES: projectData.amenities || []
+    AMENITIES: projectData.amenities || [],
   });
 }
 
 // Process and render the supplyAndDemand page
 function renderSupplyAndDemandPage(projectData) {
-  const template = loadTemplate('supplyAndDemand');
-  
+  const template = loadTemplate("supplyAndDemand");
+
   return template({
     PROJECT_NAME: projectData.projectName || "Unnamed Project",
     CITY: projectData.area || "Bengaluru",
     DEMAND: "16%",
-    SUPPLY: "16%"
+    SUPPLY: "16%",
   });
 }
 
 // Process and render the pricing page
 function renderPricingPage(projectData) {
-  const template = loadTemplate('pricing');
-  
+  const template = loadTemplate("pricing");
+
   return template({
     PROJECT_NAME: projectData.projectName || "Unnamed Project",
-    CITY: projectData.area || "Bengaluru"
+    CITY: projectData.area || "Bengaluru",
   });
 }
 
 // Process and render the gallery page
 function renderGalleryPage(projectName, images) {
-  const template = loadTemplate('gallery');
-  
+  const template = loadTemplate("gallery");
+
   // Create image objects with captions
   const imageObjects = images.map((url, index) => ({
     URL: url,
-    CAPTION: `Property View ${index + 1}`
+    CAPTION: `Property View ${index + 1}`,
   }));
-  
+
   return template({
     PROJECT_NAME: projectName,
     HAS_IMAGES: images.length > 0,
     IMAGES: imageObjects,
-    CURRENT_YEAR: new Date().getFullYear()
+    CURRENT_YEAR: new Date().getFullYear(),
+  });
+}
+
+// Process and render the overview page
+function renderOverviewPage(projectData, firstImage) {
+  const template = loadTemplate('overview');
+  
+  // Determine configurations text
+  const configurationsText = projectData.configurations && projectData.configurations.length > 0
+    ? projectData.configurations.join(', ')
+    : 'N/A';
+  
+  // Determine first image URL if available
+  const imageUrl = firstImage || 'placeholder-image.jpg';
+  
+  return template({
+    PROJECT_NAME: projectData.projectName || "Unnamed Project",
+    DEVELOPER:projectData.developerName || "---", // Replace with actual data if available
+    STAGE: projectData.status || "--",
+    CURRENT_PRICE: projectData.currentPrice ||"--", // Replace with actual data if available
+    CONFIGURATIONS: configurationsText,
+    LAUNCH_DATE: projectData.launchDate || "---",
+    HANDOVER_DATE: projectData.handOverDate || "---", 
+    ASSET_TYPE: projectData.assetType || "--",
+    WATER_SOURCE: projectData.waterSource || "--",
+    MICROMARKET: projectData.mircomarket || "--",
+    ZONE: projectData.area ||"--", // Replace with actual data if available
+    PROPERTY_IMAGE: imageUrl
   });
 }
 
@@ -340,7 +407,7 @@ function renderProjectDetailsTemplate(projectData) {
   // Extract images from all nested objects
   const allImages = extractImagesFromNestedObjects(projectData);
   console.log(`Found ${allImages.length} images in the project data`);
-  
+
   let html = `
   <!DOCTYPE html>
   <html lang="en">
@@ -498,9 +565,12 @@ function renderProjectDetailsTemplate(projectData) {
     </head>
     <body>
       <div class="header">
-        <h1>${projectData.projectName || 'Property Details'}</h1>
-        ${projectData.isReraApproved === "Approved" ? 
-          `<div class="rera-approval">RERA Approved</div>` : ''}
+        <h1>${projectData.projectName || "Property Details"}</h1>
+        ${
+          projectData.isReraApproved === "Approved"
+            ? `<div class="rera-approval">RERA Approved</div>`
+            : ""
+        }
       </div>
       
       <div class="section">
@@ -509,32 +579,46 @@ function renderProjectDetailsTemplate(projectData) {
           <div class="property">
             <span class="property-name">Project Status</span>
             <span class="property-value">
-              <span class="status-tag">${projectData.status || 'N/A'}</span>
+              <span class="status-tag">${projectData.status || "N/A"}</span>
             </span>
           </div>
           <div class="property">
             <span class="property-name">Asset Type</span>
-            <span class="property-value">${projectData.assetType ? projectData.assetType.toUpperCase() : 'N/A'}</span>
+            <span class="property-value">${
+              projectData.assetType
+                ? projectData.assetType.toUpperCase()
+                : "N/A"
+            }</span>
           </div>
           <div class="property">
             <span class="property-name">Area</span>
-            <span class="property-value">${projectData.area || 'N/A'}</span>
+            <span class="property-value">${projectData.area || "N/A"}</span>
           </div>
           <div class="property">
             <span class="property-name">Project Land Area</span>
-            <span class="property-value">${projectData.projectLandArea ? projectData.projectLandArea + ' sqft' : 'N/A'}</span>
+            <span class="property-value">${
+              projectData.projectLandArea
+                ? projectData.projectLandArea + " sqft"
+                : "N/A"
+            }</span>
           </div>
           <div class="property">
             <span class="property-name">Launch Date</span>
-            <span class="property-value">${projectData.launchDate || 'N/A'}</span>
+            <span class="property-value">${
+              projectData.launchDate || "N/A"
+            }</span>
           </div>
           <div class="property">
             <span class="property-name">Possession Date</span>
-            <span class="property-value">${projectData.possession || 'N/A'}</span>
+            <span class="property-value">${
+              projectData.possession || "N/A"
+            }</span>
           </div>
           <div class="property">
             <span class="property-name">Total Units</span>
-            <span class="property-value">${projectData.totalUnits || 'N/A'}</span>
+            <span class="property-value">${
+              projectData.totalUnits || "N/A"
+            }</span>
           </div>
         </div>
       </div>
@@ -542,11 +626,16 @@ function renderProjectDetailsTemplate(projectData) {
       <div class="section">
         <div class="section-title">Configurations</div>
         <div class="config-container">
-          ${projectData.configurations && projectData.configurations.length > 0 ? 
-            projectData.configurations.map(config => `
+          ${
+            projectData.configurations && projectData.configurations.length > 0
+              ? projectData.configurations
+                  .map(
+                    (config) => `
               <div class="config">${config}</div>
-            `).join('') : 
-            '<div class="property-value">No configurations available</div>'
+            `
+                  )
+                  .join("")
+              : '<div class="property-value">No configurations available</div>'
           }
         </div>
       </div>
@@ -554,11 +643,16 @@ function renderProjectDetailsTemplate(projectData) {
       <div class="section">
         <div class="section-title">Amenities</div>
         <div class="amenities-container">
-          ${projectData.amenities && projectData.amenities.length > 0 ? 
-            projectData.amenities.map(amenity => `
+          ${
+            projectData.amenities && projectData.amenities.length > 0
+              ? projectData.amenities
+                  .map(
+                    (amenity) => `
               <div class="amenity">${amenity}</div>
-            `).join('') : 
-            '<div class="property-value">No amenities available</div>'
+            `
+                  )
+                  .join("")
+              : '<div class="property-value">No amenities available</div>'
           }
         </div>
       </div>
@@ -567,29 +661,39 @@ function renderProjectDetailsTemplate(projectData) {
         <div class="section-title">Location & Details</div>
         <div class="property">
           <span class="property-name">Address</span>
-          <span class="property-value">${projectData.location || 'N/A'}</span>
+          <span class="property-value">${projectData.location || "N/A"}</span>
         </div>
         <div class="property">
           <span class="property-name">Water Source</span>
-          <span class="property-value">${projectData.waterSource || 'N/A'}</span>
+          <span class="property-value">${
+            projectData.waterSource || "N/A"
+          }</span>
         </div>
         <div class="property">
           <span class="property-name">RERA ID</span>
-          <span class="property-value">${projectData.reraId || 'N/A'}</span>
+          <span class="property-value">${projectData.reraId || "N/A"}</span>
         </div>
         <div class="property">
           <span class="property-name">Acknowledgement</span>
-          <span class="property-value">${projectData.acknowledgement || 'N/A'}</span>
+          <span class="property-value">${
+            projectData.acknowledgement || "N/A"
+          }</span>
         </div>
         <div class="property">
           <span class="property-name">Approval Authority</span>
-          <span class="property-value">${projectData.approvalAuthority || 'N/A'}</span>
+          <span class="property-value">${
+            projectData.approvalAuthority || "N/A"
+          }</span>
         </div>
         <div class="property">
           <span class="property-name">Handover Date</span>
-          <span class="property-value">${projectData.handOverDate || 'N/A'}</span>
+          <span class="property-value">${
+            projectData.handOverDate || "N/A"
+          }</span>
         </div>
-        ${(projectData.lat && projectData.long) ? `
+        ${
+          projectData.lat && projectData.long
+            ? `
           <div class="property">
             <span class="property-name">Coordinates</span>
             <span class="property-value">Lat: ${projectData.lat}, Long: ${projectData.long}</span>
@@ -597,7 +701,9 @@ function renderProjectDetailsTemplate(projectData) {
           <div class="location-map">
             <img src="https://maps.googleapis.com/maps/api/staticmap?center=${projectData.lat},${projectData.long}&zoom=15&size=600x300&maptype=roadmap&markers=color:red%7C${projectData.lat},${projectData.long}&key=YOUR_API_KEY" width="100%" height="100%" alt="Property location map">
           </div>
-        ` : ''}
+        `
+            : ""
+        }
       </div>
       
       <div class="section">
@@ -605,29 +711,45 @@ function renderProjectDetailsTemplate(projectData) {
         <div class="property-info">
           <div class="property">
             <span class="property-name">Title Cleared</span>
-            <span class="property-value">${projectData.isTitleCleared !== null ? projectData.isTitleCleared : 'N/A'}</span>
+            <span class="property-value">${
+              projectData.isTitleCleared !== null
+                ? projectData.isTitleCleared
+                : "N/A"
+            }</span>
           </div>
           <div class="property">
             <span class="property-name">Khata Type</span>
-            <span class="property-value">${projectData.khataType !== null ? projectData.khataType : 'N/A'}</span>
+            <span class="property-value">${
+              projectData.khataType !== null ? projectData.khataType : "N/A"
+            }</span>
           </div>
           <div class="property">
             <span class="property-name">Litigation</span>
-            <span class="property-value">${projectData.litigation !== null ? (projectData.litigation ? 'Yes' : 'No') : 'N/A'}</span>
+            <span class="property-value">${
+              projectData.litigation !== null
+                ? projectData.litigation
+                  ? "Yes"
+                  : "No"
+                : "N/A"
+            }</span>
           </div>
         </div>
       </div>
       
-      ${allImages.length > 0 ? createImageGalleryHTML(allImages) : ''}
+      ${allImages.length > 0 ? createImageGalleryHTML(allImages) : ""}
       
       <div class="footer">
         This document was generated on ${new Date().toLocaleDateString()} and contains property information as recorded in our database. 
-        Last Updated: ${projectData.lastUpdated ? new Date(projectData.lastUpdated * 1000).toLocaleDateString() : 'Unknown'}
+        Last Updated: ${
+          projectData.lastUpdated
+            ? new Date(projectData.lastUpdated * 1000).toLocaleDateString()
+            : "Unknown"
+        }
       </div>
     </body>
   </html>
   `;
-  
+
   return html;
 }
 
@@ -636,30 +758,31 @@ app.get("/download-pdf", async (req, res) => {
   try {
     console.log("Received PDF request");
     const projectId = req.query.projectId;
-    const debugMode = req.query.debug === 'true';
-    
+    const debugMode = req.query.debug === "true";
+    const viewOnly = req.query.view === "true"; // New parameter to control behavior
+
     if (!projectId) {
       return res.status(400).send("Project ID is required");
     }
-    
+
     console.log("Fetching project data for ID:", projectId);
-    
+
     // Fetch project data from Firestore
     const projectDoc = await db.collection("assetData").doc(projectId).get();
-    
+
     if (!projectDoc.exists) {
       return res.status(404).send("Project not found");
     }
-    
+
     const projectData = projectDoc.data();
     const projectName = projectData.projectName || "Unnamed Project";
-    
+
     console.log("Found project:", projectName);
 
     // Extract all images from the project data
     const allImages = extractImagesFromNestedObjects(projectData);
     console.log(`Found ${allImages.length} total images in the project data`);
-    
+
     // Process all images to get signed URLs if needed
     const processedImages = [];
     if (allImages.length > 0) {
@@ -703,8 +826,8 @@ app.get("/download-pdf", async (req, res) => {
 
     // Try a completely different approach - generate individual PDFs for each page and then merge them
     try {
-      console.log('Attempting to generate PDF using multi-page approach...');
-      
+      console.log("Attempting to generate PDF using multi-page approach...");
+
       // Generate individual HTML files for each page
       const coverPageHtml = `
         <!DOCTYPE html>
@@ -974,11 +1097,11 @@ app.get("/download-pdf", async (req, res) => {
             </div>
           </body>
         </html>
-      ` : null;
-      
-      
+      `
+          : null;
+
       // Write the HTML files to disk
-      const pagesDir = path.join(__dirname, 'pages');
+      const pagesDir = path.join(__dirname, "pages");
       if (!fs.existsSync(pagesDir)) {
         fs.mkdirSync(pagesDir);
       }
@@ -993,91 +1116,105 @@ app.get("/download-pdf", async (req, res) => {
       if (galleryPageHtml) {
         fs.writeFileSync(path.join(pagesDir, 'gallery.html'), galleryHtml);
       }
-      
+
       // Generate PDFs for each page
       const browser = await puppeteer.launch({
-        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu']
+        args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-gpu"],
       });
-      
+
       try {
         const pdfFilenames = [];
-        
+
         // Generate PDF for cover page
-        const coverPdfPath = path.join(pagesDir, 'cover.pdf');
+        const coverPdfPath = path.join(pagesDir, "cover.pdf");
         const coverPage = await browser.newPage();
-        await coverPage.goto(`file://${path.join(pagesDir, 'cover.html')}`, { waitUntil: 'networkidle0' });
+        await coverPage.goto(`file://${path.join(pagesDir, "cover.html")}`, {
+          waitUntil: "networkidle0",
+        });
         await coverPage.pdf({
           path: coverPdfPath,
-          format: 'A4',
+          
           landscape: true,
           printBackground: true,
           margin: {
             top: "0.2in",
             right: "0.2in",
             bottom: "0.2in",
-            left: "0.2in"
+            left: "0.2in",
           },
-          preferCSSPageSize: true
+          preferCSSPageSize: true,
         });
         pdfFilenames.push(coverPdfPath);
         await coverPage.close();
 
         // Generate PDF for disclaimer page
-        const disclaimerPdfPath = path.join(pagesDir, 'disclaimer.pdf');
+        const disclaimerPdfPath = path.join(pagesDir, "disclaimer.pdf");
         const disclaimerPage = await browser.newPage();
-        await disclaimerPage.goto(`file://${path.join(pagesDir, 'disclaimer.html')}`, { waitUntil: 'networkidle0' });
+        await disclaimerPage.goto(
+          `file://${path.join(pagesDir, "disclaimer.html")}`,
+          { waitUntil: "networkidle0" }
+        );
         await disclaimerPage.pdf({
           path: disclaimerPdfPath,
-          format: 'A4',
+         
           landscape: true,
           printBackground: true,
           margin: {
             top: "0.4in",
             right: "0.4in",
             bottom: "0.4in",
-            left: "0.4in"
+            left: "0.4in",
           },
-          preferCSSPageSize: true
+          preferCSSPageSize: true,
         });
         pdfFilenames.push(disclaimerPdfPath);
         await disclaimerPage.close();
 
         // Generate PDF for supply and demand page
-        const supplyAndDemandPdfPath = path.join(pagesDir, 'supplyAndDemand.pdf');
+        const supplyAndDemandPdfPath = path.join(
+          pagesDir,
+          "supplyAndDemand.pdf"
+        );
         const supplyAndDemandPage = await browser.newPage();
-        await supplyAndDemandPage.goto(`file://${path.join(pagesDir, 'supplyAndDemand.html')}`, { waitUntil: 'networkidle0' });
+        await supplyAndDemandPage.goto(
+          `file://${path.join(pagesDir, "supplyAndDemand.html")}`,
+          { waitUntil: "networkidle0" }
+        );
         await supplyAndDemandPage.pdf({
           path: supplyAndDemandPdfPath,
-          format: 'A4',
+          
           landscape: true,
           printBackground: true,
           margin: {
             top: "0.4in",
             right: "0.4in",
             bottom: "0.4in",
-            left: "0.4in"
+            left: "0.4in",
           },
-          preferCSSPageSize: true
+          preferCSSPageSize: true,
         });
         pdfFilenames.push(supplyAndDemandPdfPath);
         await supplyAndDemandPage.close();
         
         // Generate PDF for pricing page
-        const pricingPdfPath = path.join(pagesDir, 'pricing.pdf');
+        const pricingPdfPath = path.join(pagesDir, "pricing.pdf");
         const pricingPage = await browser.newPage();
-        await pricingPage.goto(`file://${path.join(pagesDir, 'pricing.html')}`, { waitUntil: 'networkidle0' });
+        await pricingPage.goto(
+          `file://${path.join(pagesDir, "pricing.html")}`,
+          { waitUntil: "networkidle0" }
+        );
         await pricingPage.pdf({
           path: pricingPdfPath,
-          format: 'A4',
+          
           landscape: true,
           printBackground: true,
           margin: {
             top: "0.4in",
             right: "0.4in",
             bottom: "0.4in",
-            left: "0.4in"
+            left: "0.4in",
           },
-          preferCSSPageSize: true
+          preferCSSPageSize: true,
         });
         pdfFilenames.push(pricingPdfPath);
         await pricingPage.close();
@@ -1088,7 +1225,7 @@ app.get("/download-pdf", async (req, res) => {
         await overviewPage.goto(`file://${path.join(pagesDir, 'overview.html')}`, { waitUntil: 'networkidle0' });
         await overviewPage.pdf({
           path: overviewPdfPath,
-          format: 'A4',
+          
           landscape: true,
           printBackground: true,
           margin: {
@@ -1103,135 +1240,136 @@ app.get("/download-pdf", async (req, res) => {
         await overviewPage.close();
 
         // Generate PDF for details page
-        const detailsPdfPath = path.join(pagesDir, 'details.pdf');
-        const detailsPage = await browser.newPage();
-        await detailsPage.goto(`file://${path.join(pagesDir, 'details.html')}`, { waitUntil: 'networkidle0' });
-        await detailsPage.pdf({
-          path: detailsPdfPath,
-          format: 'A4',
-          landscape: true,
-          printBackground: true,
-          margin: {
-            top: "0.4in",
-            right: "0.4in",
-            bottom: "0.4in",
-            left: "0.4in"
-          },
-          preferCSSPageSize: true
-        });
-        pdfFilenames.push(detailsPdfPath);
-        await detailsPage.close();
-        
-        // Generate PDF for specs page
-        const specsPdfPath = path.join(pagesDir, 'specs.pdf');
-        const specsPage = await browser.newPage();
-        await specsPage.goto(`file://${path.join(pagesDir, 'specs.html')}`, { waitUntil: 'networkidle0' });
-        await specsPage.pdf({
-          path: specsPdfPath,
-          format: 'A4',
-          landscape: true,
-          printBackground: true,
-          margin: {
-            top: "0.4in",
-            right: "0.4in",
-            bottom: "0.4in",
-            left: "0.4in"
-          },
-          preferCSSPageSize: true
-        });
-        pdfFilenames.push(specsPdfPath);
-        await specsPage.close();
-        
-        // Generate PDF for gallery page (if exists)
-        if (galleryPageHtml) {
-          const galleryPdfPath = path.join(pagesDir, 'gallery.pdf');
-          const galleryPage = await browser.newPage();
-          await galleryPage.goto(`file://${path.join(pagesDir, 'gallery.html')}`, { waitUntil: 'networkidle0' });
-          await galleryPage.pdf({
-            path: galleryPdfPath,
-            format: 'A4',
-            landscape: true,
-            printBackground: true,
-            margin: {
-              top: "0.4in",
-              right: "0.4in",
-              bottom: "0.4in",
-              left: "0.4in"
-            },
-            preferCSSPageSize: true
-          });
-          pdfFilenames.push(galleryPdfPath);
-          await galleryPage.close();
-        }
+        // const detailsPdfPath = path.join(pagesDir, "details.pdf");
+        // const detailsPage = await browser.newPage();
+        // await detailsPage.goto(
+        //   `file://${path.join(pagesDir, "details.html")}`,
+        //   { waitUntil: "networkidle0" }
+        // );
+        // await detailsPage.pdf({
+        //   path: detailsPdfPath,
+          
+        //   landscape: true,
+        //   printBackground: true,
+        //   margin: {
+        //     top: "0.4in",
+        //     right: "0.4in",
+        //     bottom: "0.4in",
+        //     left: "0.4in",
+        //   },
+        //   preferCSSPageSize: true,
+        // });
+        // pdfFilenames.push(detailsPdfPath);
+        // await detailsPage.close();
+
+        // // Generate PDF for specs page
+        // const specsPdfPath = path.join(pagesDir, "specs.pdf");
+        // const specsPage = await browser.newPage();
+        // await specsPage.goto(`file://${path.join(pagesDir, "specs.html")}`, {
+        //   waitUntil: "networkidle0",
+        // });
+        // await specsPage.pdf({
+        //   path: specsPdfPath,
+          
+        //   landscape: true,
+        //   printBackground: true,
+        //   margin: {
+        //     top: "0.4in",
+        //     right: "0.4in",
+        //     bottom: "0.4in",
+        //     left: "0.4in",
+        //   },
+        //   preferCSSPageSize: true,
+        // });
+        // pdfFilenames.push(specsPdfPath);
+        // await specsPage.close();
         
         
-        
+        // // Generate PDF for gallery page (if exists)
+        // if (galleryPageHtml) {
+        //   const galleryPdfPath = path.join(pagesDir, "gallery.pdf");
+        //   const galleryPage = await browser.newPage();
+        //   await galleryPage.goto(
+        //     `file://${path.join(pagesDir, "gallery.html")}`,
+        //     { waitUntil: "networkidle0" }
+        //   );
+        //   await galleryPage.pdf({
+        //     path: galleryPdfPath,
+            
+        //     landscape: true,
+        //     printBackground: true,
+        //     margin: {
+        //       top: "0.4in",
+        //       right: "0.4in",
+        //       bottom: "0.4in",
+        //       left: "0.4in",
+        //     },
+        //     preferCSSPageSize: true,
+        //   });
+        //   pdfFilenames.push(galleryPdfPath);
+        //   await galleryPage.close();
+        // }
+
         // Merge all PDFs
-        const { PDFDocument } = require('pdf-lib');
-        
+        const { PDFDocument } = require("pdf-lib");
+
         async function mergePDFs(pdfPaths) {
           const mergedPdf = await PDFDocument.create();
-          
+
           for (const pdfPath of pdfPaths) {
             const pdfBytes = fs.readFileSync(pdfPath);
             const pdf = await PDFDocument.load(pdfBytes);
-            const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
-            copiedPages.forEach(page => mergedPdf.addPage(page));
+            const copiedPages = await mergedPdf.copyPages(
+              pdf,
+              pdf.getPageIndices()
+            );
+            copiedPages.forEach((page) => mergedPdf.addPage(page));
           }
-          
+
           const mergedPdfBytes = await mergedPdf.save();
           return mergedPdfBytes;
         }
-        
-        const filename = `${projectName.replace(/\s+/g, '_')}_Report.pdf`;
+
+        const filename = `${projectName.replace(/\s+/g, "_")}_Report.pdf`;
         const filePath = path.join(__dirname, filename);
-        
+
         const mergedPdfBytes = await mergePDFs(pdfFilenames);
         fs.writeFileSync(filePath, mergedPdfBytes);
-        
-        // Clean up the individual PDF files
-        pdfFilenames.forEach(pdfPath => {
-          try {
-            fs.unlinkSync(pdfPath);
-          } catch (err) {
-            console.error(`Failed to delete temporary PDF: ${pdfPath}`, err);
-          }
-        });
-        
+
         // Send the PDF as a download
         res.download(filePath, filename, (err) => {
           if (err) {
             console.error("Error sending file:", err);
           }
-          // Delete the file after download attempt
-          fs.unlink(filePath, (unlinkErr) => {
-            if (unlinkErr) {
-              console.error("Error deleting file:", unlinkErr);
-            }
-          });
-          
           // Clean up the HTML files
           try {
             fs.unlinkSync(path.join(pagesDir, 'cover.html'));
             fs.unlinkSync(path.join(pagesDir, 'disclaimer.html'));
             fs.unlinkSync(path.join(pagesDir, 'overview.html'));
-            fs.unlinkSync(path.join(pagesDir, 'details.html'));
-            fs.unlinkSync(path.join(pagesDir, 'specs.html'));
             fs.unlinkSync(path.join(pagesDir, 'supplyAndDemand.html'));
             fs.unlinkSync(path.join(pagesDir, 'pricing.html'));
-            if (galleryPageHtml) {
-              fs.unlinkSync(path.join(pagesDir, 'gallery.html'));
-            }
           } catch (err) {
             console.error("Error cleaning up HTML files:", err);
           }
         });
+
+        // Save to Firebase after sending the file
+        try {
+          const result = await savePDFToFirebase(
+            mergedPdfBytes,
+            filename,
+            projectId
+          );
+          console.log("PDF saved to Firebase:", result);
+        } catch (saveErr) {
+          console.error("Error saving to Firebase:", saveErr);
+        }
       } finally {
         await browser.close();
       }
     } catch (pdfError) {
-      console.error('Error generating PDF:', pdfError);
-      res.status(500).send('Failed to generate PDF');
+      console.error("Error generating PDF:", pdfError);
+      res.status(500).send("Failed to generate PDF");
     }
   } catch (err) {
     console.error("Error generating PDF:", err);
@@ -1240,18 +1378,165 @@ app.get("/download-pdf", async (req, res) => {
 });
 
 // Simple route to view just the cover template
-app.get('/debug-cover', (req, res) => {
+app.get("/debug-cover", (req, res) => {
   try {
     const sampleData = {
       projectName: "Sample Test Project",
-      status: "Under Construction"
+      status: "Under Construction",
     };
-    
+
     const html = renderCoverPage(sampleData);
     res.send(html);
   } catch (err) {
-    console.error('Error rendering debug cover:', err);
-    res.status(500).send('Error rendering debug cover');
+    console.error("Error rendering debug cover:", err);
+    res.status(500).send("Error rendering debug cover");
+  }
+});
+
+// Helper function to save PDF to Firebase Storage
+async function savePDFToFirebase(pdfBuffer, filename, projectId) {
+  try {
+    if (!projectId) {
+      return res.status(400).send("Project ID is required");
+    }
+
+    console.log("Fetching project data for ID:", projectId);
+
+    // Fetch project data from Firestore
+    const projectDoc = await db.collection("assetData").doc(projectId).get();
+
+    if (!projectDoc.exists) {
+      return res.status(404).send("Project not found");
+    }
+    // Create a unique path for the PDF in Firebase Storage
+    const pdfPath = `project-pdfs/${projectId}/${filename}`;
+    const file = bucket.file(pdfPath);
+
+    // Upload the PDF buffer to Firebase Storage
+    await file.save(pdfBuffer, {
+      metadata: {
+        contentType: "application/pdf",
+        metadata: {
+          projectId: projectId,
+          generatedAt: new Date().toISOString(),
+        },
+      },
+    });
+
+    // Get a signed URL for the uploaded PDF
+    const [signedUrl] = await file.getSignedUrl({
+      action: "read",
+      expires: Date.now() + 7 * 24 * 60 * 60 * 1000, // URL expires in 7 days
+    });
+
+    // Save the PDF metadata to Firestore
+    const docRef = db.collection("assetData").doc(projectId);
+    await docRef.update({
+      pdfs: admin.firestore.FieldValue.arrayUnion({
+        filename: filename,
+        storagePath: pdfPath,
+        pdfURL: signedUrl,
+      }),
+    });
+
+    return {
+      url: signedUrl,
+      path: pdfPath,
+    };
+  } catch (error) {
+    console.error("Error saving PDF to Firebase:", error);
+    throw error;
+  }
+}
+
+// Test route to generate and save PDF to Firebase
+app.get("/test-save-pdf", async (req, res) => {
+  try {
+    const projectId = req.query.projectId;
+
+    if (!projectId) {
+      return res.status(400).send("Project ID is required");
+    }
+
+    // Fetch project data from Firestore
+    const projectDoc = await db.collection("assetData").doc(projectId).get();
+
+    if (!projectDoc.exists) {
+      return res.status(404).send("Project not found");
+    }
+
+    const projectData = projectDoc.data();
+    const projectName = projectData.projectName || "Unnamed Project";
+
+    // Generate PDF (using your existing PDF generation logic)
+    const browser = await puppeteer.launch({
+      args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-gpu"],
+    });
+
+    try {
+      const page = await browser.newPage();
+
+     
+      await page.setViewport({
+        width: 1200,
+        height: 1600,
+        deviceScaleFactor: 1,
+      });
+
+      
+      const testContent = `
+        <html>
+          <head>
+            <style>
+              body { font-family: Arial, sans-serif; padding: 20px; }
+              h1 { color: #333; }
+            </style>
+          </head>
+          <body>
+            <h1>${projectName}</h1>
+            <p>Test PDF generated at: ${new Date().toLocaleString()}</p>
+            <p>Project ID: ${projectId}</p>
+            <p>Status: ${projectData.status || "N/A"}</p>
+            <p>Location: ${projectData.location || "N/A"}</p>
+          </body>
+        </html>
+      `;
+
+      await page.setContent(testContent);
+
+      // Generate PDF buffer
+      const pdfBuffer = await page.pdf({
+        format: "A4",
+        printBackground: true,
+        margin: {
+          top: "0.4in",
+          right: "0.4in",
+          bottom: "0.4in",
+          left: "0.4in",
+        },
+      });
+
+      // Generate filename
+      const timestamp = new Date().getTime();
+      const filename = `${projectName.replace(/\s+/g, "_")}_${timestamp}.pdf`;
+
+      // Save PDF to Firebase
+      const result = await savePDFToFirebase(pdfBuffer, filename, projectId);
+
+      res.json({
+        message: "PDF generated and saved successfully",
+        url: result.url,
+        path: result.path,
+      });
+    } finally {
+      await browser.close();
+    }
+  } catch (error) {
+    console.error("Error in test-save-pdf route:", error);
+    res.status(500).json({
+      error: "Failed to generate and save PDF",
+      details: error.message,
+    });
   }
 });
 

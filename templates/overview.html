@@ -11,19 +11,26 @@
       box-sizing: border-box;
     }
     
-    body {
+    @page {
+      size: 1600px 800px;
+      margin: 0;
+    }
+    
+    html, body {
+      width: 1600px;
+      height: 800px;
+      overflow: hidden;
       font-family: Arial, sans-serif;
       background-color: #f9f9f9;
       color: #333;
       line-height: 1.6;
       position: relative;
-      overflow-x: hidden;
     }
     
     .container {
-      max-width: 1300px;
-      margin: 0 auto;
-      padding: 40px;
+      width: 100%;
+      height: 100%;
+      padding: 50px 70px;
       position: relative;
     }
     
@@ -35,7 +42,7 @@
     }
     
     h1 {
-      font-size: 42px;
+      font-size: 48px;
       color: #000;
       font-weight: bold;
     }
@@ -46,14 +53,14 @@
     }
     
     .whatsapp-icon {
-      width: 28px;
-      height: 28px;
-      margin-right: 10px;
+      width: 32px;
+      height: 32px;
+      margin-right: 12px;
       fill: #25D366;
     }
     
     .cta-text {
-      font-size: 16px;
+      font-size: 18px;
     }
     
     .cta-link {
@@ -69,27 +76,25 @@
     .content {
       display: flex;
       justify-content: space-between;
-      gap: 40px;
+      gap: 60px;
+      height: calc(100% - 120px);
     }
     
     .details-section {
       width: 50%;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 40px;
+      gap: 40px 60px;
     }
     
     .detail-item {
       display: flex;
       align-items: center;
-      margin-bottom: 10px;
     }
     
     .icon {
-      align-items: center;
-
-      width: 28px;
-      height: 28px;
+      width: 32px;
+      height: 32px;
       margin-right: 15px;
       opacity: 0.7;
     }
@@ -100,35 +105,38 @@
     }
     
     .detail-label {
-      font-size: 16px;
+      font-size: 18px;
       color: #666;
       margin-bottom: 5px;
     }
     
     .detail-value {
-      font-size: 20px;
+      font-size: 22px;
       font-weight: 600;
     }
     
     .image-section {
       width: 50%;
       position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     
     .property-image {
       width: 100%;
-      height: auto;
+      max-height: 580px;
+      object-fit: cover;
       border-radius: 15px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      
+      box-shadow: 0 4px 20px rgba(0,0,0,0.12);
     }
     
     .score-badge {
       position: absolute;
       top: 20px;
       right: 20px;
-      width: 130px;
-      height: 130px;
+      width: 140px;
+      height: 140px;
       z-index: 2;
     }
     
@@ -137,33 +145,25 @@
       z-index: -1;
     }
     
-    .decoration-top-right {
-      top: 100px;
-      right: -50px;
-      width: 100px;
-      height: 100px;
-    }
-    
     .decoration-star {
       position: absolute;
       top: 20px;
-      left: 10px;
-      width: 60px;
-      height: 60px;
+      left: 20px;
+      width: 70px;
+      height: 70px;
       z-index: 2;
     }
     
-  .decoration-bottom-right {
-  position: absolute;
-  bottom: -180px;
-  right: -120px;
-  width: 400px;
-  height: 400px;
-  z-index: -1;
-  overflow: hidden;
-  transform: rotate(-15deg);
-}
-    
+    .decoration-bottom-right {
+      position: absolute;
+      bottom: -180px;
+      right: -120px;
+      width: 450px;
+      height: 450px;
+      z-index: -1;
+      overflow: hidden;
+      transform: rotate(-15deg);
+    }
   </style>
 </head>
 <body>
@@ -273,11 +273,10 @@
       </div>
       
       <div class="image-section">
-        <!-- Replace with the URL to your actual property image -->
         <img src="{{PROPERTY_IMAGE}}" alt="MANYA Magna Ville Property Entrance" class="property-image">
         
         <!-- Decorative star element -->
-        <img src="../assets/icons/starLogo.png" alt="" class="decoration decoration-star">
+        <img src="../assets/icons/starLogo.png" alt="" class="decoration-star">
         
         <!-- TruEstate Score Badge -->
         <img src="../assets/icons/imactLogo.png" alt="TruEstate Score: 8/10 Impact Score" class="score-badge">

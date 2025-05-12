@@ -11,7 +11,15 @@
       box-sizing: border-box;
     }
     
-    body {
+    @page {
+      size: 1600px 800px;
+      margin: 0;
+    }
+    
+    html, body {
+      width: 1600px;
+      height: 800px;
+      overflow: hidden;
       font-family: Arial, sans-serif;
       background-color: #f9f9f9;
       color: #333;
@@ -19,9 +27,9 @@
     }
     
     .container {
-      max-width: 1300px;
-      margin: 0 auto;
-      padding: 40px;
+      width: 100%;
+      height: 100%;
+      padding: 50px;
       position: relative;
     }
     
@@ -29,11 +37,11 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 30px;
+      margin-bottom: 40px;
     }
     
     h1 {
-      font-size: 42px;
+      font-size: 48px;
       color: #000;
       font-weight: bold;
     }
@@ -44,14 +52,14 @@
     }
     
     .whatsapp-icon {
-      width: 28px;
-      height: 28px;
-      margin-right: 10px;
+      width: 32px;
+      height: 32px;
+      margin-right: 12px;
       fill: #25D366;
     }
     
     .cta-text {
-      font-size: 16px;
+      font-size: 18px;
     }
     
     .cta-link {
@@ -66,22 +74,27 @@
     
     .content {
       display: flex;
-      gap: 30px;
+      gap: 60px;
+      height: calc(100% - 120px);
     }
     
     .map-section {
       width: 50%;
+      height: 100%;
     }
     
     .map-container {
       width: 100%;
+      height: 100%;
       position: relative;
     }
     
     .map-image {
       width: 100%;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      height: 100%;
+      object-fit: contain;
+      border-radius: 12px;
+      
     }
     
     .info-section {
@@ -89,34 +102,34 @@
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
-      padding: 20px 0;
+      padding: 40px 0;
     }
     
     .score-badge {
       align-self: flex-end;
-      margin-bottom: 30px;
-      width: 130px;
-      height: 130px;
+      margin-bottom: 60px;
+      width: 150px;
+      height: 150px;
     }
     
     .bullet-points {
-      margin-top: 20px;
+      margin-top: 40px;
     }
     
     .bullet-point {
       display: flex;
       align-items: flex-start;
-      margin-bottom: 30px;
-      font-size: 18px;
+      margin-bottom: 40px;
+      font-size: 24px;
     }
     
     .bullet-point-dot {
-      min-width: 10px;
-      height: 10px;
+      min-width: 12px;
+      height: 12px;
       background-color: #333;
       border-radius: 50%;
-      margin-top: 8px;
-      margin-right: 15px;
+      margin-top: 12px;
+      margin-right: 20px;
     }
     
     .highlight {
@@ -125,21 +138,21 @@
     
     .legend {
       display: flex;
-      margin-top: 20px;
+      margin-top: 30px;
       justify-content: flex-start;
-      gap: 40px;
+      gap: 50px;
     }
     
     .legend-item {
       display: flex;
       align-items: center;
-      font-size: 14px;
+      font-size: 18px;
     }
     
     .legend-icon {
-      width: 20px;
-      height: 20px;
-      margin-right: 10px;
+      width: 24px;
+      height: 24px;
+      margin-right: 12px;
     }
     
     .commercial-icon {
@@ -151,45 +164,21 @@
       background-color: #b30000;
       color: white;
       text-align: center;
-      font-size: 12px;
-      line-height: 20px;
+      font-size: 14px;
+      line-height: 24px;
     }
     
     .legend-text {
-      font-size: 14px;
-    }
-    
-    .decoration {
-      position: absolute;
-      z-index: -1;
+      font-size: 18px;
     }
     
     .decoration-bottom-right {
-      bottom: 0;
-      right: 0;
-      width: 150px;
-      height: 150px;
-      overflow: hidden;
-    }
-    
-    .decoration-circle {
       position: absolute;
-      bottom: -50px;
-      right: -50px;
-      width: 200px;
-      height: 200px;
-      border: 15px solid #e8a745;
-      border-radius: 50%;
-    }
-    
-    .decoration-star {
-      position: absolute;
-      bottom: 25px;
-      right: 25px;
-      width: 30px;
-      height: 30px;
-      background-color: #e8a745;
-      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+      bottom: -120px;
+      right: -120px;
+      width: 400px;
+      height: 400px;
+      z-index: -1;
     }
   </style>
 </head>
@@ -208,14 +197,12 @@
     
     <div class="content">
       <div class="map-section">
-        <!-- Replace with the path to your actual map image -->
         <div class="map-container">
           <img src="../assets/images/PriceMap.png" alt="Bengaluru Area Map with Pricing" class="map-image">
         </div>
       </div>
       
       <div class="info-section">
-        <!-- Replace with the path to your actual score badge -->
         <img src="../assets/icons/imactLogo.png" alt="TruEstate Score: 8/10 Impact Score" class="score-badge">
         
         <div class="bullet-points">
@@ -236,10 +223,7 @@
       </div>
     </div>
     
-    <div class="decoration decoration-bottom-right">
-      <div class="decoration-circle"></div>
-      <div class="decoration-star"></div>
-    </div>
+    <img src="../assets/icons/bottomlogo.png" alt="" class="decoration-bottom-right">
   </div>
 </body>
 </html>
