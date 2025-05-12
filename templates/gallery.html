@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Property Gallery</title>
+    <style>
+      body {
+        font-family: 'Arial', sans-serif;
+        padding: 40px;
+        color: #333;
+        background-color: #f9f9f9;
+      }
+      h1 {
+        color: #2c3e50;
+        border-bottom: 2px solid #3498db;
+        padding-bottom: 10px;
+        font-size: 28px;
+        text-transform: uppercase;
+        text-align: center;
+        margin-bottom: 30px;
+      }
+      .gallery-intro {
+        text-align: center;
+        margin-bottom: 30px;
+        color: #7f8c8d;
+      }
+      .image-gallery {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 25px;
+        margin: 0 auto;
+      }
+      .image-container {
+        width: 100%;
+        background-color: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        position: relative;
+      }
+      .image-container img {
+        width: 100%;
+        height: auto;
+        display: block;
+        transition: transform 0.3s ease;
+      }
+      .image-label {
+        background-color: rgba(44, 62, 80, 0.8);
+        color: white;
+        padding: 8px 12px;
+        font-size: 14px;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+      }
+      .no-images {
+        text-align: center;
+        color: #95a5a6;
+        font-style: italic;
+        padding: 50px 0;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      }
+      .footer {
+        text-align: center;
+        margin-top: 40px;
+        color: #95a5a6;
+        font-size: 12px;
+        border-top: 1px solid #e0e0e0;
+        padding-top: 20px;
+      }
+      .copyright {
+        margin-top: 10px;
+        font-size: 11px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>{{PROJECT_NAME}} - Gallery</h1>
+    
+    <div class="gallery-intro">
+      Visual showcase of this property development
+    </div>
+    
+    {{#HAS_IMAGES}}
+    <div class="image-gallery">
+      {{#IMAGES}}
+      <div class="image-container">
+        <img src="{{URL}}" alt="Property view" />
+        <div class="image-label">{{CAPTION}}</div>
+      </div>
+      {{/IMAGES}}
+    </div>
+    {{/HAS_IMAGES}}
+    
+    {{^HAS_IMAGES}}
+    <div class="no-images">
+      No images are currently available for this property.
+    </div>
+    {{/HAS_IMAGES}}
+    
+    <div class="footer">
+      Images shown are representative and may be subject to change as the project progresses.
+      <div class="copyright">
+        © {{CURRENT_YEAR}} TruEstate. All rights reserved.
+      </div>
+    </div>
+  </body>
+</html> 

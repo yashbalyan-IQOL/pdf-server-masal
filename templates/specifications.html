@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Property Specifications</title>
+    <style>
+      body {
+        font-family: 'Arial', sans-serif;
+        padding: 40px;
+        color: #333;
+        background-color: #f9f9f9;
+      }
+      h1 {
+        color: #2c3e50;
+        border-bottom: 2px solid #3498db;
+        padding-bottom: 10px;
+        font-size: 28px;
+        text-transform: uppercase;
+        margin-bottom: 30px;
+      }
+      .section {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        padding: 20px;
+        margin-bottom: 30px;
+      }
+      .section-title {
+        font-size: 18px;
+        font-weight: bold;
+        color: #2c3e50;
+        margin-bottom: 15px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+      }
+      .specs-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+      }
+      .specs-table th {
+        background-color: #f7f9fa;
+        text-align: left;
+        padding: 12px 15px;
+        border-bottom: 1px solid #e1e4e8;
+        color: #7f8c8d;
+        font-weight: normal;
+        font-size: 14px;
+        text-transform: uppercase;
+      }
+      .specs-table td {
+        padding: 12px 15px;
+        border-bottom: 1px solid #e1e4e8;
+      }
+      .specs-table tr:last-child td {
+        border-bottom: none;
+      }
+      .specs-table tr:nth-child(even) {
+        background-color: #fafafa;
+      }
+      .specs-category {
+        font-weight: bold;
+        color: #2c3e50;
+        padding: 15px;
+        background-color: #edf2f7;
+        border-top: 1px solid #e1e4e8;
+        border-bottom: 1px solid #e1e4e8;
+      }
+      .specs-value {
+        font-weight: bold;
+        color: #3498db;
+      }
+      .footer {
+        text-align: center;
+        margin-top: 40px;
+        color: #95a5a6;
+        font-size: 12px;
+      }
+      .subheading {
+        color: #7f8c8d;
+        font-size: 16px;
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>{{PROJECT_NAME}} - Technical Specifications</h1>
+    <div class="subheading">Detailed technical specifications and construction details</div>
+    
+    <div class="section">
+      <div class="section-title">Construction Specifications</div>
+      <table class="specs-table">
+        <tr>
+          <th>Feature</th>
+          <th>Specification</th>
+        </tr>
+        <tr>
+          <td>Structure</td>
+          <td>{{STRUCTURE_SPEC}}</td>
+        </tr>
+        <tr>
+          <td>External Walls</td>
+          <td>{{WALLS_SPEC}}</td>
+        </tr>
+        <tr>
+          <td>Internal Walls</td>
+          <td>{{INTERNAL_WALLS_SPEC}}</td>
+        </tr>
+        <tr>
+          <td>Flooring</td>
+          <td>{{FLOORING_SPEC}}</td>
+        </tr>
+        <tr>
+          <td>Windows</td>
+          <td>{{WINDOWS_SPEC}}</td>
+        </tr>
+        <tr>
+          <td>Doors</td>
+          <td>{{DOORS_SPEC}}</td>
+        </tr>
+        <tr>
+          <td>Painting</td>
+          <td>{{PAINTING_SPEC}}</td>
+        </tr>
+      </table>
+    </div>
+    
+    <div class="section">
+      <div class="section-title">Property Details</div>
+      <table class="specs-table">
+        <tr>
+          <th>Detail</th>
+          <th>Information</th>
+        </tr>
+        <tr>
+          <td>Total Units</td>
+          <td>{{TOTAL_UNITS}}</td>
+        </tr>
+        <tr>
+          <td>Tower Units</td>
+          <td>{{TOWER_UNITS}}</td>
+        </tr>
+        <tr>
+          <td>Land Area</td>
+          <td>{{PROJECT_LAND_AREA}}</td>
+        </tr>
+        <tr>
+          <td>Unit Sizes</td>
+          <td>{{UNIT_SIZES}}</td>
+        </tr>
+        <tr>
+          <td>Approved By</td>
+          <td>{{APPROVAL_AUTHORITY}}</td>
+        </tr>
+        <tr>
+          <td>Handover Date</td>
+          <td>{{HANDOVER_DATE}}</td>
+        </tr>
+      </table>
+    </div>
+    
+    <div class="section">
+      <div class="section-title">Amenities Features</div>
+      <div class="amenities-list">
+        {{#AMENITIES}}
+          <div class="specs-category">{{.}}</div>
+        {{/AMENITIES}}
+        {{^AMENITIES}}
+          <div>No amenities information available</div>
+        {{/AMENITIES}}
+      </div>
+    </div>
+    
+    <div class="footer">
+      This document is subject to change. All specifications mentioned are indicative and subject to final design.
+    </div>
+  </body>
+</html> 

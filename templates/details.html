@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Property Details</title>
+    <style>
+      body {
+        font-family: 'Arial', sans-serif;
+        padding: 40px;
+        color: #333;
+        background-color: #f9f9f9;
+      }
+      h1 {
+        color: #2c3e50;
+        border-bottom: 2px solid #3498db;
+        padding-bottom: 10px;
+        font-size: 28px;
+        text-transform: uppercase;
+      }
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      .property-title {
+        font-size: 24px;
+        color: #2c3e50;
+      }
+      .rera-approval {
+        color: #27ae60;
+        font-weight: bold;
+        padding: 5px 10px;
+        border-radius: 4px;
+        background-color: #e8f8f0;
+        border: 1px solid #27ae60;
+      }
+      .section {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        padding: 20px;
+        margin-bottom: 30px;
+      }
+      .section-title {
+        font-size: 18px;
+        font-weight: bold;
+        color: #2c3e50;
+        margin-bottom: 15px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+      }
+      .property-info {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+      }
+      .property {
+        margin-bottom: 10px;
+      }
+      .property-name {
+        font-weight: bold;
+        color: #7f8c8d;
+        display: block;
+        margin-bottom: 3px;
+        font-size: 12px;
+        text-transform: uppercase;
+      }
+      .property-value {
+        font-size: 16px;
+        color: #2c3e50;
+      }
+      .amenities-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px;
+      }
+      .amenity {
+        background-color: #edf2f7;
+        padding: 8px 12px;
+        border-radius: 20px;
+        font-size: 14px;
+        color: #4a5568;
+      }
+      .config-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-top: 10px;
+      }
+      .config {
+        background-color: #e3f2fd;
+        border: 1px solid #bbdefb;
+        padding: 10px 15px;
+        border-radius: 6px;
+        font-size: 15px;
+        color: #1565c0;
+        font-weight: bold;
+      }
+      .location-map {
+        width: 100%;
+        height: 300px;
+        background-color: #eee;
+        border-radius: 8px;
+        margin-top: 15px;
+        border: 1px solid #ddd;
+      }
+      .status-tag {
+        display: inline-block;
+        background-color: #ff9800;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 14px;
+        text-transform: uppercase;
+      }
+      .footer {
+        text-align: center;
+        margin-top: 40px;
+        color: #95a5a6;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>{{PROJECT_NAME}}</h1>
+      {{#IS_RERA_APPROVED}}
+        <div class="rera-approval">RERA Approved</div>
+      {{/IS_RERA_APPROVED}}
+    </div>
+    
+    <div class="section">
+      <div class="section-title">Project Overview</div>
+      <div class="property-info">
+        <div class="property">
+          <span class="property-name">Project Status</span>
+          <span class="property-value">
+            <span class="status-tag">{{STATUS}}</span>
+          </span>
+        </div>
+        <div class="property">
+          <span class="property-name">Asset Type</span>
+          <span class="property-value">{{ASSET_TYPE}}</span>
+        </div>
+        <div class="property">
+          <span class="property-name">Area</span>
+          <span class="property-value">{{AREA}}</span>
+        </div>
+        <div class="property">
+          <span class="property-name">Project Land Area</span>
+          <span class="property-value">{{PROJECT_LAND_AREA}}</span>
+        </div>
+        <div class="property">
+          <span class="property-name">Launch Date</span>
+          <span class="property-value">{{LAUNCH_DATE}}</span>
+        </div>
+        <div class="property">
+          <span class="property-name">Possession Date</span>
+          <span class="property-value">{{POSSESSION_DATE}}</span>
+        </div>
+        <div class="property">
+          <span class="property-name">Total Units</span>
+          <span class="property-value">{{TOTAL_UNITS}}</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="section">
+      <div class="section-title">Configurations</div>
+      <div class="config-container">
+        {{#CONFIGURATIONS}}
+          <div class="config">{{.}}</div>
+        {{/CONFIGURATIONS}}
+        {{^CONFIGURATIONS}}
+          <div class="property-value">No configurations available</div>
+        {{/CONFIGURATIONS}}
+      </div>
+    </div>
+    
+    <div class="section">
+      <div class="section-title">Amenities</div>
+      <div class="amenities-container">
+        {{#AMENITIES}}
+          <div class="amenity">{{.}}</div>
+        {{/AMENITIES}}
+        {{^AMENITIES}}
+          <div class="property-value">No amenities available</div>
+        {{/AMENITIES}}
+      </div>
+    </div>
+    
+    <div class="section">
+      <div class="section-title">Location & Details</div>
+      <div class="property">
+        <span class="property-name">Address</span>
+        <span class="property-value">{{LOCATION}}</span>
+      </div>
+      <div class="property">
+        <span class="property-name">Water Source</span>
+        <span class="property-value">{{WATER_SOURCE}}</span>
+      </div>
+      <div class="property">
+        <span class="property-name">RERA ID</span>
+        <span class="property-value">{{RERA_ID}}</span>
+      </div>
+      <div class="property">
+        <span class="property-name">Acknowledgement</span>
+        <span class="property-value">{{ACKNOWLEDGEMENT}}</span>
+      </div>
+      <div class="property">
+        <span class="property-name">Approval Authority</span>
+        <span class="property-value">{{APPROVAL_AUTHORITY}}</span>
+      </div>
+      <div class="property">
+        <span class="property-name">Handover Date</span>
+        <span class="property-value">{{HANDOVER_DATE}}</span>
+      </div>
+      {{#HAS_COORDINATES}}
+      <div class="property">
+        <span class="property-name">Coordinates</span>
+        <span class="property-value">Lat: {{LAT}}, Long: {{LONG}}</span>
+      </div>
+      <div class="location-map">
+        <img src="https://maps.googleapis.com/maps/api/staticmap?center={{LAT}},{{LONG}}&zoom=15&size=600x300&maptype=roadmap&markers=color:red%7C{{LAT}},{{LONG}}&key=YOUR_API_KEY" width="100%" height="100%" alt="Property location map">
+      </div>
+      {{/HAS_COORDINATES}}
+    </div>
+    
+    <div class="section">
+      <div class="section-title">Legal Information</div>
+      <div class="property-info">
+        <div class="property">
+          <span class="property-name">Title Cleared</span>
+          <span class="property-value">{{TITLE_CLEARED}}</span>
+        </div>
+        <div class="property">
+          <span class="property-name">Khata Type</span>
+          <span class="property-value">{{KHATA_TYPE}}</span>
+        </div>
+        <div class="property">
+          <span class="property-name">Litigation</span>
+          <span class="property-value">{{LITIGATION}}</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer">
+      This document was generated on {{GENERATION_DATE}} and contains property information as recorded in our database. 
+      Last Updated: {{LAST_UPDATED}}
+    </div>
+  </body>
+</html> 

@@ -3,27 +3,125 @@
   <head>
     <meta charset="UTF-8" />
     <title>Disclaimer</title>
+    <style>
+      body {
+        font-family: 'Arial', sans-serif;
+        padding: 0;
+        margin: 0;
+        background-color: #f8f9fa;
+        color: #2c3e50;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
+      
+      .disclaimer-container {
+        width: 85%;
+        max-width: 1000px;
+        margin: 40px auto;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+      
+      .disclaimer-header {
+        background-color: #2c3e50;
+        color: white;
+        padding: 30px;
+        position: relative;
+      }
+      
+      .disclaimer-title {
+        font-size: 28px;
+        font-weight: bold;
+        margin: 0;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #3498db;
+        display: inline-block;
+      }
+      
+      .disclaimer-content {
+        padding: 30px;
+        line-height: 1.6;
+        font-size: 16px;
+        color: #34495e;
+      }
+      
+      .disclaimer-section {
+        margin-bottom: 20px;
+      }
+      
+      .disclaimer-footer {
+        background-color: #f1f2f6;
+        padding: 20px 30px;
+        font-size: 14px;
+        color: #7f8c8d;
+        border-top: 1px solid #e0e0e0;
+      }
+      
+      .note {
+        font-style: italic;
+        opacity: 0.8;
+      }
+      
+      .section-title {
+        font-weight: bold;
+        color: #2c3e50;
+        margin-bottom: 10px;
+        font-size: 18px;
+      }
+      
+      .highlight {
+        color: #e74c3c;
+        font-weight: bold;
+      }
+    </style>
   </head>
   <body>
-    <div class="disclaimer-link">
-      Want to invest?
-    </div>
-    <div class="disclaimer-box">
-      <div class="disclaimer-title">Disclaimer</div>
+    <div class="disclaimer-container">
+      <div class="disclaimer-header">
+        <div class="disclaimer-title">Legal Disclaimer</div>
+      </div>
+      
       <div class="disclaimer-content">
-        The information provided about project is for informational purposes
-        only and is based on preliminary details. Please note that all project
-        specifications, pricing, and timelines are subject to change as the
-        project progresses. The project is currently awaiting RERA approval, and
-        any changes to regulatory requirements may affect the final details.<br /><br />
-        This document does not constitute legal, financial, or professional
-        advice. Agents and prospective buyers are encouraged to consult with
-        relevant professionals before making any decisions based on the
-        information shared. We recommend conducting your own due diligence and
-        verifying all project details independently.<br /><br />
-        The developer and associated entities are not liable for any actions or
-        decisions made based on the information contained in this document. By
-        using this document, you acknowledge and agree to these terms.
+        <div class="disclaimer-section">
+          <div class="section-title">Information Accuracy</div>
+          <p>
+            The information provided in this report is for informational purposes only and is based on data available at the time of generation. 
+            Please note that all project specifications, pricing, and timelines are subject to change as the project progresses. 
+            Any changes to regulatory requirements may affect the final details.
+          </p>
+        </div>
+        
+        <div class="disclaimer-section">
+          <div class="section-title">Not Financial Advice</div>
+          <p>
+            This document does not constitute legal, financial, or professional advice. 
+            <span class="highlight">Prospective investors are encouraged to consult with relevant professionals</span> before making any decisions based on the information shared. 
+            We recommend conducting your own due diligence and verifying all project details independently.
+          </p>
+        </div>
+        
+        <div class="disclaimer-section">
+          <div class="section-title">Limitation of Liability</div>
+          <p>
+            The developer and associated entities are not liable for any actions or decisions made based on the information contained in this document. 
+            By using this document, you acknowledge and agree to these terms.
+          </p>
+        </div>
+        
+        <div class="disclaimer-section note">
+          <p>
+            RERA approval status and all project details should be independently verified before making any investment decisions.
+            TruEstate provides this information as a service, and makes no warranties about the completeness, reliability, and accuracy of this information.
+          </p>
+        </div>
+      </div>
+      
+      <div class="disclaimer-footer">
+        This is a confidential document intended only for the recipient. Unauthorized reproduction or distribution is prohibited.
       </div>
     </div>
   </body>
