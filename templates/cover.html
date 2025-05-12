@@ -1,151 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Real Estate Investment Report</title>
-    <style>
-      body {
-        margin: 0;
-        padding: 0;
-        background-color: #2c3e50;
-        font-family: 'Arial', sans-serif;
-        height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-      }
-      .container {
-        width: 90%;
-        height: 90%;
-        display: flex;
-        flex-direction: column;
-        position: relative;
-        overflow: hidden;
-      }
-      .blueprint-bg {
-        position: absolute;
-        bottom: 0;
-        right: 0;
-        width: 70%;
-        height: 70%;
-        opacity: 0.15;
-        z-index: 1;
-        background-image: url('../assets/blueprint.png');
-        background-size: contain;
-        background-position: bottom right;
-        background-repeat: no-repeat;
-        border: 1px solid rgba(255,255,255,0.1);
-        /* Fallback design if image is not available */
-        background-color: rgba(0,0,0,0.2);
-        background-image: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-                          linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);
-        background-size: 20px 20px, 20px 20px;
-      }
-      .content {
-        z-index: 2;
-        position: relative;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        padding: 50px;
-      }
-      .logo {
-        font-size: 18px;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        margin-bottom: 80px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid rgba(255,255,255,0.3);
-        width: fit-content;
-      }
-      .title-section {
-        margin-bottom: 50px;
-      }
-      .label {
-        color: #3498db;
-        font-size: 18px;
-        margin-bottom: 15px;
-        font-weight: 500;
-      }
-      .title {
-        font-size: 54px;
-        font-weight: bold;
-        text-transform: uppercase;
-        margin-bottom: 20px;
-        line-height: 1.2;
-      }
-      .subtitle {
-        font-size: 28px;
-        opacity: 0.8;
-        margin-bottom: 15px;
-        font-weight: 300;
-        color: #3498db;
-      }
-      .project {
-        font-size: 52px;
-        font-weight: 700;
-        margin-bottom: 25px;
-        line-height: 1.2;
-        text-transform: capitalize;
-        color: #fff;
-        border-left: 5px solid #3498db;
-        padding-left: 20px;
-      }
-      .date {
-        font-size: 18px;
-        font-weight: light;
-        margin-top: 8px;
-        color: rgba(255,255,255,0.7);
-      }
-      .footer {
-        margin-top: auto;
-        font-size: 14px;
-        opacity: 0.7;
-        display: flex;
-        justify-content: space-between;
-      }
-      .separator {
-        width: 50px;
-        height: 5px;
-        background-color: #3498db;
-        margin: 20px 0;
-      }
-      .design-element {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 120px;
-        height: 120px;
-        border-top: 3px solid #3498db;
-        border-left: 3px solid #3498db;
-        opacity: 0.7;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <div class="blueprint-bg"></div>
-      <div class="design-element"></div>
-      <div class="content">
-        <div class="logo">TruEstate</div>
-        
-        <div class="title-section">
-          <div class="label">EXCLUSIVE</div>
-          <div class="title">PROPERTY REPORT</div>
-          <div class="separator"></div>
-          <div class="subtitle">Investment Analysis</div>
-        </div>
-        
-        <div class="project">{{PROJECT_NAME}}</div>
-        <div class="date">Report Generated: {{UPDATED_DATE}}</div>
-        
-        <div class="footer">
-          <div>CONFIDENTIAL INVESTMENT DOCUMENT</div>
-          <div>TruEstate Research Team</div>
-        </div>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TruEstate Investment Report</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body, html {
+      height: 100%;
+      font-family: Arial, sans-serif;
+      color: white;
+      background-color: #004642;
+    }
+    
+    .report-container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .bg-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #004642;
+      z-index: 1;
+    }
+    
+    .content-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      padding: 50px;
+    }
+    
+    /* Header removed and replaced with direct logo positioning */
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      margin-bottom: 200px;
+    }
+    
+    .logo-icon {
+      margin-right: 15px;
+    }
+    
+    .logo-text {
+      font-size: 32px;
+      font-weight: bold;
+    }
+    
+    .date {
+      font-size: 16px;
+      position: absolute;
+      top: 0;
+      right: 50px;
+    }
+    
+    .report-info {
+      max-width: 50%;
+    }
+    
+    .label {
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+    
+    .project-name {
+      font-size: 58px;
+      font-weight: bold;
+      line-height: 1.1;
+    }
+    
+    .blueprint-overlay {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"><path d="M150,280 L150,100 L180,80 L220,100 L260,80 L290,100 L290,280 M180,80 L180,280 M220,100 L220,280 M260,80 L260,280 M150,120 L290,120 M150,140 L290,140 M150,160 L290,160 M150,180 L290,180 M150,200 L290,200 M150,220 L290,220 M150,240 L290,240 M150,260 L290,260 M165,110 L165,130 M195,110 L195,130 M225,110 L225,130 M255,110 L255,130 M165,150 L165,170 M195,150 L195,170 M225,150 L225,170 M255,150 L255,170 M165,190 L165,210 M195,190 L195,210 M225,190 L225,210 M255,190 L255,210 M165,230 L165,250 M195,230 L195,250 M225,230 L225,250 M255,230 L255,250"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right center;
+      background-size: 60%;
+      opacity: 0.2;
+      z-index: 1;
+    }
+    
+    /* Divider removed as requested */
+  </style>
+</head>
+<body>
+  <div class="report-container">
+    <!-- Solid background color -->
+    <div class="bg-image"></div>
+    
+    <!-- Blueprint overlay on right side -->
+    <div class="blueprint-overlay"></div>
+    
+    <!-- Divider removed as requested -->
+    
+    <!-- Content overlay -->
+    <div class="content-overlay">
+      <div class="logo">
+        <svg class="logo-icon" width="40" height="40" viewBox="0 0 40 40" fill="white">
+          <path d="M20,4L6,16v20h28V16L20,4z M20,9l9,7.5V32H11V16.5L20,9z"/>
+        </svg>
+        <div class="logo-text">TruEstate</div>
+      </div>
+      <div class="date">Updated on: {{UPDATED_DATE}}</div>
+      
+      <div class="report-info">
+        <div class="label">Investment Report</div>
+        <div class="project-name">{{PROJECT_NAME}}</div>
       </div>
     </div>
-  </body>
+  </div>
+</body>
 </html>

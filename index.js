@@ -131,8 +131,8 @@ function loadTemplate(templateName) {
 }
 
 // Process and render the cover page
-function renderCoverPage(projectName) {
-  const template = loadTemplate("cover");
+function renderCoverPage(projectData) {
+  const template = loadTemplate('cover');
   const currentDate = new Date();
   const formattedDate = currentDate.toLocaleDateString("en-US", {
     month: "2-digit",
@@ -141,8 +141,8 @@ function renderCoverPage(projectName) {
   });
 
   return template({
-    PROJECT_NAME: projectName || "Unnamed Project",
-    UPDATED_DATE: formattedDate,
+    PROJECT_NAME: projectData.projectName || "Unnamed Project",
+    UPDATED_DATE: projectData.lastUpdated || formattedDate 
   });
 }
 
@@ -680,6 +680,7 @@ app.get("/download-pdf", async (req, res) => {
   try {
     console.log("Received PDF request");
     const projectId = req.query.projectId;
+    const debugMode = req.query.debug === 'true';
     const viewOnly = req.query.view === "true"; // New parameter to control behavior
 
     if (!projectId) {
@@ -735,112 +736,370 @@ app.get("/download-pdf", async (req, res) => {
       "utf8"
     );
 
-    // Combine all pages with page breaks
-    const combinedHtml = `
-      <html>
-        <head>
-          <style>
-            @page {
-              size: A4;
-              margin: 0;
-            }
-            html, body {
-              margin: 0;
-              padding: 0;
-              flex-direction: column;
-              width: 100%;
-              height: 100%;
-            }
-            .page-break {
-              page-break-before: always;
-              display: block;
-              height: 0;
-              clear: both;
-            }
-            .page-container {
-              display: block;
-              position: relative;
-              width: 100%;
-              box-sizing: border-box;
-            }
-          </style>
-        </head>
-        <body>
-          <div class="page-container">${coverHtml}</div>
+    // Try a completely different approach - generate individual PDFs for each page and then merge them
+    try {
+      console.log('Attempting to generate PDF using multi-page approach...');
+      
+      // Generate individual HTML files for each page
+      const coverPageHtml = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="UTF-8">
+            <style>
+              body, html {
+                margin: 0;
+                padding: 0;
+                height: 100vh;
+                width: 100%;
+                overflow: hidden;
+              }
+              /* Landscape-specific styling */
+              @page {
+                size: A4 landscape;
+                margin: 0;
+              }
+              .landscape-container {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                flex-direction: row;
+              }
+            </style>
+          </head>
+          <body>${coverHtml}</body>
+        </html>
+      `;
+      
+      const detailsPageHtml = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="UTF-8">
+            <style>
+              body, html {
+                margin: 0;
+                padding: 0;
+                height: 100vh;
+                width: 100%;
+                overflow: hidden;
+                background-color: #f9f9f9;
+              }
+              /* Landscape-specific styling */
+              @page {
+                size: A4 landscape;
+                margin: 0;
+              }
+              .content-wrapper {
+                padding: 40px;
+                max-width: 100%;
+                overflow-x: hidden;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="content-wrapper">
+              ${detailsHtml}
+            </div>
+          </body>
+        </html>
+      `;
+      
+      const specsPageHtml = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="UTF-8">
+            <style>
+              body, html {
+                margin: 0;
+                padding: 0;
+                height: 100vh;
+                width: 100%;
+                overflow: hidden;
+                background-color: #f9f9f9;
+              }
+              /* Landscape-specific styling */
+              @page {
+                size: A4 landscape;
+                margin: 0;
+              }
+              .content-wrapper {
+                padding: 40px;
+                max-width: 100%;
+                overflow-x: hidden;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="content-wrapper">
+              ${specsHtml}
+            </div>
+          </body>
+        </html>
+      `;
+      
+      const galleryPageHtml = processedImages.length > 0 ? `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="UTF-8">
+            <style>
+              body, html {
+                margin: 0;
+                padding: 0;
+                height: 100vh;
+                width: 100%;
+                overflow: hidden;
+                background-color: #f9f9f9;
+              }
+              /* Landscape-specific styling */
+              @page {
+                size: A4 landscape;
+                margin: 0;
+              }
+              .content-wrapper {
+                padding: 40px;
+                max-width: 100%;
+                overflow-x: hidden;
+              }
+              /* Make gallery grid better for landscape */
+              .image-gallery {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 20px;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="content-wrapper">
+              ${galleryHtml}
+            </div>
+          </body>
+        </html>
+      ` : null;
+      
+      const disclaimerPageHtml = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="UTF-8">
+            <style>
+              body, html {
+                margin: 0;
+                padding: 0;
+                height: 100vh;
+                width: 100%;
+                overflow: hidden;
+                background-color: #f9f9f9;
+              }
+              /* Landscape-specific styling */
+              @page {
+                size: A4 landscape;
+                margin: 0;
+              }
+              .content-wrapper {
+                padding: 40px;
+                max-width: 100%;
+                overflow-x: hidden;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="content-wrapper">
+              ${disclaimerHtml}
+            </div>
+          </body>
+        </html>
+      `;
+      
+      // Write the HTML files to disk
+      const pagesDir = path.join(__dirname, 'pages');
+      if (!fs.existsSync(pagesDir)) {
+        fs.mkdirSync(pagesDir);
+      }
+      
+      fs.writeFileSync(path.join(pagesDir, 'cover.html'), coverPageHtml);
+      fs.writeFileSync(path.join(pagesDir, 'details.html'), detailsPageHtml);
+      fs.writeFileSync(path.join(pagesDir, 'specs.html'), specsPageHtml);
+      if (galleryPageHtml) {
+        fs.writeFileSync(path.join(pagesDir, 'gallery.html'), galleryPageHtml);
+      }
+      fs.writeFileSync(path.join(pagesDir, 'disclaimer.html'), disclaimerPageHtml);
+      
+      // Generate PDFs for each page
+      const browser = await puppeteer.launch({
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu']
+      });
+      
+      try {
+        const pdfFilenames = [];
+        
+        // Generate PDF for cover page
+        const coverPdfPath = path.join(pagesDir, 'cover.pdf');
+        const coverPage = await browser.newPage();
+        await coverPage.goto(`file://${path.join(pagesDir, 'cover.html')}`, { waitUntil: 'networkidle0' });
+        await coverPage.pdf({
+          path: coverPdfPath,
+          format: 'A4',
+          landscape: true,
+          printBackground: true,
+          margin: {
+            top: "0.2in",
+            right: "0.2in",
+            bottom: "0.2in",
+            left: "0.2in"
+          },
+          preferCSSPageSize: true
+        });
+        pdfFilenames.push(coverPdfPath);
+        await coverPage.close();
+        
+        // Generate PDF for details page
+        const detailsPdfPath = path.join(pagesDir, 'details.pdf');
+        const detailsPage = await browser.newPage();
+        await detailsPage.goto(`file://${path.join(pagesDir, 'details.html')}`, { waitUntil: 'networkidle0' });
+        await detailsPage.pdf({
+          path: detailsPdfPath,
+          format: 'A4',
+          landscape: true,
+          printBackground: true,
+          margin: {
+            top: "0.4in",
+            right: "0.4in",
+            bottom: "0.4in",
+            left: "0.4in"
+          },
+          preferCSSPageSize: true
+        });
+        pdfFilenames.push(detailsPdfPath);
+        await detailsPage.close();
+        
+        // Generate PDF for specs page
+        const specsPdfPath = path.join(pagesDir, 'specs.pdf');
+        const specsPage = await browser.newPage();
+        await specsPage.goto(`file://${path.join(pagesDir, 'specs.html')}`, { waitUntil: 'networkidle0' });
+        await specsPage.pdf({
+          path: specsPdfPath,
+          format: 'A4',
+          landscape: true,
+          printBackground: true,
+          margin: {
+            top: "0.4in",
+            right: "0.4in",
+            bottom: "0.4in",
+            left: "0.4in"
+          },
+          preferCSSPageSize: true
+        });
+        pdfFilenames.push(specsPdfPath);
+        await specsPage.close();
+        
+        // Generate PDF for gallery page (if exists)
+        if (galleryPageHtml) {
+          const galleryPdfPath = path.join(pagesDir, 'gallery.pdf');
+          const galleryPage = await browser.newPage();
+          await galleryPage.goto(`file://${path.join(pagesDir, 'gallery.html')}`, { waitUntil: 'networkidle0' });
+          await galleryPage.pdf({
+            path: galleryPdfPath,
+            format: 'A4',
+            landscape: true,
+            printBackground: true,
+            margin: {
+              top: "0.4in",
+              right: "0.4in",
+              bottom: "0.4in",
+              left: "0.4in"
+            },
+            preferCSSPageSize: true
+          });
+          pdfFilenames.push(galleryPdfPath);
+          await galleryPage.close();
+        }
+        
+        // Generate PDF for disclaimer page
+        const disclaimerPdfPath = path.join(pagesDir, 'disclaimer.pdf');
+        const disclaimerPage = await browser.newPage();
+        await disclaimerPage.goto(`file://${path.join(pagesDir, 'disclaimer.html')}`, { waitUntil: 'networkidle0' });
+        await disclaimerPage.pdf({
+          path: disclaimerPdfPath,
+          format: 'A4',
+          landscape: true,
+          printBackground: true,
+          margin: {
+            top: "0.4in",
+            right: "0.4in",
+            bottom: "0.4in",
+            left: "0.4in"
+          },
+          preferCSSPageSize: true
+        });
+        pdfFilenames.push(disclaimerPdfPath);
+        await disclaimerPage.close();
+        
+        // Merge all PDFs
+        const { PDFDocument } = require('pdf-lib');
+        
+        async function mergePDFs(pdfPaths) {
+          const mergedPdf = await PDFDocument.create();
           
-          <div class="page-break"></div>
-          <div class="page-container">${detailsHtml}</div>
-          
-          <div class="page-break"></div>
-          <div class="page-container">${specsHtml}</div>
-          
-          ${
-            processedImages.length > 0
-              ? '<div class="page-break"></div><div class="page-container">' +
-                galleryHtml +
-                "</div>"
-              : ""
+          for (const pdfPath of pdfPaths) {
+            const pdfBytes = fs.readFileSync(pdfPath);
+            const pdf = await PDFDocument.load(pdfBytes);
+            const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+            copiedPages.forEach(page => mergedPdf.addPage(page));
           }
           
-          <div class="page-break"></div>
-          <div class="page-container">${disclaimerHtml}</div>
-        </body>
-      </html>
-    `;
-
-    const browser = await puppeteer.launch({
-      args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-gpu"],
-    });
-    const page = await browser.newPage();
-
-    // Set a larger viewport size for better rendering
-    await page.setViewport({
-      width: 1200,
-      height: 1600,
-      deviceScaleFactor: 1,
-    });
-
-    await page.setContent(combinedHtml, { waitUntil: "networkidle0" });
-
-    const filename = `${projectName.replace(/\s+/g, "_")}_Report.pdf`;
-    const filePath = path.join(__dirname, filename);
-
-    await page.pdf({
-      path: filePath,
-      format: "A4",
-      printBackground: true,
-      margin: {
-        top: "0.4in",
-        right: "0.4in",
-        bottom: "0.4in",
-        left: "0.4in",
-      },
-      preferCSSPageSize: false,
-    });
-
-    await browser.close();
-
-    // Read the generated PDF file
-    const pdfBuffer = fs.readFileSync(filePath);
-
-    if (viewOnly) {
-      // Set headers for viewing in browser
-      res.setHeader("Content-Type", "application/pdf");
-      res.setHeader("Content-Disposition", `inline; filename="${filename}"`);
-      res.send(pdfBuffer);
-    } else {
-      // Download the file
-      res.download(filePath, filename, (err) => {
-        if (err) {
-          console.error("Error sending file:", err);
+          const mergedPdfBytes = await mergedPdf.save();
+          return mergedPdfBytes;
         }
-        // Delete the file after download attempt
-        fs.unlink(filePath, (unlinkErr) => {
-          if (unlinkErr) {
-            console.error("Error deleting file:", unlinkErr);
+        
+        const filename = `${projectName.replace(/\s+/g, '_')}_Report.pdf`;
+        const filePath = path.join(__dirname, filename);
+        
+        const mergedPdfBytes = await mergePDFs(pdfFilenames);
+        fs.writeFileSync(filePath, mergedPdfBytes);
+        
+        // Clean up the individual PDF files
+        pdfFilenames.forEach(pdfPath => {
+          try {
+            fs.unlinkSync(pdfPath);
+          } catch (err) {
+            console.error(`Failed to delete temporary PDF: ${pdfPath}`, err);
           }
         });
-      });
+        
+        // Send the PDF as a download
+        res.download(filePath, filename, (err) => {
+          if (err) {
+            console.error("Error sending file:", err);
+          }
+          // Delete the file after download attempt
+          fs.unlink(filePath, (unlinkErr) => {
+            if (unlinkErr) {
+              console.error("Error deleting file:", unlinkErr);
+            }
+          });
+          
+          // Clean up the HTML files
+          try {
+            fs.unlinkSync(path.join(pagesDir, 'cover.html'));
+            fs.unlinkSync(path.join(pagesDir, 'details.html'));
+            fs.unlinkSync(path.join(pagesDir, 'specs.html'));
+            if (galleryPageHtml) {
+              fs.unlinkSync(path.join(pagesDir, 'gallery.html'));
+            }
+            fs.unlinkSync(path.join(pagesDir, 'disclaimer.html'));
+          } catch (err) {
+            console.error("Error cleaning up HTML files:", err);
+          }
+        });
+      } finally {
+        await browser.close();
+      }
+    } catch (pdfError) {
+      console.error('Error generating PDF:', pdfError);
+      res.status(500).send('Failed to generate PDF');
     }
   } catch (err) {
     console.error("Error generating PDF:", err);
@@ -848,24 +1107,19 @@ app.get("/download-pdf", async (req, res) => {
   }
 });
 
-// Debug route to test cover page rendering
-app.get("/test-cover", async (req, res) => {
+// Simple route to view just the cover template
+app.get('/debug-cover', (req, res) => {
   try {
-    // Create sample data
-    const projectData = {
-      projectName: "Sample Project Name",
-      isReraApproved: "Approved",
-      status: "Under Construction",
+    const sampleData = {
+      projectName: "Sample Test Project",
+      status: "Under Construction"
     };
-
-    // Render the cover page
-    const coverHtml = renderCoverPage(projectData);
-
-    // Send the HTML directly
-    res.send(coverHtml);
+    
+    const html = renderCoverPage(sampleData);
+    res.send(html);
   } catch (err) {
-    console.error("Error rendering test cover:", err);
-    res.status(500).send("Failed to render test cover");
+    console.error('Error rendering debug cover:', err);
+    res.status(500).send('Error rendering debug cover');
   }
 });
 
