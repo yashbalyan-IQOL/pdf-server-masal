@@ -8,9 +8,19 @@ const fs = require("fs");
 const puppeteer = require("puppeteer");
 const path = require("path");
 const Handlebars = require("handlebars");
+const cors = require("cors");
 
 const app = express();
 const port = 3000;
+
+// Configure CORS
+app.use(
+  cors({
+    origin: "*", // Allow all origins
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 // Middleware to parse JSON bodies
 app.use(express.json());
@@ -55,84 +65,102 @@ async function getSignedUrl(path) {
 
 // Helper function to extract all images from nested objects
 function extractImagesFromNestedObjects(obj, imageList = []) {
-  if (!obj || typeof obj !== 'object') return imageList;
-  
+  if (!obj || typeof obj !== "object") return imageList;
+
   // Check if the current object is an array
   if (Array.isArray(obj)) {
     // If it's an images array, add all items to the image list
-    if (obj.length > 0 && typeof obj[0] === 'string' && (
-        obj[0].includes('firebasestorage.googleapis.com') || 
-        obj[0].includes('http') && (
-          obj[0].endsWith('.jpg') || 
-          obj[0].endsWith('.jpeg') || 
-          obj[0].endsWith('.png') || 
-          obj[0].endsWith('.webp')
-        )
-      )) {
+    if (
+      obj.length > 0 &&
+      typeof obj[0] === "string" &&
+      (obj[0].includes("firebasestorage.googleapis.com") ||
+        (obj[0].includes("http") &&
+          (obj[0].endsWith(".jpg") ||
+            obj[0].endsWith(".jpeg") ||
+            obj[0].endsWith(".png") ||
+            obj[0].endsWith(".webp"))))
+    ) {
       imageList.push(...obj);
     } else {
       // If it's some other array, process each item recursively
-      obj.forEach(item => extractImagesFromNestedObjects(item, imageList));
+      obj.forEach((item) => extractImagesFromNestedObjects(item, imageList));
     }
   } else {
     // Process each key in the object
     for (const key in obj) {
       const value = obj[key];
-      
+
       // If the key is 'images' and the value is an array of strings, add them to the image list
-      if (key === 'images' && Array.isArray(value) && value.length > 0 && typeof value[0] === 'string') {
+      if (
+        key === "images" &&
+        Array.isArray(value) &&
+        value.length > 0 &&
+        typeof value[0] === "string"
+      ) {
         imageList.push(...value);
-      } 
+      }
       // If the key contains 'image' or 'photo' and the value is a string URL, add it to the image list
-      else if ((key.includes('image') || key.includes('photo') || key.includes('img')) && 
-               typeof value === 'string' && 
-               (value.includes('http') || value.includes('firebasestorage'))) {
+      else if (
+        (key.includes("image") ||
+          key.includes("photo") ||
+          key.includes("img")) &&
+        typeof value === "string" &&
+        (value.includes("http") || value.includes("firebasestorage"))
+      ) {
         imageList.push(value);
       }
       // If the value is an object or array, process it recursively
-      else if (value && typeof value === 'object') {
+      else if (value && typeof value === "object") {
         extractImagesFromNestedObjects(value, imageList);
       }
     }
   }
-  
+
   return imageList;
 }
 
 // Load and compile templates
 function loadTemplate(templateName) {
-  const templatePath = path.join(__dirname, 'templates', `${templateName}.html`);
-  const templateSource = fs.readFileSync(templatePath, 'utf8');
+  const templatePath = path.join(
+    __dirname,
+    "templates",
+    `${templateName}.html`
+  );
+  const templateSource = fs.readFileSync(templatePath, "utf8");
   return Handlebars.compile(templateSource);
 }
 
 // Process and render the cover page
 function renderCoverPage(projectName) {
-  const template = loadTemplate('cover');
+  const template = loadTemplate("cover");
   const currentDate = new Date();
-  const formattedDate = currentDate.toLocaleDateString('en-US', {
-    month: '2-digit',
-    day: '2-digit',
-    year: 'numeric'
+  const formattedDate = currentDate.toLocaleDateString("en-US", {
+    month: "2-digit",
+    day: "2-digit",
+    year: "numeric",
   });
-  
+
   return template({
     PROJECT_NAME: projectName || "Unnamed Project",
-    UPDATED_DATE: formattedDate
+    UPDATED_DATE: formattedDate,
   });
 }
 
 // Process and render the details page
 function renderDetailsPage(projectData) {
-  const template = loadTemplate('details');
-  
+  const template = loadTemplate("details");
+
   return template({
     PROJECT_NAME: projectData.projectName || "Unnamed Project",
     IS_RERA_APPROVED: projectData.isReraApproved === "Approved",
     STATUS: projectData.status || "N/A",
-    ASSET_TYPE: projectData.assetType ? projectData.assetType.toUpperCase() : "N/A",
+    ASSET_TYPE: projectData.assetType
+      ? projectData.assetType.toUpperCase()
+      : "N/A",
     AREA: projectData.area || "N/A",
-    PROJECT_LAND_AREA: projectData.projectLandArea ? `${projectData.projectLandArea} sqft` : "N/A",
+    PROJECT_LAND_AREA: projectData.projectLandArea
+      ? `${projectData.projectLandArea} sqft`
+      : "N/A",
     LAUNCH_DATE: projectData.launchDate || "N/A",
     POSSESSION_DATE: projectData.possession || "N/A",
     TOTAL_UNITS: projectData.totalUnits || "N/A",
@@ -147,65 +175,76 @@ function renderDetailsPage(projectData) {
     HAS_COORDINATES: projectData.lat && projectData.long,
     LAT: projectData.lat,
     LONG: projectData.long,
-    TITLE_CLEARED: projectData.isTitleCleared !== null ? projectData.isTitleCleared : "N/A",
+    TITLE_CLEARED:
+      projectData.isTitleCleared !== null ? projectData.isTitleCleared : "N/A",
     KHATA_TYPE: projectData.khataType !== null ? projectData.khataType : "N/A",
-    LITIGATION: projectData.litigation !== null ? (projectData.litigation ? "Yes" : "No") : "N/A",
+    LITIGATION:
+      projectData.litigation !== null
+        ? projectData.litigation
+          ? "Yes"
+          : "No"
+        : "N/A",
     GENERATION_DATE: new Date().toLocaleDateString(),
-    LAST_UPDATED: projectData.lastUpdated 
-      ? new Date(projectData.lastUpdated * 1000).toLocaleDateString() 
-      : "Unknown"
+    LAST_UPDATED: projectData.lastUpdated
+      ? new Date(projectData.lastUpdated * 1000).toLocaleDateString()
+      : "Unknown",
   });
 }
 
 // Process and render the specs page
 function renderSpecsPage(projectData) {
-  const template = loadTemplate('specifications');
-  
+  const template = loadTemplate("specifications");
+
   // Default values for construction specifications if not available
   const specs = {
     STRUCTURE_SPEC: "RCC framed structure with seismic considerations",
     WALLS_SPEC: "Concrete blocks with weather-resistant exterior finish",
     INTERNAL_WALLS_SPEC: "Solid concrete block partitions with smooth finish",
-    FLOORING_SPEC: "Vitrified tiles in living areas, anti-skid ceramic in wet areas",
+    FLOORING_SPEC:
+      "Vitrified tiles in living areas, anti-skid ceramic in wet areas",
     WINDOWS_SPEC: "UPVC framed windows with appropriate glazing",
     DOORS_SPEC: "Engineered wooden doors with quality hardware",
-    PAINTING_SPEC: "Premium emulsion paint for internal walls, exterior grade paint outside"
+    PAINTING_SPEC:
+      "Premium emulsion paint for internal walls, exterior grade paint outside",
   };
-  
+
   return template({
     PROJECT_NAME: projectData.projectName || "Unnamed Project",
     STRUCTURE_SPEC: projectData.structureSpec || specs.STRUCTURE_SPEC,
     WALLS_SPEC: projectData.wallsSpec || specs.WALLS_SPEC,
-    INTERNAL_WALLS_SPEC: projectData.internalWallsSpec || specs.INTERNAL_WALLS_SPEC,
+    INTERNAL_WALLS_SPEC:
+      projectData.internalWallsSpec || specs.INTERNAL_WALLS_SPEC,
     FLOORING_SPEC: projectData.flooringSpec || specs.FLOORING_SPEC,
     WINDOWS_SPEC: projectData.windowsSpec || specs.WINDOWS_SPEC,
     DOORS_SPEC: projectData.doorsSpec || specs.DOORS_SPEC,
     PAINTING_SPEC: projectData.paintingSpec || specs.PAINTING_SPEC,
     TOTAL_UNITS: projectData.totalUnits || "N/A",
     TOWER_UNITS: projectData.towerUnits || "N/A",
-    PROJECT_LAND_AREA: projectData.projectLandArea ? `${projectData.projectLandArea} sqft` : "N/A",
+    PROJECT_LAND_AREA: projectData.projectLandArea
+      ? `${projectData.projectLandArea} sqft`
+      : "N/A",
     UNIT_SIZES: projectData.unitSizes || "Various configurations available",
     APPROVAL_AUTHORITY: projectData.approvalAuthority || "N/A",
     HANDOVER_DATE: projectData.handOverDate || "N/A",
-    AMENITIES: projectData.amenities || []
+    AMENITIES: projectData.amenities || [],
   });
 }
 
 // Process and render the gallery page
 function renderGalleryPage(projectName, images) {
-  const template = loadTemplate('gallery');
-  
+  const template = loadTemplate("gallery");
+
   // Create image objects with captions
   const imageObjects = images.map((url, index) => ({
     URL: url,
-    CAPTION: `Property View ${index + 1}`
+    CAPTION: `Property View ${index + 1}`,
   }));
-  
+
   return template({
     PROJECT_NAME: projectName,
     HAS_IMAGES: images.length > 0,
     IMAGES: imageObjects,
-    CURRENT_YEAR: new Date().getFullYear()
+    CURRENT_YEAR: new Date().getFullYear(),
   });
 }
 
@@ -290,7 +329,7 @@ function renderProjectDetailsTemplate(projectData) {
   // Extract images from all nested objects
   const allImages = extractImagesFromNestedObjects(projectData);
   console.log(`Found ${allImages.length} images in the project data`);
-  
+
   let html = `
   <!DOCTYPE html>
   <html lang="en">
@@ -448,9 +487,12 @@ function renderProjectDetailsTemplate(projectData) {
     </head>
     <body>
       <div class="header">
-        <h1>${projectData.projectName || 'Property Details'}</h1>
-        ${projectData.isReraApproved === "Approved" ? 
-          `<div class="rera-approval">RERA Approved</div>` : ''}
+        <h1>${projectData.projectName || "Property Details"}</h1>
+        ${
+          projectData.isReraApproved === "Approved"
+            ? `<div class="rera-approval">RERA Approved</div>`
+            : ""
+        }
       </div>
       
       <div class="section">
@@ -459,32 +501,46 @@ function renderProjectDetailsTemplate(projectData) {
           <div class="property">
             <span class="property-name">Project Status</span>
             <span class="property-value">
-              <span class="status-tag">${projectData.status || 'N/A'}</span>
+              <span class="status-tag">${projectData.status || "N/A"}</span>
             </span>
           </div>
           <div class="property">
             <span class="property-name">Asset Type</span>
-            <span class="property-value">${projectData.assetType ? projectData.assetType.toUpperCase() : 'N/A'}</span>
+            <span class="property-value">${
+              projectData.assetType
+                ? projectData.assetType.toUpperCase()
+                : "N/A"
+            }</span>
           </div>
           <div class="property">
             <span class="property-name">Area</span>
-            <span class="property-value">${projectData.area || 'N/A'}</span>
+            <span class="property-value">${projectData.area || "N/A"}</span>
           </div>
           <div class="property">
             <span class="property-name">Project Land Area</span>
-            <span class="property-value">${projectData.projectLandArea ? projectData.projectLandArea + ' sqft' : 'N/A'}</span>
+            <span class="property-value">${
+              projectData.projectLandArea
+                ? projectData.projectLandArea + " sqft"
+                : "N/A"
+            }</span>
           </div>
           <div class="property">
             <span class="property-name">Launch Date</span>
-            <span class="property-value">${projectData.launchDate || 'N/A'}</span>
+            <span class="property-value">${
+              projectData.launchDate || "N/A"
+            }</span>
           </div>
           <div class="property">
             <span class="property-name">Possession Date</span>
-            <span class="property-value">${projectData.possession || 'N/A'}</span>
+            <span class="property-value">${
+              projectData.possession || "N/A"
+            }</span>
           </div>
           <div class="property">
             <span class="property-name">Total Units</span>
-            <span class="property-value">${projectData.totalUnits || 'N/A'}</span>
+            <span class="property-value">${
+              projectData.totalUnits || "N/A"
+            }</span>
           </div>
         </div>
       </div>
@@ -492,11 +548,16 @@ function renderProjectDetailsTemplate(projectData) {
       <div class="section">
         <div class="section-title">Configurations</div>
         <div class="config-container">
-          ${projectData.configurations && projectData.configurations.length > 0 ? 
-            projectData.configurations.map(config => `
+          ${
+            projectData.configurations && projectData.configurations.length > 0
+              ? projectData.configurations
+                  .map(
+                    (config) => `
               <div class="config">${config}</div>
-            `).join('') : 
-            '<div class="property-value">No configurations available</div>'
+            `
+                  )
+                  .join("")
+              : '<div class="property-value">No configurations available</div>'
           }
         </div>
       </div>
@@ -504,11 +565,16 @@ function renderProjectDetailsTemplate(projectData) {
       <div class="section">
         <div class="section-title">Amenities</div>
         <div class="amenities-container">
-          ${projectData.amenities && projectData.amenities.length > 0 ? 
-            projectData.amenities.map(amenity => `
+          ${
+            projectData.amenities && projectData.amenities.length > 0
+              ? projectData.amenities
+                  .map(
+                    (amenity) => `
               <div class="amenity">${amenity}</div>
-            `).join('') : 
-            '<div class="property-value">No amenities available</div>'
+            `
+                  )
+                  .join("")
+              : '<div class="property-value">No amenities available</div>'
           }
         </div>
       </div>
@@ -517,29 +583,39 @@ function renderProjectDetailsTemplate(projectData) {
         <div class="section-title">Location & Details</div>
         <div class="property">
           <span class="property-name">Address</span>
-          <span class="property-value">${projectData.location || 'N/A'}</span>
+          <span class="property-value">${projectData.location || "N/A"}</span>
         </div>
         <div class="property">
           <span class="property-name">Water Source</span>
-          <span class="property-value">${projectData.waterSource || 'N/A'}</span>
+          <span class="property-value">${
+            projectData.waterSource || "N/A"
+          }</span>
         </div>
         <div class="property">
           <span class="property-name">RERA ID</span>
-          <span class="property-value">${projectData.reraId || 'N/A'}</span>
+          <span class="property-value">${projectData.reraId || "N/A"}</span>
         </div>
         <div class="property">
           <span class="property-name">Acknowledgement</span>
-          <span class="property-value">${projectData.acknowledgement || 'N/A'}</span>
+          <span class="property-value">${
+            projectData.acknowledgement || "N/A"
+          }</span>
         </div>
         <div class="property">
           <span class="property-name">Approval Authority</span>
-          <span class="property-value">${projectData.approvalAuthority || 'N/A'}</span>
+          <span class="property-value">${
+            projectData.approvalAuthority || "N/A"
+          }</span>
         </div>
         <div class="property">
           <span class="property-name">Handover Date</span>
-          <span class="property-value">${projectData.handOverDate || 'N/A'}</span>
+          <span class="property-value">${
+            projectData.handOverDate || "N/A"
+          }</span>
         </div>
-        ${(projectData.lat && projectData.long) ? `
+        ${
+          projectData.lat && projectData.long
+            ? `
           <div class="property">
             <span class="property-name">Coordinates</span>
             <span class="property-value">Lat: ${projectData.lat}, Long: ${projectData.long}</span>
@@ -547,7 +623,9 @@ function renderProjectDetailsTemplate(projectData) {
           <div class="location-map">
             <img src="https://maps.googleapis.com/maps/api/staticmap?center=${projectData.lat},${projectData.long}&zoom=15&size=600x300&maptype=roadmap&markers=color:red%7C${projectData.lat},${projectData.long}&key=YOUR_API_KEY" width="100%" height="100%" alt="Property location map">
           </div>
-        ` : ''}
+        `
+            : ""
+        }
       </div>
       
       <div class="section">
@@ -555,29 +633,45 @@ function renderProjectDetailsTemplate(projectData) {
         <div class="property-info">
           <div class="property">
             <span class="property-name">Title Cleared</span>
-            <span class="property-value">${projectData.isTitleCleared !== null ? projectData.isTitleCleared : 'N/A'}</span>
+            <span class="property-value">${
+              projectData.isTitleCleared !== null
+                ? projectData.isTitleCleared
+                : "N/A"
+            }</span>
           </div>
           <div class="property">
             <span class="property-name">Khata Type</span>
-            <span class="property-value">${projectData.khataType !== null ? projectData.khataType : 'N/A'}</span>
+            <span class="property-value">${
+              projectData.khataType !== null ? projectData.khataType : "N/A"
+            }</span>
           </div>
           <div class="property">
             <span class="property-name">Litigation</span>
-            <span class="property-value">${projectData.litigation !== null ? (projectData.litigation ? 'Yes' : 'No') : 'N/A'}</span>
+            <span class="property-value">${
+              projectData.litigation !== null
+                ? projectData.litigation
+                  ? "Yes"
+                  : "No"
+                : "N/A"
+            }</span>
           </div>
         </div>
       </div>
       
-      ${allImages.length > 0 ? createImageGalleryHTML(allImages) : ''}
+      ${allImages.length > 0 ? createImageGalleryHTML(allImages) : ""}
       
       <div class="footer">
         This document was generated on ${new Date().toLocaleDateString()} and contains property information as recorded in our database. 
-        Last Updated: ${projectData.lastUpdated ? new Date(projectData.lastUpdated * 1000).toLocaleDateString() : 'Unknown'}
+        Last Updated: ${
+          projectData.lastUpdated
+            ? new Date(projectData.lastUpdated * 1000).toLocaleDateString()
+            : "Unknown"
+        }
       </div>
     </body>
   </html>
   `;
-  
+
   return html;
 }
 
@@ -586,29 +680,30 @@ app.get("/download-pdf", async (req, res) => {
   try {
     console.log("Received PDF request");
     const projectId = req.query.projectId;
-    
+    const viewOnly = req.query.view === "true"; // New parameter to control behavior
+
     if (!projectId) {
       return res.status(400).send("Project ID is required");
     }
-    
+
     console.log("Fetching project data for ID:", projectId);
-    
+
     // Fetch project data from Firestore
     const projectDoc = await db.collection("assetData").doc(projectId).get();
-    
+
     if (!projectDoc.exists) {
       return res.status(404).send("Project not found");
     }
-    
+
     const projectData = projectDoc.data();
     const projectName = projectData.projectName || "Unnamed Project";
-    
+
     console.log("Found project:", projectName);
 
     // Extract all images from the project data
     const allImages = extractImagesFromNestedObjects(projectData);
     console.log(`Found ${allImages.length} total images in the project data`);
-    
+
     // Process all images to get signed URLs if needed
     const processedImages = [];
     if (allImages.length > 0) {
@@ -679,7 +774,13 @@ app.get("/download-pdf", async (req, res) => {
           <div class="page-break"></div>
           <div class="page-container">${specsHtml}</div>
           
-          ${processedImages.length > 0 ? '<div class="page-break"></div><div class="page-container">' + galleryHtml + '</div>' : ''}
+          ${
+            processedImages.length > 0
+              ? '<div class="page-break"></div><div class="page-container">' +
+                galleryHtml +
+                "</div>"
+              : ""
+          }
           
           <div class="page-break"></div>
           <div class="page-container">${disclaimerHtml}</div>
@@ -688,20 +789,20 @@ app.get("/download-pdf", async (req, res) => {
     `;
 
     const browser = await puppeteer.launch({
-      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu']
+      args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-gpu"],
     });
     const page = await browser.newPage();
-    
+
     // Set a larger viewport size for better rendering
     await page.setViewport({
       width: 1200,
       height: 1600,
-      deviceScaleFactor: 1
+      deviceScaleFactor: 1,
     });
-    
+
     await page.setContent(combinedHtml, { waitUntil: "networkidle0" });
 
-    const filename = `${projectName.replace(/\s+/g, '_')}_Report.pdf`;
+    const filename = `${projectName.replace(/\s+/g, "_")}_Report.pdf`;
     const filePath = path.join(__dirname, filename);
 
     await page.pdf({
@@ -712,23 +813,35 @@ app.get("/download-pdf", async (req, res) => {
         top: "0.4in",
         right: "0.4in",
         bottom: "0.4in",
-        left: "0.4in"
+        left: "0.4in",
       },
-      preferCSSPageSize: false
+      preferCSSPageSize: false,
     });
-    
+
     await browser.close();
-    res.download(filePath, filename, (err) => {
-      if (err) {
-        console.error("Error sending file:", err);
-      }
-      // Delete the file after download attempt
-      fs.unlink(filePath, (unlinkErr) => {
-        if (unlinkErr) {
-          console.error("Error deleting file:", unlinkErr);
+
+    // Read the generated PDF file
+    const pdfBuffer = fs.readFileSync(filePath);
+
+    if (viewOnly) {
+      // Set headers for viewing in browser
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader("Content-Disposition", `inline; filename="${filename}"`);
+      res.send(pdfBuffer);
+    } else {
+      // Download the file
+      res.download(filePath, filename, (err) => {
+        if (err) {
+          console.error("Error sending file:", err);
         }
+        // Delete the file after download attempt
+        fs.unlink(filePath, (unlinkErr) => {
+          if (unlinkErr) {
+            console.error("Error deleting file:", unlinkErr);
+          }
+        });
       });
-    });
+    }
   } catch (err) {
     console.error("Error generating PDF:", err);
     res.status(500).send("Failed to generate PDF");
@@ -742,12 +855,12 @@ app.get("/test-cover", async (req, res) => {
     const projectData = {
       projectName: "Sample Project Name",
       isReraApproved: "Approved",
-      status: "Under Construction"
+      status: "Under Construction",
     };
-    
+
     // Render the cover page
     const coverHtml = renderCoverPage(projectData);
-    
+
     // Send the HTML directly
     res.send(coverHtml);
   } catch (err) {
