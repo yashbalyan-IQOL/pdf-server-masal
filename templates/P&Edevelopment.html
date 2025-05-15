@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proposed Vs Existing Development</title>
+    <style>
+      @page {
+        size: 1600px 800px;
+        margin: 0;
+      }
+      
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        
+        background-color: #f8f8f8;
+        position: relative;
+        overflow:auto;
+      }
+      .report-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+        background-color: #f5f5f5;
+        background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23bdbdbd' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+      }
+      
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+      }
+      
+      h1 {
+        font-size: 48px;
+        margin: 0;
+        font-weight: bold;
+      }
+      
+      .invest-button {
+        display: flex;
+        align-items: center;
+        font-size: 20px;
+      }
+      
+      .invest-button img {
+        width: 40px;
+        height: 40px;
+        margin-right: 10px;
+      }
+      
+      .invest-button a {
+        color: #008080;
+        font-weight: bold;
+        text-decoration: none;
+      }
+      
+      .invest-button a:hover {
+        text-decoration: underline;
+      }
+      
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        
+      }
+      
+      th {
+        background-color: #f2f2f2;
+        text-align: center;
+        padding: 12px 15px;
+        font-weight: bold;
+        font-size: 18px;
+        border-bottom: 2px solid #ddd;
+      }
+      
+      td {
+        text-align: center;
+        padding: 12px 15px;
+        border-bottom: 1px solid #ddd;
+        font-size: 16px;
+      }
+      
+      tr:last-child {
+        background-color: #e6f7f5;
+        font-weight: bold;
+      }
+      
+      .impact-column {
+        width: 150px;
+      }
+      
+      .impact-indicator {
+        position: relative;
+        width: 100%;
+        height: 20px;
+        
+        border-radius: 10px;
+        overflow: hidden;
+      }
+      
+      .impact-level {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+        display: flex;
+      }
+      
+      .impact-red {
+        flex: 1;
+        
+        border-top-left-radius: 10px ;
+        border-bottom-left-radius: 10px ;
+        margin-top: 5px;
+        margin-bottom: 5px;
+        background: linear-gradient(to right, #ff6b6b, #ff9999);
+      }
+      
+      .impact-yellow {
+        flex: 1;
+        margin-top: 5px;
+        margin-bottom: 5px;
+        background: linear-gradient(to right, #ffe066, #ffd166);
+      }
+      
+      .impact-green {
+        flex: 1;
+        margin-top: 5px;
+        margin-bottom: 5px;
+        background: linear-gradient(to right, #8fffdf,#06d6a0);
+      }
+      
+      .impact-marker {
+        position: absolute;
+        top: -5px;
+        width: 6px;
+        height: 30px;
+        
+        background-color: #333;
+        border-radius: 3px;
+      }
+      
+      .impact-text {
+        text-align: center;
+        margin-top: 5px;
+        font-weight: bold;
+      }
+      
+      .low-impact .impact-marker {
+        left: 16.7%;
+      }
+      
+      .medium-impact .impact-marker {
+        left: 50%;
+      }
+      
+      .high-impact .impact-marker {
+        left: 83.3%;
+      }
+      
+      /* Decorative elements */
+      .decoration-circle {
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        border-radius: 50%;
+        opacity: 0.1;
+        z-index: -1;
+      }
+      
+      .decoration-circle-1 {
+        top: -100px;
+        left: -100px;
+        background-color: #ffd166;
+      }
+      
+      .decoration-star {
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        z-index: -1;
+        right: 30px;
+        top: 0;
+        color: #ff9f1c;
+        font-size: 100px;
+        transform: rotate(20deg);
+      }
+      
+      /* Responsive adjustments */
+      @media (max-width: 1200px) {
+        body {
+          padding: 10px;
+        }
+        
+        h1 {
+          font-size: 36px;
+        }
+        
+        th, td {
+          padding: 8px 10px;
+          font-size: 14px;
+        }
+      }
+    </style>
+</head>
+<body>
+  <div class="report-container">
+    <div class="decoration-circle decoration-circle-1"></div>
+    <div class="decoration-star">★</div>
+    
+    <div class="header">
+        <h1>Proposed Vs Existing development</h1>
+        <div class="invest-button">
+            <img src="https://img.icons8.com/color/48/000000/whatsapp.png" alt="WhatsApp Icon" style="width: 40px; height: 40px;">
+            <span>Want to invest? <a href="#">Click here</a></span>
+        </div>
+    </div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th style="text-align: left;">Category</th>
+                <th>Existing Area</th>
+                <th>Existing %</th>
+                <th>Proposed Area</th>
+                <th>Proposed %</th>
+                <th>Change in Area</th>
+                <th>Change in %</th>
+                <th>Impact</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="text-align: left;">Residential</td>
+                <td>28 mn Sqft</td>
+                <td>28%</td>
+                <td>28 mn Sqft</td>
+                <td>28%</td>
+                <td>28 mn Sqft</td>
+                <td>28%</td>
+                <td class="impact-column">
+                    <div class="impact-indicator">
+                        <div class="impact-level">
+                            <div class="impact-red"></div>
+                            <div class="impact-yellow"></div>
+                            <div class="impact-green"></div>
+                        </div>
+                        <div class="impact-marker"></div>
+                    </div>
+                    <div class="impact-text">High</div>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align: left;">Commercial</td>
+                <td>28 mn Sqft</td>
+                <td>28%</td>
+                <td>28 mn Sqft</td>
+                <td>28%</td>
+                <td>28 mn Sqft</td>
+                <td>28%</td>
+                <td class="impact-column">
+                    <div class="impact-indicator">
+                        <div class="impact-level">
+                            <div class="impact-red"></div>
+                            <div class="impact-yellow"></div>
+                            <div class="impact-green"></div>
+                        </div>
+                        <div class="impact-marker"></div>
+                    </div>
+                    <div class="impact-text">High</div>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align: left;">Industrial</td>
+                <td>28 mn Sqft</td>
+                <td>28%</td>
+                <td>28 mn Sqft</td>
+                <td>28%</td>
+                <td>28 mn Sqft</td>
+                <td>28%</td>
+                <td class="impact-column">
+                    <div class="impact-indicator">
+                        <div class="impact-level">
+                            <div class="impact-red"></div>
+                            <div class="impact-yellow"></div>
+                            <div class="impact-green"></div>
+                        </div>
+                        <div class="impact-marker"></div>
+                    </div>
+                    <div class="impact-text">High</div>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align: left;">Public & Semi-Public</td>
+                <td>28 mn Sqft</td>
+                <td>28%</td>
+                <td>28 mn Sqft</td>
+                <td>28%</td>
+                <td>28 mn Sqft</td>
+                <td>28%</td>
+                <td class="impact-column">
+                    <div class="impact-indicator">
+                        <div class="impact-level">
+                            <div class="impact-red"></div>
+                            <div class="impact-yellow"></div>
+                            <div class="impact-green"></div>
+                        </div>
+                        <div class="impact-marker"></div>
+                    </div>
+                    <div class="impact-text">High</div>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align: left;">Parks & Open Spaces</td>
+                <td>28 mn Sqft</td>
+                <td>28%</td>
+                <td>28 mn Sqft</td>
+                <td>28%</td>
+                <td>28 mn Sqft</td>
+                <td>28%</td>
+                <td class="impact-column">
+                    <div class="impact-indicator">
+                        <div class="impact-level">
+                            <div class="impact-red"></div>
+                            <div class="impact-yellow"></div>
+                            <div class="impact-green"></div>
+                        </div>
+                        <div class="impact-marker"></div>
+                    </div>
+                    <div class="impact-text">Medium</div>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align: left;">Transport & Communication</td>
+                <td>28 mn Sqft</td>
+                <td>28%</td>
+                <td>28 mn Sqft</td>
+                <td>28%</td>
+                <td>28 mn Sqft</td>
+                <td>28%</td>
+                <td class="impact-column">
+                    <div class="impact-indicator">
+                        <div class="impact-level">
+                            <div class="impact-red"></div>
+                            <div class="impact-yellow"></div>
+                            <div class="impact-green"></div>
+                        </div>
+                        <div class="impact-marker"></div>
+                    </div>
+                    <div class="impact-text">Medium</div>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align: left;">Vacant Land</td>
+                <td>28 mn Sqft</td>
+                <td>28%</td>
+                <td>28 mn Sqft</td>
+                <td>28%</td>
+                <td>28 mn Sqft</td>
+                <td>28%</td>
+                <td class="impact-column">
+                    <div class="impact-indicator">
+                        <div class="impact-level">
+                            <div class="impact-red"></div>
+                            <div class="impact-yellow"></div>
+                            <div class="impact-green"></div>
+                        </div>
+                        <div class="impact-marker"></div>
+                    </div>
+                    <div class="impact-text">Low</div>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align: left;">Water Bodies & Streams</td>
+                <td>28 mn Sqft</td>
+                <td>28%</td>
+                <td>28 mn Sqft</td>
+                <td>28%</td>
+                <td>28 mn Sqft</td>
+                <td>28%</td>
+                <td class="impact-column">
+                    <div class="impact-indicator">
+                        <div class="impact-level">
+                            <div class="impact-red"></div>
+                            <div class="impact-yellow"></div>
+                            <div class="impact-green"></div>
+                        </div>
+                        <div class="impact-marker"></div>
+                    </div>
+                    <div class="impact-text">Low</div>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align: left;">Other</td>
+                <td>28 mn Sqft</td>
+                <td>28%</td>
+                <td>28 mn Sqft</td>
+                <td>28%</td>
+                <td>28 mn Sqft</td>
+                <td>28%</td>
+                <td class="impact-column">
+                    <div class="impact-indicator">
+                        <div class="impact-level">
+                            <div class="impact-red"></div>
+                            <div class="impact-yellow"></div>
+                            <div class="impact-green"></div>
+                        </div>
+                        <div class="impact-marker"></div>
+                    </div>
+                    <div class="impact-text">Medium</div>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align: left;">Total</td>
+                <td>28 mn Sqft</td>
+                <td>28%</td>
+                <td>28 mn Sqft</td>
+                <td>28%</td>
+                <td>28 mn Sqft</td>
+                <td>28%</td>
+                <td class="impact-column">
+                    <div class="impact-indicator">
+                        <div class="impact-level">
+                            <div class="impact-red"></div>
+                            <div class="impact-yellow"></div>
+                            <div class="impact-green"></div>
+                        </div>
+                        <div class="impact-marker"></div>
+                    </div>
+                    <div class="impact-text">High</div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        // Set different impact levels
+        document.addEventListener('DOMContentLoaded', function() {
+            const rows = document.querySelectorAll('tbody tr');
+            
+            // Set high impact (first 4 rows and last row)
+            [0, 1, 2, 3, 9].forEach(index => {
+                if (rows[index]) {
+                    const marker = rows[index].querySelector('.impact-marker');
+                    marker.style.left = '83.3%';
+                    rows[index].querySelector('.impact-text').textContent = 'High';
+                }
+            });
+            
+            // Set medium impact (rows 4, 5, 8)
+            [4, 5, 8].forEach(index => {
+                if (rows[index]) {
+                    const marker = rows[index].querySelector('.impact-marker');
+                    marker.style.left = '50%';
+                    rows[index].querySelector('.impact-text').textContent = 'Medium';
+                }
+            });
+            
+            // Set low impact (rows 6, 7)
+            [6, 7].forEach(index => {
+                if (rows[index]) {
+                    const marker = rows[index].querySelector('.impact-marker');
+                    marker.style.left = '16.7%';
+                    rows[index].querySelector('.impact-text').textContent = 'Low';
+                }
+            });
+        });
+    </script>
+  </div>
+</body>
+</html>

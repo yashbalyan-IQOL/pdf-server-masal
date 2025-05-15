@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us</title>
+    <style>
+        @page {
+            size: 1600px 800px;
+            margin: 0;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            min-height: 800px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 60px;
+        }
+        
+        .header h1 {
+            font-size: 48px;
+            margin: 0;
+            color: #000;
+        }
+        
+        .invest-button {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 20px;
+        }
+        
+        .invest-button a {
+            color: #008080;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .invest-button img {
+            width: 30px;
+            height: 30px;
+        }
+        
+        .main-content {
+            flex: 1;
+            display: flex;
+            background-color: #2d6363;
+            color: white;
+            margin: 20px 60px;
+        }
+        
+        .left-section, .right-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .left-section {
+            border-right: 3px solid white;
+        }
+        
+        .left-section h2 {
+            font-size: 30px;
+            line-height: 1.4;
+            max-width: 600px;
+            margin-bottom: 40px;
+        }
+        
+        .right-section h2 {
+            font-size: 30px;
+            line-height: 1.4;
+            margin-bottom: 20px;
+        }
+        
+        .phone-number {
+            font-size: 32px;
+            margin-bottom: 30px;
+        }
+        
+        .cta-button {
+            background-color: white;
+            color: #2d6363;
+            padding: 15px 30px;
+            border-radius: 5px;
+            font-size: 20px;
+            font-weight: bold;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .cta-button:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .qr-placeholder {
+            width: 180px;
+            height: 180px;
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        
+        
+        
+        .whatsapp-icon {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background-color: #25D366;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+            bottom: 70px;
+            right: 70px;
+        }
+        
+        .star-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 60px;
+            height: 60px;
+            color: #ff9900;
+            font-size: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div class="star-icon">★</div>
+    
+    <div class="header">
+        <h1>Contact Us</h1>
+        <div class="invest-button">
+            <img src="../assets/logos/whatsapp.png" alt="WhatsApp" style="width: 30px; height: 30px; object-fit: cover;">
+            Want to invest? <a href="#">Click here</a>
+        </div>
+    </div>
+    
+    <div class="main-content">
+        <div class="left-section">
+            <h2>Apply for an EOI (Expression of Interest) today to get exclusive units at the best price!</h2>
+            <a href='https://docs.google.com/forms/d/e/1FAIpQLSezq7mm6m_XWf5k5KRpDxUGoXDj_jtXjuEZ2wjLHmHTHAs8eQ/viewform' class="cta-button">Fill the Form</a>
+        </div>
+        
+        
+        <div class="right-section">
+            
+            <h2>Contact us to know more about New Project. Tap/scan below or call us at</h2>
+            <div class="phone-number">+91 8444999770</div>
+            <div class="qr-placeholder">
+                <img src="../assets/images/QR.png" alt="QR Code" style="width: 100%; height: 100%; padding: 0px; object-fit: cover;">
+                <div class="whatsapp-icon">
+                    <img src="../assets/logos/whatsapp.png" alt="WhatsApp" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

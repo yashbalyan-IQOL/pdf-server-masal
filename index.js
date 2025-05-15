@@ -139,10 +139,25 @@ function renderCoverPage(projectData) {
     day: "2-digit",
     year: "numeric",
   });
-
+  const formatTimestampDate = (timestamp) => {
+    // If timestamp is too large, assume it's in milliseconds
+    if (timestamp > 1e10) {
+      timestamp = Math.floor(timestamp / 1000); // Convert to seconds
+    }
+  
+    const date = new Date(timestamp * 1000); // Ensure timestamp is in milliseconds
+  
+    const day = date.getUTCDate();
+    const month = date.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' });
+    const year = date.getUTCFullYear();
+  
+    return `${day} ${month} ${year}`;
+  }
+  const formattedDate1 = formatTimestampDate(projectData.lastUpdated);
+  console.log("Date aaj ki",formattedDate1);
   return template({
     PROJECT_NAME: projectData.projectName || "Unnamed Project",
-    UPDATED_DATE: projectData.lastUpdated || formattedDate,
+    UPDATED_DATE: formattedDate1 || formattedDate,
   });
 }
 
@@ -272,57 +287,78 @@ function renderGalleryPage(projectName, images) {
 
 // Process and render the overview page
 function renderOverviewPage(projectData, firstImage) {
-  const template = loadTemplate('overview');
-  
+  const template = loadTemplate("overview");
+
   // Determine configurations text
-  const configurationsText = projectData.configurations && projectData.configurations.length > 0
-    ? projectData.configurations.join(', ')
-    : 'N/A';
-  
+  const configurationsText =
+    projectData.configurations && projectData.configurations.length > 0
+      ? projectData.configurations.join(", ")
+      : "N/A";
+
   // Determine first image URL if available
-  const imageUrl = firstImage || 'placeholder-image.jpg';
-  
+  const imageUrl = firstImage || "placeholder-image.jpg";
+
   return template({
     PROJECT_NAME: projectData.projectName || "Unnamed Project",
-    DEVELOPER:projectData.developerName || "---", // Replace with actual data if available
+    DEVELOPER: projectData.developerName || "---", // Replace with actual data if available
     STAGE: projectData.status || "--",
-    CURRENT_PRICE: projectData.currentPrice ||"--", // Replace with actual data if available
+    CURRENT_PRICE: projectData.currentPrice || "--", // Replace with actual data if available
     CONFIGURATIONS: configurationsText,
     LAUNCH_DATE: projectData.launchDate || "---",
-    HANDOVER_DATE: projectData.handOverDate || "---", 
+    HANDOVER_DATE: projectData.handOverDate || "---",
     ASSET_TYPE: projectData.assetType || "--",
     WATER_SOURCE: projectData.waterSource || "--",
     MICROMARKET: projectData.mircomarket || "--",
-    ZONE: projectData.area ||"--", // Replace with actual data if available
-    PROPERTY_IMAGE: imageUrl
+    ZONE: projectData.area || "--", // Replace with actual data if available
+    PROPERTY_IMAGE: imageUrl,
   });
 }
 
-// Process and render the overview page
-function renderOverviewPage(projectData, firstImage) {
-  const template = loadTemplate('overview');
-  
-  // Determine configurations text
-  const configurationsText = projectData.configurations && projectData.configurations.length > 0
-    ? projectData.configurations.join(', ')
-    : 'N/A';
-  
-  // Determine first image URL if available
-  const imageUrl = firstImage || 'placeholder-image.jpg';
-  
+// Process and render the recommended strategy page
+function renderRecommendedStrategyPage(projectData) {
+  const template = loadTemplate("recommendedStrategy");
   return template({
     PROJECT_NAME: projectData.projectName || "Unnamed Project",
-    DEVELOPER:projectData.developerName || "---", // Replace with actual data if available
-    STAGE: projectData.status || "--",
-    CURRENT_PRICE: projectData.currentPrice ||"--", // Replace with actual data if available
-    CONFIGURATIONS: configurationsText,
-    LAUNCH_DATE: projectData.launchDate || "---",
-    HANDOVER_DATE: projectData.handOverDate || "---", 
-    ASSET_TYPE: projectData.assetType || "--",
-    WATER_SOURCE: projectData.waterSource || "--",
-    MICROMARKET: projectData.mircomarket || "--",
-    ZONE: projectData.area ||"--", // Replace with actual data if available
-    PROPERTY_IMAGE: imageUrl
+  });
+}
+
+// Process and render the investment highlight page
+function renderInvestmentHighlightPage(projectData) {
+  const template = loadTemplate("investmentHighlight");
+  return template({
+    PROJECT_NAME: projectData.projectName || "Unnamed Project",
+  });
+}
+
+// Process and render the yearly cashflow page
+function renderYearlyCashflowPage(projectData) {
+  const template = loadTemplate("yearlyCashflow");
+  return template({
+    PROJECT_NAME: projectData.projectName || "Unnamed Project",
+  });
+}
+
+// Process and render the P&E development page
+function renderPEDevelopmentPage(projectData) {
+  const template = loadTemplate("P&Edevelopment");
+  return template({
+    PROJECT_NAME: projectData.projectName || "Unnamed Project",
+  });
+}
+
+// Process and render the about page
+function renderAboutPage(projectData) {
+  const template = loadTemplate("about");
+  return template({
+    PROJECT_NAME: projectData.projectName || "Unnamed Project",
+  });
+}
+
+// Process and render the contact us page
+function renderContactUsPage(projectData) {
+  const template = loadTemplate("contactUs");
+  return template({
+    PROJECT_NAME: projectData.projectName || "Unnamed Project",
   });
 }
 
@@ -823,299 +859,55 @@ app.get("/download-pdf", async (req, res) => {
     const supplyAndDemandHtml = renderSupplyAndDemandPage(projectData);
     const pricingHtml = renderPricingPage(projectData);
     const galleryHtml = renderGalleryPage(projectName, processedImages);
+    const recommendedStrategyHtml = renderRecommendedStrategyPage(projectData);
+    const investmentHighlightHtml = renderInvestmentHighlightPage(projectData);
+    const yearlyCashflowHtml = renderYearlyCashflowPage(projectData);
+    const pEDevelopmentHtml = renderPEDevelopmentPage(projectData);
+    const aboutHtml = renderAboutPage(projectData);
+    const contactUsHtml = renderContactUsPage(projectData);
 
     // Try a completely different approach - generate individual PDFs for each page and then merge them
     try {
       console.log("Attempting to generate PDF using multi-page approach...");
 
-      // Generate individual HTML files for each page
-      const coverPageHtml = `
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <meta charset="UTF-8">
-            <style>
-              body, html {
-                margin: 0;
-                padding: 0;
-                height: 100vh;
-                width: 100%;
-                overflow: hidden;
-              }
-              /* Landscape-specific styling */
-              @page {
-                size: A4 landscape;
-                margin: 0;
-              }
-              .landscape-container {
-                width: 100%;
-                height: 100%;
-                display: flex;
-                flex-direction: row;
-              }
-            </style>
-          </head>
-          <body>${coverHtml}</body>
-        </html>
-      `;
-      const disclaimerPageHtml = `
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <meta charset="UTF-8">
-            <style>
-              body, html {
-                margin: 0;
-                padding: 0;
-                height: 100vh;
-                width: 100%;
-                overflow: hidden;
-                background-color: #f9f9f9;
-              }
-              /* Landscape-specific styling */
-              @page {
-                size: A4 landscape;
-                margin: 0;
-              }
-              .content-wrapper {
-                padding: 40px;
-                max-width: 100%;
-                overflow-x: hidden;
-              }
-            </style>
-          </head>
-          <body>
-            <div class="content-wrapper">
-              ${disclaimerHtml}
-            </div>
-          </body>
-        </html>
-      `;
-      const supplyAndDemandPageHtml = `
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <meta charset="UTF-8">
-            <style>
-              body, html {
-                margin: 0;
-                padding: 0;
-                height: 100vh;
-                width: 100%;
-                overflow: hidden;
-                background-color: #f9f9f9;
-              }
-              /* Landscape-specific styling */
-              @page {
-                size: A4 landscape;
-                margin: 0;
-              }
-              .content-wrapper {
-                padding: 0;
-                max-width: 100%;
-                overflow-x: hidden;
-              }
-            </style>
-          </head>
-          <body>
-            <div class="content-wrapper">
-              ${supplyAndDemandHtml}
-            </div>
-          </body>
-        </html>
-      `;
-      
-      const pricingPageHtml = `
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <meta charset="UTF-8">
-            <style>
-              body, html {
-                margin: 0;
-                padding: 0;
-                height: 100vh;
-                width: 100%;
-                overflow: hidden;
-                background-color: #f9f9f9;
-              }
-              /* Landscape-specific styling */
-              @page {
-                size: A4 landscape;
-                margin: 0;
-              }
-              .content-wrapper {
-                padding: 0;
-                max-width: 100%;
-                overflow-x: hidden;
-              }
-            </style>
-          </head>
-          <body>
-            <div class="content-wrapper">
-              ${pricingHtml}
-            </div>
-          </body>
-        </html>
-      `;
-      const overviewPageHtml = `
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <meta charset="UTF-8">
-            <style>
-              body, html {
-                margin: 0;
-                padding: 0;
-                height: 100vh;
-                width: 100%;
-                overflow: hidden;
-                background-color: #f9f9f9;
-              }
-              /* Landscape-specific styling */
-              @page {
-                size: A4 landscape;
-                margin: 0;
-              }
-              .content-wrapper {
-                padding: 0;
-                max-width: 100%;
-                overflow-x: hidden;
-              }
-            </style>
-          </head>
-          <body>
-            <div class="content-wrapper">
-              ${overviewHtml}
-            </div>
-          </body>
-        </html>
-      `;
-      
-      const detailsPageHtml = `
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <meta charset="UTF-8">
-            <style>
-              body, html {
-                margin: 0;
-                padding: 0;
-                height: 100vh;
-                width: 100%;
-                overflow: hidden;
-                background-color: #f9f9f9;
-              }
-              /* Landscape-specific styling */
-              @page {
-                size: A4 landscape;
-                margin: 0;
-              }
-              .content-wrapper {
-                padding: 40px;
-                max-width: 100%;
-                overflow-x: hidden;
-              }
-            </style>
-          </head>
-          <body>
-            <div class="content-wrapper">
-              ${detailsHtml}
-            </div>
-          </body>
-        </html>
-      `;
-      
-      const specsPageHtml = `
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <meta charset="UTF-8">
-            <style>
-              body, html {
-                margin: 0;
-                padding: 0;
-                height: 100vh;
-                width: 100%;
-                overflow: hidden;
-                background-color: #f9f9f9;
-              }
-              /* Landscape-specific styling */
-              @page {
-                size: A4 landscape;
-                margin: 0;
-              }
-              .content-wrapper {
-                padding: 40px;
-                max-width: 100%;
-                overflow-x: hidden;
-              }
-            </style>
-          </head>
-          <body>
-            <div class="content-wrapper">
-              ${specsHtml}
-            </div>
-          </body>
-        </html>
-      `;  
-      const galleryPageHtml = processedImages.length > 0 ? `
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <meta charset="UTF-8">
-            <style>
-              body, html {
-                margin: 0;
-                padding: 0;
-                height: 100vh;
-                width: 100%;
-                overflow: hidden;
-                background-color: #f9f9f9;
-              }
-              /* Landscape-specific styling */
-              @page {
-                size: A4 landscape;
-                margin: 0;
-              }
-              .content-wrapper {
-                padding: 40px;
-                max-width: 100%;
-                overflow-x: hidden;
-              }
-              /* Make gallery grid better for landscape */
-              .image-gallery {
-                display: grid;
-                grid-template-columns: repeat(3, 1fr) !important;
-                gap: 20px;
-              }
-            </style>
-          </head>
-          <body>
-            <div class="content-wrapper">
-              ${galleryHtml}
-            </div>
-          </body>
-        </html>
-      `
-          : null;
-
-      // Write the HTML files to disk
+      // Create pages directory if it doesn't exist
       const pagesDir = path.join(__dirname, "pages");
       if (!fs.existsSync(pagesDir)) {
-        fs.mkdirSync(pagesDir);
+        fs.mkdirSync(pagesDir, { recursive: true });
       }
-      
-      fs.writeFileSync(path.join(pagesDir, 'cover.html'), coverHtml);
-      fs.writeFileSync(path.join(pagesDir, 'disclaimer.html'), disclaimerHtml);
-      fs.writeFileSync(path.join(pagesDir, 'overview.html'), overviewHtml);
-      fs.writeFileSync(path.join(pagesDir, 'details.html'), detailsHtml);
-      fs.writeFileSync(path.join(pagesDir, 'specs.html'), specsHtml);
-      fs.writeFileSync(path.join(pagesDir, 'supplyAndDemand.html'), supplyAndDemandHtml);
-      fs.writeFileSync(path.join(pagesDir, 'pricing.html'), pricingHtml);
-      if (galleryPageHtml) {
-        fs.writeFileSync(path.join(pagesDir, 'gallery.html'), galleryHtml);
+
+      // Write the HTML files to disk
+      fs.writeFileSync(path.join(pagesDir, "cover.html"), coverHtml);
+      fs.writeFileSync(path.join(pagesDir, "disclaimer.html"), disclaimerHtml);
+      fs.writeFileSync(path.join(pagesDir, "overview.html"), overviewHtml);
+      fs.writeFileSync(path.join(pagesDir, "details.html"), detailsHtml);
+      fs.writeFileSync(path.join(pagesDir, "specs.html"), specsHtml);
+      fs.writeFileSync(
+        path.join(pagesDir, "supplyAndDemand.html"),
+        supplyAndDemandHtml
+      );
+      fs.writeFileSync(path.join(pagesDir, "pricing.html"), pricingHtml);
+      if (galleryHtml) {
+        fs.writeFileSync(path.join(pagesDir, "gallery.html"), galleryHtml);
       }
+      fs.writeFileSync(
+        path.join(pagesDir, "recommendedStrategy.html"),
+        recommendedStrategyHtml
+      );
+      fs.writeFileSync(
+        path.join(pagesDir, "investmentHighlight.html"),
+        investmentHighlightHtml
+      );
+      fs.writeFileSync(
+        path.join(pagesDir, "yearlyCashflow.html"),
+        yearlyCashflowHtml
+      );
+      fs.writeFileSync(
+        path.join(pagesDir, "P&Edevelopment.html"),
+        pEDevelopmentHtml
+      );
+      fs.writeFileSync(path.join(pagesDir, "about.html"), aboutHtml);
+      fs.writeFileSync(path.join(pagesDir, "contactUs.html"), contactUsHtml);
 
       // Generate PDFs for each page
       const browser = await puppeteer.launch({
@@ -1133,7 +925,6 @@ app.get("/download-pdf", async (req, res) => {
         });
         await coverPage.pdf({
           path: coverPdfPath,
-          
           landscape: true,
           printBackground: true,
           margin: {
@@ -1156,7 +947,6 @@ app.get("/download-pdf", async (req, res) => {
         );
         await disclaimerPage.pdf({
           path: disclaimerPdfPath,
-         
           landscape: true,
           printBackground: true,
           margin: {
@@ -1180,9 +970,9 @@ app.get("/download-pdf", async (req, res) => {
           `file://${path.join(pagesDir, "supplyAndDemand.html")}`,
           { waitUntil: "networkidle0" }
         );
+
         await supplyAndDemandPage.pdf({
           path: supplyAndDemandPdfPath,
-          
           landscape: true,
           printBackground: true,
           margin: {
@@ -1195,7 +985,7 @@ app.get("/download-pdf", async (req, res) => {
         });
         pdfFilenames.push(supplyAndDemandPdfPath);
         await supplyAndDemandPage.close();
-        
+
         // Generate PDF for pricing page
         const pricingPdfPath = path.join(pagesDir, "pricing.pdf");
         const pricingPage = await browser.newPage();
@@ -1205,7 +995,6 @@ app.get("/download-pdf", async (req, res) => {
         );
         await pricingPage.pdf({
           path: pricingPdfPath,
-          
           landscape: true,
           printBackground: true,
           margin: {
@@ -1220,97 +1009,187 @@ app.get("/download-pdf", async (req, res) => {
         await pricingPage.close();
 
         // Generate PDF for overview page
-        const overviewPdfPath = path.join(pagesDir, 'overview.pdf');
+        const overviewPdfPath = path.join(pagesDir, "overview.pdf");
         const overviewPage = await browser.newPage();
-        await overviewPage.goto(`file://${path.join(pagesDir, 'overview.html')}`, { waitUntil: 'networkidle0' });
+        await overviewPage.goto(
+          `file://${path.join(pagesDir, "overview.html")}`,
+          { waitUntil: "networkidle0" }
+        );
         await overviewPage.pdf({
           path: overviewPdfPath,
-          
           landscape: true,
           printBackground: true,
           margin: {
             top: "0.4in",
             right: "0.4in",
             bottom: "0.4in",
-            left: "0.4in"
+            left: "0.4in",
           },
-          preferCSSPageSize: true
+          preferCSSPageSize: true,
         });
         pdfFilenames.push(overviewPdfPath);
         await overviewPage.close();
 
-        // Generate PDF for details page
-        // const detailsPdfPath = path.join(pagesDir, "details.pdf");
-        // const detailsPage = await browser.newPage();
-        // await detailsPage.goto(
-        //   `file://${path.join(pagesDir, "details.html")}`,
-        //   { waitUntil: "networkidle0" }
-        // );
-        // await detailsPage.pdf({
-        //   path: detailsPdfPath,
-          
-        //   landscape: true,
-        //   printBackground: true,
-        //   margin: {
-        //     top: "0.4in",
-        //     right: "0.4in",
-        //     bottom: "0.4in",
-        //     left: "0.4in",
-        //   },
-        //   preferCSSPageSize: true,
-        // });
-        // pdfFilenames.push(detailsPdfPath);
-        // await detailsPage.close();
+        // Generate PDF for gallery page
+        const galleryPdfPath = path.join(pagesDir, "gallery.pdf");
+        const galleryPage = await browser.newPage();
+        await galleryPage.goto(
+          `file://${path.join(pagesDir, "gallery.html")}`,
+          { waitUntil: "networkidle0" }
+        );
+        await galleryPage.pdf({
+          path: galleryPdfPath,
+          landscape: true,
+          printBackground: true,
+          margin: {
+            top: "0.4in",
+            right: "0.4in",
+            bottom: "0.4in",
+            left: "0.4in",
+          },
+          preferCSSPageSize: true,
+        });
+        pdfFilenames.push(galleryPdfPath);
+        await galleryPage.close();
 
-        // // Generate PDF for specs page
-        // const specsPdfPath = path.join(pagesDir, "specs.pdf");
-        // const specsPage = await browser.newPage();
-        // await specsPage.goto(`file://${path.join(pagesDir, "specs.html")}`, {
-        //   waitUntil: "networkidle0",
-        // });
-        // await specsPage.pdf({
-        //   path: specsPdfPath,
-          
-        //   landscape: true,
-        //   printBackground: true,
-        //   margin: {
-        //     top: "0.4in",
-        //     right: "0.4in",
-        //     bottom: "0.4in",
-        //     left: "0.4in",
-        //   },
-        //   preferCSSPageSize: true,
-        // });
-        // pdfFilenames.push(specsPdfPath);
-        // await specsPage.close();
-        
-        
-        // // Generate PDF for gallery page (if exists)
-        // if (galleryPageHtml) {
-        //   const galleryPdfPath = path.join(pagesDir, "gallery.pdf");
-        //   const galleryPage = await browser.newPage();
-        //   await galleryPage.goto(
-        //     `file://${path.join(pagesDir, "gallery.html")}`,
-        //     { waitUntil: "networkidle0" }
-        //   );
-        //   await galleryPage.pdf({
-        //     path: galleryPdfPath,
-            
-        //     landscape: true,
-        //     printBackground: true,
-        //     margin: {
-        //       top: "0.4in",
-        //       right: "0.4in",
-        //       bottom: "0.4in",
-        //       left: "0.4in",
-        //     },
-        //     preferCSSPageSize: true,
-        //   });
-        //   pdfFilenames.push(galleryPdfPath);
-        //   await galleryPage.close();
-        // }
+        // Generate PDF for recommended strategy page
+        const recommendedStrategyPdfPath = path.join(
+          pagesDir,
+          "recommendedStrategy.pdf"
+        );
+        const recommendedStrategyPage = await browser.newPage();
+        await recommendedStrategyPage.goto(
+          `file://${path.join(pagesDir, "recommendedStrategy.html")}`,
+          { waitUntil: "networkidle0" }
+        );
+        await recommendedStrategyPage.pdf({
+          path: recommendedStrategyPdfPath,
+          landscape: true,
+          printBackground: true,
+          margin: {
+            top: "0.4in",
+            right: "0.4in",
+            bottom: "0.4in",
+            left: "0.4in",
+          },
+          preferCSSPageSize: true,
+        });
+        pdfFilenames.push(recommendedStrategyPdfPath);
+        await recommendedStrategyPage.close();
 
-        // Merge all PDFs
+        // Generate PDF for investment highlight page
+        const investmentHighlightPdfPath = path.join(
+          pagesDir,
+          "InvestmentHighlight.pdf"
+        );
+        const investmentHighlightPage = await browser.newPage();
+        await investmentHighlightPage.goto(
+          `file://${path.join(pagesDir, "InvestmentHighlight.html")}`,
+          { waitUntil: "networkidle0" }
+        );
+        await investmentHighlightPage.pdf({
+          path: investmentHighlightPdfPath,
+          landscape: true,
+          printBackground: true,
+          margin: {
+            top: "0.4in",
+            right: "0.4in",
+            bottom: "0.4in",
+            left: "0.4in",
+          },
+          preferCSSPageSize: true,
+        });
+        pdfFilenames.push(investmentHighlightPdfPath);
+        await investmentHighlightPage.close();
+
+        // Generate PDF for yearly cashflow page
+        const yearlyCashflowPdfPath = path.join(pagesDir, "yearlyCashflow.pdf");
+        const yearlyCashflowPage = await browser.newPage();
+        await yearlyCashflowPage.goto(
+          `file://${path.join(pagesDir, "yearlyCashflow.html")}`,
+          { waitUntil: "networkidle0" }
+        );
+        await yearlyCashflowPage.pdf({
+          path: yearlyCashflowPdfPath,
+          landscape: true,
+          printBackground: true,
+          margin: {
+            top: "0.4in",
+            right: "0.4in",
+            bottom: "0.4in",
+            left: "0.4in",
+          },
+          preferCSSPageSize: true,
+        });
+        pdfFilenames.push(yearlyCashflowPdfPath);
+        await yearlyCashflowPage.close();
+
+        // Generate PDF for P&E development page
+        const pEDevelopmentPdfPath = path.join(pagesDir, "P&Edevelopment.pdf");
+        const pEDevelopmentPage = await browser.newPage();
+        await pEDevelopmentPage.goto(
+          `file://${path.join(pagesDir, "P&Edevelopment.html")}`,
+          { waitUntil: "networkidle0" }
+        );
+        await pEDevelopmentPage.pdf({
+          path: pEDevelopmentPdfPath,
+          landscape: true,
+          printBackground: true,
+          margin: {
+            top: "0.4in",
+            right: "0.4in",
+            bottom: "0.4in",
+            left: "0.4in",
+          },
+          preferCSSPageSize: true,
+        });
+        pdfFilenames.push(pEDevelopmentPdfPath);
+        await pEDevelopmentPage.close();
+
+        // Generate PDF for about page
+        const aboutPdfPath = path.join(pagesDir, "about.pdf");
+        const aboutPage = await browser.newPage();
+        await aboutPage.goto(`file://${path.join(pagesDir, "about.html")}`, {
+          waitUntil: "networkidle0",
+        });
+        await aboutPage.pdf({
+          path: aboutPdfPath,
+          landscape: true,
+          printBackground: true,
+          margin: {
+            top: "0.4in",
+            right: "0.4in",
+            bottom: "0.4in",
+            left: "0.4in",
+          },
+          preferCSSPageSize: true,
+        });
+        pdfFilenames.push(aboutPdfPath);
+        await aboutPage.close();
+
+        // Generate PDF for contact us page
+        const contactUsPdfPath = path.join(pagesDir, "contactUs.pdf");
+        const contactUsPage = await browser.newPage();
+        await contactUsPage.goto(
+          `file://${path.join(pagesDir, "contactUs.html")}`,
+          { waitUntil: "networkidle0" }
+        );
+        await contactUsPage.pdf({
+          path: contactUsPdfPath,
+          landscape: true,
+          printBackground: true,
+          margin: {
+            top: "0.4in",
+            right: "0.4in",
+            bottom: "0.4in",
+            left: "0.4in",
+          },
+          preferCSSPageSize: true,
+        });
+        pdfFilenames.push(contactUsPdfPath);
+        await contactUsPage.close();
+
+        // Merge all PDF
         const { PDFDocument } = require("pdf-lib");
 
         async function mergePDFs(pdfPaths) {
@@ -1343,11 +1222,20 @@ app.get("/download-pdf", async (req, res) => {
           }
           // Clean up the HTML files
           try {
-            fs.unlinkSync(path.join(pagesDir, 'cover.html'));
-            fs.unlinkSync(path.join(pagesDir, 'disclaimer.html'));
-            fs.unlinkSync(path.join(pagesDir, 'overview.html'));
-            fs.unlinkSync(path.join(pagesDir, 'supplyAndDemand.html'));
-            fs.unlinkSync(path.join(pagesDir, 'pricing.html'));
+            fs.unlinkSync(path.join(pagesDir, "cover.html"));
+            fs.unlinkSync(path.join(pagesDir, "disclaimer.html"));
+            fs.unlinkSync(path.join(pagesDir, "overview.html"));
+            fs.unlinkSync(path.join(pagesDir, "details.html"));
+            fs.unlinkSync(path.join(pagesDir, "specs.html"));
+            fs.unlinkSync(path.join(pagesDir, "supplyAndDemand.html"));
+            fs.unlinkSync(path.join(pagesDir, "pricing.html"));
+            fs.unlinkSync(path.join(pagesDir, "gallery.html"));
+            fs.unlinkSync(path.join(pagesDir, "recommendedStrategy.html"));
+            fs.unlinkSync(path.join(pagesDir, "investmentHighlight.html"));
+            fs.unlinkSync(path.join(pagesDir, "yearlyCashflow.html"));
+            fs.unlinkSync(path.join(pagesDir, "P&Edevelopment.html"));
+            fs.unlinkSync(path.join(pagesDir, "about.html"));
+            fs.unlinkSync(path.join(pagesDir, "contactUs.html"));
           } catch (err) {
             console.error("Error cleaning up HTML files:", err);
           }
@@ -1476,14 +1364,12 @@ app.get("/test-save-pdf", async (req, res) => {
     try {
       const page = await browser.newPage();
 
-     
       await page.setViewport({
         width: 1200,
         height: 1600,
         deviceScaleFactor: 1,
       });
 
-      
       const testContent = `
         <html>
           <head>
