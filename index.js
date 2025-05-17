@@ -53,7 +53,7 @@ async function getSignedUrl(path) {
     const file = bucket.file(path);
     const [url] = await file.getSignedUrl({
       action: "read",
-      expires: Date.now() + 7 * 24 * 60 * 60 * 1000, // URL expires in 7 days
+      expires: Date.now() + 7 * 24 * 60 * 60 * 1000, 
     });
     console.log("Generated signed URL:", url);
     return url;
@@ -299,7 +299,7 @@ function renderOverviewPage(projectData, firstImage) {
   const imageUrl = firstImage || "placeholder-image.jpg";
 
   return template({
-    PROJECT_NAME: projectData.projectName || "Unnamed Project",
+    PROJECT_NAME: projectData.projectName || "---",
     DEVELOPER: projectData.developerName || "---", // Replace with actual data if available
     STAGE: projectData.status || "--",
     CURRENT_PRICE: projectData.currentPrice || "--", // Replace with actual data if available
@@ -359,6 +359,466 @@ function renderContactUsPage(projectData) {
   const template = loadTemplate("contactUs");
   return template({
     PROJECT_NAME: projectData.projectName || "Unnamed Project",
+  });
+}
+
+// Process and render the master plan page
+function renderMasterPlanPage(projectData, masterPlanImage) {
+  const template = loadTemplate("masterPlan");
+  return template({
+    PROJECT_NAME: projectData.projectName || "---",
+    LOADING: projectData.loading || "---",
+    UDS_DATE: projectData.udsDate || "---",
+    TOTAL_UNITS: projectData.totalUnits || "---",
+    PROJECT_SIZE: projectData.projectSize || "---",
+    OPEN_AREA: projectData.openArea || "---",
+    CONSTRUCTION_QUALITY: projectData.constructionQuality || "---",
+    ROAD_WIDTH: projectData.roadWidth || "---",
+    CONSTRUCTION_PARTNER: projectData.constructionPartner || "---",
+    PROJECT_DENSITY: projectData.projectDensity || "---",
+    MASTER_PLAN_IMAGE: masterPlanImage || "../assets/images/master-plan.png"
+  });
+}
+
+// Process and render the unit level page
+function renderUnitLevelPage(projectData, unitLevelImage) {
+  const template = loadTemplate("unitLevel");
+  return template({
+    PROJECT_NAME: projectData.projectName || "---",
+    UNIT_LEVEL_IMAGE: unitLevelImage || "../assets/images/unitLevel.png",
+    UNIT_CONFIGS: projectData.unitConfigs || [
+      {
+        type: "1BHK",
+        saleableArea: "2120 Sqft",
+        carpetArea: "1800 Sqft",
+        loading: "56%",
+        pricePerSqftSBU: "₹2,500 /Sq ft",
+        pricePerSqftCA: "₹2,500 /Sq ft"
+      },
+      {
+        type: "2BHK",
+        saleableArea: "2120 Sqft",
+        carpetArea: "1800 Sqft",
+        loading: "56%",
+        pricePerSqftSBU: "₹2,500 /Sq ft",
+        pricePerSqftCA: "₹2,500 /Sq ft"
+      },
+      {
+        type: "3BHK",
+        saleableArea: "2120 Sqft",
+        carpetArea: "1800 Sqft",
+        loading: "56%",
+        pricePerSqftSBU: "₹2,500 /Sq ft",
+        pricePerSqftCA: "₹2,500 /Sq ft"
+      }
+    ]
+  });
+}
+
+// Process and render the project comparison page
+function renderProjectComparisonPage(projectData) {
+  const template = loadTemplate("projectComparison");
+  return template({
+    PROJECT_NAME: projectData.projectName || "Unnamed Project",
+    COMPARISON_DATA: projectData.comparisonData || {
+      projects: [
+        {
+          name: "Birla Trimaya",
+          config: "2, 3 & 4 BHKs",
+          price: "₹1.25 Crs",
+          value: "Undervalued",
+          currentPrice: "₹12,500",
+          futurePrice: "₹14,500",
+          risk: "Low",
+          cagr: "9.8%",
+          irr: "18.25%",
+          cashOutflow: "₹87 Lac",
+          profit: "28 mn Sqft"
+        },
+        {
+          name: "Tata Caranctic",
+          config: "2, 3 & 4 BHKs",
+          price: "₹1.25 Crs",
+          value: "Undervalued",
+          currentPrice: "₹12,500",
+          futurePrice: "₹14,500",
+          risk: "Low",
+          cagr: "9.8%",
+          irr: "18.25%",
+          cashOutflow: "₹87 Lac",
+          profit: "28 mn Sqft"
+        },
+        {
+          name: "Assetz Ragam",
+          config: "2, 3 & 4 BHKs",
+          price: "₹1.25 Crs",
+          value: "Undervalued",
+          currentPrice: "₹12,500",
+          futurePrice: "₹14,500",
+          risk: "High",
+          cagr: "9.8%",
+          irr: "18.25%",
+          cashOutflow: "₹87 Lac",
+          profit: "28 mn Sqft"
+        },
+        {
+          name: "Prestige Rain Tree",
+          config: "2, 3 & 4 BHKs",
+          price: "₹1.25 Crs",
+          value: "Undervalued",
+          currentPrice: "₹12,500",
+          futurePrice: "₹14,500",
+          risk: "Low",
+          cagr: "9.8%",
+          irr: "18.25%",
+          cashOutflow: "₹87 Lac",
+          profit: "28 mn Sqft"
+        }
+      ]
+    }
+  });
+}
+
+// Process and render the performance page
+function renderPerformancePage(projectData) {
+  const template = loadTemplate("performance");
+  return template({
+    PROJECT_NAME: projectData.projectName || "Unnamed Project",
+    PERFORMANCE_DATA: projectData.performanceData || {
+      metrics: [
+        {
+          name: "IRR",
+          value: "18.25%",
+          description: "Internal Rate of Return"
+        },
+        {
+          name: "CAGR",
+          value: "9.8%",
+          description: "Compound Annual Growth Rate"
+        },
+        {
+          name: "ROI",
+          value: "12.5%",
+          description: "Return on Investment"
+        },
+        {
+          name: "Payback Period",
+          value: "4.2 years",
+          description: "Time to recover investment"
+        }
+      ],
+      charts: {
+        monthlyReturns: "chart1.png",
+        yearlyGrowth: "chart2.png",
+        marketComparison: "chart3.png"
+      }
+    }
+  });
+}
+
+// Process and render the evaluation page
+function renderEvaluationPage(projectData) {
+  const template = loadTemplate("evalution");
+  return template({
+    PROJECT_NAME: projectData.projectName || "Unnamed Project",
+    EVALUATION_DATA: projectData.evaluationData || {
+      factors: [
+        {
+          name: "Nearest Metro",
+          currentStatus: "Yes, 8 km",
+          referenceAvg: "5 km",
+          evaluation: "Good"
+        },
+        {
+          name: "Traffic Density",
+          currentStatus: "No",
+          referenceAvg: "No",
+          evaluation: "Good"
+        },
+        {
+          name: "Air Quality Index",
+          currentStatus: "80",
+          referenceAvg: "95-100",
+          evaluation: "Good"
+        },
+        {
+          name: "Noise Levels",
+          currentStatus: "<75 db",
+          referenceAvg: "~85-90 dB",
+          evaluation: "Good"
+        },
+        {
+          name: "Informal Settlements",
+          currentStatus: "Yes",
+          referenceAvg: "No",
+          evaluation: "Good"
+        },
+        {
+          name: "Waterlogging Risk",
+          currentStatus: "Yes",
+          referenceAvg: "No",
+          evaluation: "Good"
+        },
+        {
+          name: "High Tension Line",
+          currentStatus: "at 16 km, 440 kv",
+          referenceAvg: "32 km",
+          evaluation: "Good"
+        }
+      ]
+    }
+  });
+}
+
+// Process and render the project risk page
+function renderProjectRiskPage(projectData) {
+  const template = loadTemplate("projectRisk");
+  return template({
+    PROJECT_NAME: projectData.projectName || "Unnamed Project",
+    RISK_DATA: projectData.riskData || {
+      risks: [
+        {
+          title: "Builder Risk",
+          value: "Medium",
+          level: "medium"
+        },
+        {
+          title: "Delay Risk",
+          value: "Low",
+          level: "low"
+        },
+        {
+          title: "Legal Risk",
+          value: "NA",
+          level: "na"
+        },
+        {
+          title: "Exit Risk",
+          value: "High",
+          level: "high"
+        },
+        {
+          title: "Market Risk",
+          value: "Medium",
+          level: "medium"
+        },
+        {
+          title: "Environmental Risk",
+          value: "Low",
+          level: "low"
+        }
+      ]
+    }
+  });
+}
+
+// Process and render the Google Reviews page
+async function renderGoogleReviewsPage(projectData) {
+  const template = await loadTemplate('GoogleReviews');
+  return template({
+    projectName: projectData?.projectName || 'Sample Project',
+    reviews: {
+      overallRating: projectData?.googleReviews?.overallRating || 4.25,
+      totalReviews: projectData?.googleReviews?.totalReviews || 52,
+      ratingDistribution: {
+        5: { 
+          count: projectData?.googleReviews?.ratingDistribution?.[5]?.count || 125,
+          percentage: projectData?.googleReviews?.ratingDistribution?.[5]?.percentage || 27
+        },
+        4: { 
+          count: projectData?.googleReviews?.ratingDistribution?.[4]?.count || 125,
+          percentage: projectData?.googleReviews?.ratingDistribution?.[4]?.percentage || 40
+        },
+        3: { 
+          count: projectData?.googleReviews?.ratingDistribution?.[3]?.count || 125,
+          percentage: projectData?.googleReviews?.ratingDistribution?.[3]?.percentage || 25
+        },
+        2: { 
+          count: projectData?.googleReviews?.ratingDistribution?.[2]?.count || 125,
+          percentage: projectData?.googleReviews?.ratingDistribution?.[2]?.percentage || 5
+        },
+        1: { 
+          count: projectData?.googleReviews?.ratingDistribution?.[1]?.count || 125,
+          percentage: projectData?.googleReviews?.ratingDistribution?.[1]?.percentage || 10
+        }
+      },
+      positiveReviews: projectData?.googleReviews?.positiveReviews || [
+        { category: 'Sales', rating: 5 },
+        { category: 'Project Name', rating: 5 },
+        { category: 'Sales', rating: 5 },
+        { category: 'Project Name', rating: 5 },
+        { category: 'Sales', rating: 5 }
+      ],
+      negativeReviews: projectData?.googleReviews?.negativeReviews || [
+        { category: 'Sales', rating: 5 },
+        { category: 'Project Name', rating: 5 },
+        { category: 'Sales', rating: 5 },
+        { category: 'Project Name', rating: 5 },
+        { category: 'Sales', rating: 5 },
+        { category: 'Sales', rating: 5 }
+      ],
+      recentReviews: projectData?.googleReviews?.recentReviews || [
+        {
+          rating: 5,
+          content: 'Absolute gold mine to invest in.. Really liked the integrated township plan by Tata and Birla.. They would be launching super luxurious Villaments in July - August 2024.',
+          author: 'Rajan Yadav',
+          date: '9th May'
+        },
+        {
+          rating: 4,
+          content: 'Absolute gold mine to invest in.. Really liked the integrated township plan by Tata and Birla.. They would be launching super luxurious Villaments in July - August 2024.',
+          author: 'Rajan Yadav',
+          date: '9th May'
+        },
+        {
+          rating: 3,
+          content: 'Absolute gold mine to invest in.. Really liked the integrated township plan by Tata and Birla.. They would be launching super luxurious Villaments in July - August 2024.',
+          author: 'Rajan Yadav',
+          date: '9th May'
+        },
+        {
+          rating: 1,
+          content: 'Absolute gold mine to invest in.. Really liked the integrated township plan by Tata and Birla.. They would be launching super luxurious Villaments in July - August 2024.',
+          author: 'Rajan Yadav',
+          date: '9th May'
+        }
+      ]
+    }
+  });
+}
+
+// Process and render the micromarket demand analysis page
+async function renderMicromarketDemandAnalysisPage(projectData) {
+  const template = await loadTemplate('MicromarketDemandAnalysis');
+  return template({
+    projectName: projectData?.projectName || 'Sample Project',
+    micromarketData: projectData?.micromarketData || {
+      demandAnalysis: {
+        currentDemand: '16%',
+        futureDemand: '24%',
+        supplyGap: '8%',
+        marketTrend: 'Growing'
+      },
+      keyMetrics: {
+        populationGrowth: '12%',
+        incomeGrowth: '15%',
+        employmentRate: '85%',
+        infrastructureDevelopment: 'High'
+      },
+      marketSegments: [
+        {
+          segment: 'Residential',
+          demand: 'High',
+          supply: 'Medium',
+          gap: 'Positive'
+        },
+        {
+          segment: 'Commercial',
+          demand: 'Medium',
+          supply: 'High',
+          gap: 'Negative'
+        },
+        {
+          segment: 'Industrial',
+          demand: 'Low',
+          supply: 'Low',
+          gap: 'Neutral'
+        }
+      ],
+      futureOutlook: {
+        shortTerm: 'Positive',
+        mediumTerm: 'Very Positive',
+        longTerm: 'Excellent'
+      }
+    }
+  });
+}
+
+// Process and render the micromarket supply analysis page 1
+async function renderMicromarketSupplyAnalysis1Page(projectData) {
+  const template = await loadTemplate('MircomarketSupplyAnalysis1');
+  return template({
+    projectName: projectData?.projectName || 'Sample Project',
+    supplyData: projectData?.supplyData || {
+      parameters: [
+        {
+          name: 'Devanahalli Business Park',
+          distance: '5 kms',
+          area: '28 mn Sqft'
+        },
+        {
+          name: 'Airport Township',
+          distance: '5 kms',
+          area: '28 mn Sqft'
+        },
+        {
+          name: 'KIADB Hardware Tech Park',
+          distance: '5 kms',
+          area: '28 mn Sqft'
+        },
+        {
+          name: 'KIADB Aerospace Industry',
+          distance: '5 kms',
+          area: '28 mn Sqft'
+        },
+        {
+          name: 'Prestige Tech cloud',
+          distance: '5 kms',
+          area: '28 mn Sqft'
+        }
+      ],
+      totalArea: '221 mn Sqft',
+      bubbleData: {
+        expectedDemand: '26.52 Lac',
+        readyToMove: '26.52 Lac',
+        underConstruction: '26.52 Lac',
+        delta: '26.52 Lac'
+      }
+    }
+  });
+}
+
+// Process and render the micromarket supply analysis page 2
+async function renderMicromarketSupplyAnalysis2Page(projectData) {
+  const template = await loadTemplate('MicromarketSupplyAnalysis2');
+  return template({
+    projectName: projectData?.projectName || 'Sample Project',
+    supplyData2: projectData?.supplyData2 || {
+      parameters: [
+        {
+          name: 'Devanahalli Business Park',
+          distance: '5 kms',
+          area: '28 mn Sqft'
+        },
+        {
+          name: 'Airport Township',
+          distance: '5 kms',
+          area: '28 mn Sqft'
+        },
+        {
+          name: 'KIADB Hardware Tech Park',
+          distance: '5 kms',
+          area: '28 mn Sqft'
+        },
+        {
+          name: 'KIADB Aerospace Industry',
+          distance: '5 kms',
+          area: '28 mn Sqft'
+        },
+        {
+          name: 'Prestige Tech cloud',
+          distance: '5 kms',
+          area: '28 mn Sqft'
+        }
+      ],
+      totalArea: '221 mn Sqft',
+      bubbleData: {
+        expectedDemand: '26.52 Lac',
+        readyToMove: '26.52 Lac',
+        underConstruction: '26.52 Lac',
+        delta: '26.52 Lac'
+      }
+    }
   });
 }
 
@@ -865,6 +1325,16 @@ app.get("/download-pdf", async (req, res) => {
     const pEDevelopmentHtml = renderPEDevelopmentPage(projectData);
     const aboutHtml = renderAboutPage(projectData);
     const contactUsHtml = renderContactUsPage(projectData);
+    const masterPlanHtml = renderMasterPlanPage(projectData, firstImageUrl);
+    const unitLevelHtml = renderUnitLevelPage(projectData, firstImageUrl);
+    const projectComparisonHtml = renderProjectComparisonPage(projectData);
+    const performanceHtml = renderPerformancePage(projectData);
+    const evaluationHtml = renderEvaluationPage(projectData);
+    const projectRiskHtml = renderProjectRiskPage(projectData);
+    const googleReviewsHtml = await renderGoogleReviewsPage(projectData);
+    const micromarketDemandAnalysisHtml = await renderMicromarketDemandAnalysisPage(projectData);
+    const micromarketSupplyAnalysis1Html = await renderMicromarketSupplyAnalysis1Page(projectData);
+    const micromarketSupplyAnalysis2Html = await renderMicromarketSupplyAnalysis2Page(projectData);
 
     // Try a completely different approach - generate individual PDFs for each page and then merge them
     try {
@@ -876,318 +1346,157 @@ app.get("/download-pdf", async (req, res) => {
         fs.mkdirSync(pagesDir, { recursive: true });
       }
 
+      // Clean up any existing PDF files in the pages directory
+      const existingFiles = fs.readdirSync(pagesDir);
+      for (const file of existingFiles) {
+        if (file.endsWith('.pdf') || file.endsWith('.html')) {
+          try {
+            fs.unlinkSync(path.join(pagesDir, file));
+          } catch (err) {
+            console.warn(`Warning: Could not delete existing file ${file}:`, err);
+          }
+        }
+      }
+
       // Write the HTML files to disk
       fs.writeFileSync(path.join(pagesDir, "cover.html"), coverHtml);
       fs.writeFileSync(path.join(pagesDir, "disclaimer.html"), disclaimerHtml);
       fs.writeFileSync(path.join(pagesDir, "overview.html"), overviewHtml);
       fs.writeFileSync(path.join(pagesDir, "details.html"), detailsHtml);
       fs.writeFileSync(path.join(pagesDir, "specs.html"), specsHtml);
-      fs.writeFileSync(
-        path.join(pagesDir, "supplyAndDemand.html"),
-        supplyAndDemandHtml
-      );
+      fs.writeFileSync(path.join(pagesDir, "supplyAndDemand.html"), supplyAndDemandHtml);
       fs.writeFileSync(path.join(pagesDir, "pricing.html"), pricingHtml);
       if (galleryHtml) {
         fs.writeFileSync(path.join(pagesDir, "gallery.html"), galleryHtml);
       }
-      fs.writeFileSync(
-        path.join(pagesDir, "recommendedStrategy.html"),
-        recommendedStrategyHtml
-      );
-      fs.writeFileSync(
-        path.join(pagesDir, "investmentHighlight.html"),
-        investmentHighlightHtml
-      );
-      fs.writeFileSync(
-        path.join(pagesDir, "yearlyCashflow.html"),
-        yearlyCashflowHtml
-      );
-      fs.writeFileSync(
-        path.join(pagesDir, "P&Edevelopment.html"),
-        pEDevelopmentHtml
-      );
+      fs.writeFileSync(path.join(pagesDir, "recommendedStrategy.html"), recommendedStrategyHtml);
+      fs.writeFileSync(path.join(pagesDir, "investmentHighlight.html"), investmentHighlightHtml);
+      fs.writeFileSync(path.join(pagesDir, "yearlyCashflow.html"), yearlyCashflowHtml);
+      fs.writeFileSync(path.join(pagesDir, "P&Edevelopment.html"), pEDevelopmentHtml);
       fs.writeFileSync(path.join(pagesDir, "about.html"), aboutHtml);
       fs.writeFileSync(path.join(pagesDir, "contactUs.html"), contactUsHtml);
+      fs.writeFileSync(path.join(pagesDir, 'masterPlan.html'), masterPlanHtml);
+      fs.writeFileSync(path.join(pagesDir, 'unitLevel.html'), unitLevelHtml);
+      fs.writeFileSync(path.join(pagesDir, 'projectComparison.html'), projectComparisonHtml);
+      fs.writeFileSync(path.join(pagesDir, 'performance.html'), performanceHtml);
+      fs.writeFileSync(path.join(pagesDir, 'evalution.html'), evaluationHtml);
+      fs.writeFileSync(path.join(pagesDir, 'projectRisk.html'), projectRiskHtml);
+      fs.writeFileSync(path.join(pagesDir, 'googleReviews.html'), googleReviewsHtml);
+      fs.writeFileSync(path.join(pagesDir, 'micromarketDemandAnalysis.html'), micromarketDemandAnalysisHtml);
+      fs.writeFileSync(path.join(pagesDir, 'micromarketSupplyAnalysis1.html'), micromarketSupplyAnalysis1Html);
+      fs.writeFileSync(path.join(pagesDir, 'micromarketSupplyAnalysis2.html'), micromarketSupplyAnalysis2Html);
 
       // Generate PDFs for each page
       const browser = await puppeteer.launch({
         args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-gpu"],
+        headless: "new"
       });
 
       try {
         const pdfFilenames = [];
+        const page = await browser.newPage();
+        
+        // Set viewport to match the page size
+        await page.setViewport({
+          width: 1920,
+          height: 1080,
+          deviceScaleFactor: 1
+        });
 
-        // Generate PDF for cover page
-        const coverPdfPath = path.join(pagesDir, "cover.pdf");
-        const coverPage = await browser.newPage();
-        await coverPage.goto(`file://${path.join(pagesDir, "cover.html")}`, {
-          waitUntil: "networkidle0",
-        });
-        await coverPage.pdf({
-          path: coverPdfPath,
-          landscape: true,
-          printBackground: true,
-          margin: {
-            top: "0.2in",
-            right: "0.2in",
-            bottom: "0.2in",
-            left: "0.2in",
-          },
-          preferCSSPageSize: true,
-        });
-        pdfFilenames.push(coverPdfPath);
-        await coverPage.close();
+        // Helper function to generate PDF for a page
+        async function generatePDF(htmlFile, pdfFile) {
+          try {
+            const page = await browser.newPage();
+            await page.setViewport({
+              width: 1920,
+              height: 1080,
+              deviceScaleFactor: 1
+            });
+            
+            // Wait for fonts to load
+            await page.evaluateOnNewDocument(() => {
+              document.fonts.ready.then(() => {
+                console.log('Fonts loaded');
+              });
+            });
 
-        // Generate PDF for disclaimer page
-        const disclaimerPdfPath = path.join(pagesDir, "disclaimer.pdf");
-        const disclaimerPage = await browser.newPage();
-        await disclaimerPage.goto(
-          `file://${path.join(pagesDir, "disclaimer.html")}`,
-          { waitUntil: "networkidle0" }
-        );
-        await disclaimerPage.pdf({
-          path: disclaimerPdfPath,
-          landscape: true,
-          printBackground: true,
-          margin: {
-            top: "0.4in",
-            right: "0.4in",
-            bottom: "0.4in",
-            left: "0.4in",
-          },
-          preferCSSPageSize: true,
-        });
-        pdfFilenames.push(disclaimerPdfPath);
-        await disclaimerPage.close();
+            await page.goto(`file://${path.join(pagesDir, htmlFile)}`, {
+              waitUntil: ['networkidle0', 'domcontentloaded'],
+              timeout: 30000
+            });
 
-        // Generate PDF for supply and demand page
-        const supplyAndDemandPdfPath = path.join(
-          pagesDir,
-          "supplyAndDemand.pdf"
-        );
-        const supplyAndDemandPage = await browser.newPage();
-        await supplyAndDemandPage.goto(
-          `file://${path.join(pagesDir, "supplyAndDemand.html")}`,
-          { waitUntil: "networkidle0" }
-        );
+            // Wait for fonts to be loaded
+            await page.evaluate(() => {
+              return document.fonts.ready;
+            });
 
-        await supplyAndDemandPage.pdf({
-          path: supplyAndDemandPdfPath,
-          landscape: true,
-          printBackground: true,
-          margin: {
-            top: "0.4in",
-            right: "0.4in",
-            bottom: "0.4in",
-            left: "0.4in",
-          },
-          preferCSSPageSize: true,
-        });
-        pdfFilenames.push(supplyAndDemandPdfPath);
-        await supplyAndDemandPage.close();
+            // Create a temporary file path
+            const tempPdfPath = path.join(pagesDir, `temp_${pdfFile}`);
+            
+            await page.pdf({
+              path: tempPdfPath,
+              width: '1920px',
+              height: '1080px',
+              printBackground: true,
+              margin: {
+                top: "0.4in",
+                right: "0.4in",
+                bottom: "0.4in",
+                left: "0.4in",
+              },
+              preferCSSPageSize: true,
+            });
+            
+            // Move the temporary file to the final location
+            const finalPdfPath = path.join(pagesDir, pdfFile);
+            try {
+              // Remove existing file if it exists
+              if (fs.existsSync(finalPdfPath)) {
+                fs.unlinkSync(finalPdfPath);
+              }
+              fs.renameSync(tempPdfPath, finalPdfPath);
+            } catch (moveError) {
+              console.error(`Error moving PDF file: ${moveError.message}`);
+              // If rename fails, try copy and delete
+              fs.copyFileSync(tempPdfPath, finalPdfPath);
+              fs.unlinkSync(tempPdfPath);
+            }
+            
+            pdfFilenames.push(finalPdfPath);
+            await page.close();
+          } catch (err) {
+            console.error(`Error generating PDF for ${htmlFile}:`, err);
+            throw err;
+          }
+        }
 
-        // Generate PDF for pricing page
-        const pricingPdfPath = path.join(pagesDir, "pricing.pdf");
-        const pricingPage = await browser.newPage();
-        await pricingPage.goto(
-          `file://${path.join(pagesDir, "pricing.html")}`,
-          { waitUntil: "networkidle0" }
-        );
-        await pricingPage.pdf({
-          path: pricingPdfPath,
-          landscape: true,
-          printBackground: true,
-          margin: {
-            top: "0.4in",
-            right: "0.4in",
-            bottom: "0.4in",
-            left: "0.4in",
-          },
-          preferCSSPageSize: true,
-        });
-        pdfFilenames.push(pricingPdfPath);
-        await pricingPage.close();
-
-        // Generate PDF for overview page
-        const overviewPdfPath = path.join(pagesDir, "overview.pdf");
-        const overviewPage = await browser.newPage();
-        await overviewPage.goto(
-          `file://${path.join(pagesDir, "overview.html")}`,
-          { waitUntil: "networkidle0" }
-        );
-        await overviewPage.pdf({
-          path: overviewPdfPath,
-          landscape: true,
-          printBackground: true,
-          margin: {
-            top: "0.4in",
-            right: "0.4in",
-            bottom: "0.4in",
-            left: "0.4in",
-          },
-          preferCSSPageSize: true,
-        });
-        pdfFilenames.push(overviewPdfPath);
-        await overviewPage.close();
-
-        // Generate PDF for gallery page
-        const galleryPdfPath = path.join(pagesDir, "gallery.pdf");
-        const galleryPage = await browser.newPage();
-        await galleryPage.goto(
-          `file://${path.join(pagesDir, "gallery.html")}`,
-          { waitUntil: "networkidle0" }
-        );
-        await galleryPage.pdf({
-          path: galleryPdfPath,
-          landscape: true,
-          printBackground: true,
-          margin: {
-            top: "0.4in",
-            right: "0.4in",
-            bottom: "0.4in",
-            left: "0.4in",
-          },
-          preferCSSPageSize: true,
-        });
-        pdfFilenames.push(galleryPdfPath);
-        await galleryPage.close();
-
-        // Generate PDF for recommended strategy page
-        const recommendedStrategyPdfPath = path.join(
-          pagesDir,
-          "recommendedStrategy.pdf"
-        );
-        const recommendedStrategyPage = await browser.newPage();
-        await recommendedStrategyPage.goto(
-          `file://${path.join(pagesDir, "recommendedStrategy.html")}`,
-          { waitUntil: "networkidle0" }
-        );
-        await recommendedStrategyPage.pdf({
-          path: recommendedStrategyPdfPath,
-          landscape: true,
-          printBackground: true,
-          margin: {
-            top: "0.4in",
-            right: "0.4in",
-            bottom: "0.4in",
-            left: "0.4in",
-          },
-          preferCSSPageSize: true,
-        });
-        pdfFilenames.push(recommendedStrategyPdfPath);
-        await recommendedStrategyPage.close();
-
-        // Generate PDF for investment highlight page
-        const investmentHighlightPdfPath = path.join(
-          pagesDir,
-          "InvestmentHighlight.pdf"
-        );
-        const investmentHighlightPage = await browser.newPage();
-        await investmentHighlightPage.goto(
-          `file://${path.join(pagesDir, "InvestmentHighlight.html")}`,
-          { waitUntil: "networkidle0" }
-        );
-        await investmentHighlightPage.pdf({
-          path: investmentHighlightPdfPath,
-          landscape: true,
-          printBackground: true,
-          margin: {
-            top: "0.4in",
-            right: "0.4in",
-            bottom: "0.4in",
-            left: "0.4in",
-          },
-          preferCSSPageSize: true,
-        });
-        pdfFilenames.push(investmentHighlightPdfPath);
-        await investmentHighlightPage.close();
-
-        // Generate PDF for yearly cashflow page
-        const yearlyCashflowPdfPath = path.join(pagesDir, "yearlyCashflow.pdf");
-        const yearlyCashflowPage = await browser.newPage();
-        await yearlyCashflowPage.goto(
-          `file://${path.join(pagesDir, "yearlyCashflow.html")}`,
-          { waitUntil: "networkidle0" }
-        );
-        await yearlyCashflowPage.pdf({
-          path: yearlyCashflowPdfPath,
-          landscape: true,
-          printBackground: true,
-          margin: {
-            top: "0.4in",
-            right: "0.4in",
-            bottom: "0.4in",
-            left: "0.4in",
-          },
-          preferCSSPageSize: true,
-        });
-        pdfFilenames.push(yearlyCashflowPdfPath);
-        await yearlyCashflowPage.close();
-
-        // Generate PDF for P&E development page
-        const pEDevelopmentPdfPath = path.join(pagesDir, "P&Edevelopment.pdf");
-        const pEDevelopmentPage = await browser.newPage();
-        await pEDevelopmentPage.goto(
-          `file://${path.join(pagesDir, "P&Edevelopment.html")}`,
-          { waitUntil: "networkidle0" }
-        );
-        await pEDevelopmentPage.pdf({
-          path: pEDevelopmentPdfPath,
-          landscape: true,
-          printBackground: true,
-          margin: {
-            top: "0.4in",
-            right: "0.4in",
-            bottom: "0.4in",
-            left: "0.4in",
-          },
-          preferCSSPageSize: true,
-        });
-        pdfFilenames.push(pEDevelopmentPdfPath);
-        await pEDevelopmentPage.close();
-
-        // Generate PDF for about page
-        const aboutPdfPath = path.join(pagesDir, "about.pdf");
-        const aboutPage = await browser.newPage();
-        await aboutPage.goto(`file://${path.join(pagesDir, "about.html")}`, {
-          waitUntil: "networkidle0",
-        });
-        await aboutPage.pdf({
-          path: aboutPdfPath,
-          landscape: true,
-          printBackground: true,
-          margin: {
-            top: "0.4in",
-            right: "0.4in",
-            bottom: "0.4in",
-            left: "0.4in",
-          },
-          preferCSSPageSize: true,
-        });
-        pdfFilenames.push(aboutPdfPath);
-        await aboutPage.close();
-
-        // Generate PDF for contact us page
-        const contactUsPdfPath = path.join(pagesDir, "contactUs.pdf");
-        const contactUsPage = await browser.newPage();
-        await contactUsPage.goto(
-          `file://${path.join(pagesDir, "contactUs.html")}`,
-          { waitUntil: "networkidle0" }
-        );
-        await contactUsPage.pdf({
-          path: contactUsPdfPath,
-          landscape: true,
-          printBackground: true,
-          margin: {
-            top: "0.4in",
-            right: "0.4in",
-            bottom: "0.4in",
-            left: "0.4in",
-          },
-          preferCSSPageSize: true,
-        });
-        pdfFilenames.push(contactUsPdfPath);
-        await contactUsPage.close();
+        // Generate PDFs for each page
+        await generatePDF("cover.html", "cover.pdf");
+        await generatePDF("disclaimer.html", "disclaimer.pdf");
+        await generatePDF("overview.html", "overview.pdf");
+        await generatePDF("details.html", "details.pdf");
+        await generatePDF("specs.html", "specs.pdf");
+        await generatePDF("supplyAndDemand.html", "supplyAndDemand.pdf");
+        await generatePDF("pricing.html", "pricing.pdf");
+        if (galleryHtml) {
+          await generatePDF("gallery.html", "gallery.pdf");
+        }
+        await generatePDF("recommendedStrategy.html", "recommendedStrategy.pdf");
+        await generatePDF("investmentHighlight.html", "investmentHighlight.pdf");
+        await generatePDF("yearlyCashflow.html", "yearlyCashflow.pdf");
+        await generatePDF("P&Edevelopment.html", "P&Edevelopment.pdf");
+        await generatePDF("about.html", "about.pdf");
+        await generatePDF("contactUs.html", "contactUs.pdf");
+        await generatePDF("masterPlan.html", "masterPlan.pdf");
+        await generatePDF("unitLevel.html", "unitLevel.pdf");
+        await generatePDF("projectComparison.html", "projectComparison.pdf");
+        await generatePDF("performance.html", "performance.pdf");
+        await generatePDF("evalution.html", "evalution.pdf");
+        await generatePDF("projectRisk.html", "projectRisk.pdf");
+        await generatePDF("googleReviews.html", "googleReviews.pdf");
+        await generatePDF("micromarketDemandAnalysis.html", "micromarketDemandAnalysis.pdf");
+        await generatePDF("micromarketSupplyAnalysis1.html", "micromarketSupplyAnalysis1.pdf");
+        await generatePDF("micromarketSupplyAnalysis2.html", "micromarketSupplyAnalysis2.pdf");
 
         // Merge all PDF
         const { PDFDocument } = require("pdf-lib");
@@ -1209,35 +1518,75 @@ app.get("/download-pdf", async (req, res) => {
           return mergedPdfBytes;
         }
 
+        // Create a unique filename with timestamp
+        const timestamp = new Date().getTime();
         const filename = `${projectName.replace(/\s+/g, "_")}_Report.pdf`;
         const filePath = path.join(__dirname, filename);
 
+        // Ensure the directory exists and is writable
+        try {
+          if (!fs.existsSync(__dirname)) {
+            fs.mkdirSync(__dirname, { recursive: true });
+          }
+        } catch (dirError) {
+          console.error("Error creating directory:", dirError);
+          return res.status(500).send("Failed to create directory for PDF generation");
+        }
+
         const mergedPdfBytes = await mergePDFs(pdfFilenames);
-        fs.writeFileSync(filePath, mergedPdfBytes);
+        
+        // Write to a temporary file first
+        const tempFilePath = path.join(__dirname, `temp_${filename}`);
+        try {
+          fs.writeFileSync(tempFilePath, mergedPdfBytes);
+          // Move the temporary file to the final location
+          if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+          }
+          fs.renameSync(tempFilePath, filePath);
+        } catch (writeError) {
+          console.error("Error writing PDF file:", writeError);
+          return res.status(500).send("Failed to write PDF file");
+        }
 
         // Send the PDF as a download
         res.download(filePath, filename, (err) => {
           if (err) {
             console.error("Error sending file:", err);
           }
-          // Clean up the HTML files
+          // Clean up files after sending
           try {
-            fs.unlinkSync(path.join(pagesDir, "cover.html"));
-            fs.unlinkSync(path.join(pagesDir, "disclaimer.html"));
-            fs.unlinkSync(path.join(pagesDir, "overview.html"));
-            fs.unlinkSync(path.join(pagesDir, "details.html"));
-            fs.unlinkSync(path.join(pagesDir, "specs.html"));
-            fs.unlinkSync(path.join(pagesDir, "supplyAndDemand.html"));
-            fs.unlinkSync(path.join(pagesDir, "pricing.html"));
-            fs.unlinkSync(path.join(pagesDir, "gallery.html"));
-            fs.unlinkSync(path.join(pagesDir, "recommendedStrategy.html"));
-            fs.unlinkSync(path.join(pagesDir, "investmentHighlight.html"));
-            fs.unlinkSync(path.join(pagesDir, "yearlyCashflow.html"));
-            fs.unlinkSync(path.join(pagesDir, "P&Edevelopment.html"));
-            fs.unlinkSync(path.join(pagesDir, "about.html"));
-            fs.unlinkSync(path.join(pagesDir, "contactUs.html"));
-          } catch (err) {
-            console.error("Error cleaning up HTML files:", err);
+            // Clean up the HTML files
+            const filesToClean = [
+              "cover.html", "disclaimer.html", "overview.html", "details.html",
+              "specs.html", "supplyAndDemand.html", "pricing.html", "gallery.html",
+              "recommendedStrategy.html", "investmentHighlight.html", "yearlyCashflow.html",
+              "P&Edevelopment.html", "about.html", "contactUs.html", "masterPlan.html",
+              "unitLevel.html", "projectComparison.html", "performance.html", "evalution.html",
+              "projectRisk.html", "googleReviews.html", "micromarketDemandAnalysis.html",
+              "micromarketSupplyAnalysis1.html", "micromarketSupplyAnalysis2.html"
+            ];
+            
+            filesToClean.forEach(file => {
+              const filePath = path.join(pagesDir, file);
+              if (fs.existsSync(filePath)) {
+                fs.unlinkSync(filePath);
+              }
+            });
+
+            // Clean up the PDF files
+            pdfFilenames.forEach(pdfPath => {
+              if (fs.existsSync(pdfPath)) {
+                fs.unlinkSync(pdfPath);
+              }
+            });
+
+            // Clean up the final merged PDF
+            if (fs.existsSync(filePath)) {
+              fs.unlinkSync(filePath);
+            }
+          } catch (cleanupError) {
+            console.error("Error cleaning up files:", cleanupError);
           }
         });
 

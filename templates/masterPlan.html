@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TruEstate Master Plan</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      @page {
+        size: 1600px 800px;
+        margin: 0;
+      }
+      body,
+      html {
+        width: 100%;
+        height: 100%;
+        font-family: Arial, sans-serif;
+        color: #333;
+        background-color: #f5f5f5;
+      }
+
+      .page-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+        position: relative;
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 50px;
+      }
+
+      .title {
+        font-size: 42px;
+        font-weight: bold;
+        color: #222;
+      }
+
+      .contact-info {
+        display: flex;
+        align-items: center;
+      }
+
+      .contact-info .whatsapp {
+        display: flex;
+        align-items: center;
+        padding: 10px 15px;
+        border-radius: 30px;
+        text-decoration: none;
+        color: #333;
+      }
+
+      .contact-info .whatsapp img {
+        width: 24px;
+        height: 24px;
+        margin-right: 10px;
+      }
+
+      .contact-info .whatsapp .click-here {
+        color: #2c7e2f;
+        font-weight: bold;
+      }
+
+      .main-content {
+        display: flex;
+        gap: 30px;
+      }
+
+      .master-plan-image {
+        width: 55%;
+        border-radius: 15px;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .master-plan-image img {
+        width: 100%;
+        display: block;
+      }
+
+      .decorative-shape {
+        position: absolute;
+        bottom: -100px;
+        left: -100px;
+        width: 300px;
+        height: 300px;
+        border-radius: 50%;
+        background-color: #FFA500;
+        opacity: 0.3;
+        z-index: -1;
+      }
+
+      .star-icon {
+        position: absolute;
+        right: -30px;
+        top: 50%;
+        width: 80px;
+        height: 80px;
+      }
+
+      .info-container {
+        width: 45%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .info-row {
+        display: flex;
+        margin-bottom: 30px;
+      }
+
+      .info-item {
+        flex: 1;
+        display: flex;
+        align-items: flex-start;
+      }
+
+      .info-item-icon {
+        width: 40px;
+        margin-right: 15px;
+        opacity: 0.6;
+      }
+
+      .info-text {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .info-label {
+        font-size: 16px;
+        font-weight: bold;
+        color: #666;
+        margin-bottom: 5px;
+      }
+
+      .info-value {
+        font-size: 20px;
+        font-weight: bold;
+        color: #222;
+        margin-bottom: 10px;
+      }
+
+      /* Improved impact indicator styling */
+      .impact-column {
+        width: 100px;
+        margin-top: 5px;
+      }
+
+      .impact-indicator {
+        position: relative;
+        width: 100%;
+        height: 6px;
+        border-radius: 4px;
+        overflow: hidden;
+        background: #e0e0e0;
+      }
+
+      .impact-level {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        display: flex;
+      }
+
+      .impact-red {
+        flex: 1;
+        background: linear-gradient(to right, #ff6b6b, #ff9999);
+        border-top-left-radius: 4px;
+        border-bottom-left-radius: 4px;
+      }
+
+      .impact-yellow {
+        flex: 1;
+        background: linear-gradient(to right, #ffe066, #ffd166);
+      }
+
+      .impact-green {
+        flex: 1;
+        background: linear-gradient(to right, #8fffdf, #06d6a0);
+        border-top-right-radius: 4px;
+        border-bottom-right-radius: 4px;
+      }
+
+      .impact-marker {
+        position: absolute;
+        width: 4px;
+        height: 14px;
+        background-color: #000;
+        border-radius: 2px;
+        top: -3px;
+        transform: translateX(-50%);
+      }
+
+      .impact-text {
+        text-align: right;
+        margin-top: 5px;
+        font-size: 14px;
+        font-weight: bold;
+        color: #222;
+      }
+
+      /* Marker positions */
+      .low-impact .impact-marker {
+        left: 16.7%;
+      }
+
+      .medium-impact .impact-marker {
+        left: 50%;
+      }
+
+      .high-impact .impact-marker {
+        left: 83.3%;
+      }
+
+      .score-badge {
+        position: absolute;
+        top: 150px;
+        left: 40px;
+        width: 150px;
+        height: 150px;
+      }
+
+      @media (max-width: 768px) {
+        .main-content {
+          flex-direction: column;
+        }
+
+        .master-plan-image,
+        .info-container {
+          width: 100%;
+        }
+
+        .title {
+          font-size: 42px;
+        }
+
+        .info-row {
+          flex-direction: column;
+        }
+
+        .info-item {
+          margin-bottom: 20px;
+        }
+
+        .score-badge {
+          width: 100px;
+          height: 100px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page-container">
+      <div class="header">
+        <h1 class="title">Master Plan</h1>
+        <div class="contact-info">
+          <a href="https://wa.me/918444999770" class="whatsapp">
+            <img src="../assets/logos/whatsapp.png" alt="WhatsApp" />
+            <span>Want to invest? <span class="click-here">Click here</span></span>
+          </a>
+        </div>
+      </div>
+
+      <div class="main-content">
+        <div class="master-plan-image">
+          <img src="{{MASTER_PLAN_IMAGE}}" alt="Project Master Plan" />
+          <div class="decorative-shape"></div>
+          <img src="assets/icons/star.png" alt="Highlight" class="star-icon" />
+        </div>
+
+        <div class="info-container">
+          <div class="info-row">
+            <div class="info-item">
+              <img src="../assets/icons/Overview/zone.png" alt="Loading" class="info-item-icon" />
+              <div class="info-text">
+                <div class="info-label">Loading</div>
+                <div class="info-value">{{LOADING}}</div>
+                <div class="impact-column">
+                  <div class="impact-indicator high-impact">
+                    <div class="impact-level">
+                      <div class="impact-red"></div>
+                      <div class="impact-yellow"></div>
+                      <div class="impact-green"></div>
+                    </div>
+                    <div class="impact-marker"></div>
+                  </div>
+                  <div class="impact-text">High</div>
+                </div>
+              </div>
+            </div>
+            <div class="info-item">
+              <img src="../assets/icons/masterplan/UDS.png" alt="UDS" class="info-item-icon" />
+              <div class="info-text">
+                <div class="info-label">UDS</div>
+                <div class="info-value">{{UDS_DATE}}</div>
+                <div class="impact-column">
+                  <div class="impact-indicator high-impact">
+                    <div class="impact-level">
+                      <div class="impact-red"></div>
+                      <div class="impact-yellow"></div>
+                      <div class="impact-green"></div>
+                    </div>
+                    <div class="impact-marker"></div>
+                  </div>
+                  <div class="impact-text">High</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-item">
+              <img src="../assets/icons/masterplan/units.png" alt="Units" class="info-item-icon" />
+              <div class="info-text">
+                <div class="info-label">Total Units</div>
+                <div class="info-value">{{TOTAL_UNITS}}</div>
+                <div class="impact-column">
+                  <div class="impact-indicator high-impact">
+                    <div class="impact-level">
+                      <div class="impact-red"></div>
+                      <div class="impact-yellow"></div>
+                      <div class="impact-green"></div>
+                    </div>
+                    <div class="impact-marker"></div>
+                  </div>
+                  <div class="impact-text">High</div>
+                </div>
+              </div>
+            </div>
+            <div class="info-item">
+              <img src="../assets/icons/masterplan/size.png" alt="Size" class="info-item-icon" />
+              <div class="info-text">
+                <div class="info-label">Project Size</div>
+                <div class="info-value">{{PROJECT_SIZE}}</div>
+                <div class="impact-column">
+                  <div class="impact-indicator low-impact">
+                    <div class="impact-level">
+                      <div class="impact-red"></div>
+                      <div class="impact-yellow"></div>
+                      <div class="impact-green"></div>
+                    </div>
+                    <div class="impact-marker"></div>
+                  </div>
+                  <div class="impact-text">Low</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-item">
+              <img src="../assets/icons/masterplan/plant.png" alt="Open Area" class="info-item-icon" />
+              <div class="info-text">
+                <div class="info-label">Open Area</div>
+                <div class="info-value">{{OPEN_AREA}}</div>
+                <div class="impact-column">
+                  <div class="impact-indicator medium-impact">
+                    <div class="impact-level">
+                      <div class="impact-red"></div>
+                      <div class="impact-yellow"></div>
+                      <div class="impact-green"></div>
+                    </div>
+                    <div class="impact-marker"></div>
+                  </div>
+                  <div class="impact-text">Medium</div>
+                </div>
+              </div>
+            </div>
+            <div class="info-item">
+              <img src="../assets/icons/masterplan/quality.png" alt="Quality" class="info-item-icon" />
+              <div class="info-text">
+                <div class="info-label">Construction Quality</div>
+                <div class="info-value">{{CONSTRUCTION_QUALITY}}</div>
+                <div class="impact-column">
+                  <div class="impact-indicator high-impact">
+                    <div class="impact-level">
+                      <div class="impact-red"></div>
+                      <div class="impact-yellow"></div>
+                      <div class="impact-green"></div>
+                    </div>
+                    <div class="impact-marker"></div>
+                  </div>
+                  <div class="impact-text">High</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-item">
+              <img src="../assets/icons/masterplan/road.png" alt="Road Width" class="info-item-icon" />
+              <div class="info-text">
+                <div class="info-label">Access road width</div>
+                <div class="info-value">{{ROAD_WIDTH}}</div>
+                <div class="impact-column">
+                  <div class="impact-indicator high-impact">
+                    <div class="impact-level">
+                      <div class="impact-red"></div>
+                      <div class="impact-yellow"></div>
+                      <div class="impact-green"></div>
+                    </div>
+                    <div class="impact-marker"></div>
+                  </div>
+                  <div class="impact-text">High</div>
+                </div>
+              </div>
+            </div>
+            <div class="info-item">
+              <img src="../assets/icons/masterplan/construction.png" alt="Construction" class="info-item-icon" />
+              <div class="info-text">
+                <div class="info-label">Construction Partner</div>
+                <div class="info-value">{{CONSTRUCTION_PARTNER}}</div>
+                <div class="impact-column">
+                  <div class="impact-indicator high-impact">
+                    <div class="impact-level">
+                      <div class="impact-red"></div>
+                      <div class="impact-yellow"></div>
+                      <div class="impact-green"></div>
+                    </div>
+                    <div class="impact-marker"></div>
+                  </div>
+                  <div class="impact-text">High</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-item">
+              <img src="../assets/icons/density.png" alt="Density" class="info-item-icon" />
+              <div class="info-text">
+                <div class="info-label">Project density</div>
+                <div class="info-value">{{PROJECT_DENSITY}}</div>
+                <div class="impact-column">
+                  <div class="impact-indicator high-impact">
+                    <div class="impact-level">
+                      <div class="impact-red"></div>
+                      <div class="impact-yellow"></div>
+                      <div class="impact-green"></div>
+                    </div>
+                    <div class="impact-marker"></div>
+                  </div>
+                  <div class="impact-text">High</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <img src="../assets/icons/imactLogo.png" alt="TruEstate Score: 8/10 Impact Score" class="score-badge" />
+    </div>
+  </body>
+</html>
