@@ -822,6 +822,67 @@ async function renderMicromarketSupplyAnalysis2Page(projectData) {
   });
 }
 
+// Process and render the micromarket rental analysis page
+async function renderMicromarketRentalAnalysisPage(projectData) {
+  const template = await loadTemplate('MicromarketRentalAnalysis');
+  return template({
+    projectName: projectData?.projectName || 'Sample Project',
+    rentalAnalysisData: projectData?.rentalAnalysisData || {
+      rentalDemand: '10%',
+      rentalSupply: '10%',
+      rentalGap: '0%',
+      rentalTrend: 'Stable'
+    }
+  });
+}
+
+// Process and render the micromarket resale analysis page
+async function renderMicromarketResaleAnalysisPage(projectData) {
+  const template = await loadTemplate('MicromarketResaleAnalysis');
+  return template({
+    projectName: projectData?.projectName || 'Sample Project',
+    resaleAnalysisData: projectData?.resaleAnalysisData || {
+      resaleDemand: '10%',
+      resaleSupply: '10%',
+      resaleGap: '0%',
+      resaleTrend: 'Stable'
+    }
+  });
+}
+
+// Process and render the impact scores page
+async function renderImpactScoresPage(projectData) {
+  const template = await loadTemplate('ImpactScores');
+  return template({
+    projectName: projectData?.projectName || 'Sample Project',
+    impactScores: projectData?.impactScores || {
+      overallScore: 8,
+      categories: [
+        {
+          name: 'Location',
+          score: 8,
+          description: 'Prime location with good connectivity'
+        },
+        {
+          name: 'Developer',
+          score: 7,
+          description: 'Reputed developer with good track record'
+        },
+        {
+          name: 'Price',
+          score: 9,
+          description: 'Competitive pricing in the market'
+        },
+        {
+          name: 'Amenities',
+          score: 8,
+          description: 'Comprehensive amenities package'
+        }
+      ]
+    }
+  });
+}
+
 // Basic route
 app.get("/", (req, res) => {
   res.send("Hello World!");
@@ -1314,11 +1375,11 @@ app.get("/download-pdf", async (req, res) => {
     }
 
     const overviewHtml = renderOverviewPage(projectData, firstImageUrl);
-    const detailsHtml = renderDetailsPage(projectData);
-    const specsHtml = renderSpecsPage(projectData);
+   // const detailsHtml = renderDetailsPage(projectData);
+    //const specsHtml = renderSpecsPage(projectData);
     const supplyAndDemandHtml = renderSupplyAndDemandPage(projectData);
     const pricingHtml = renderPricingPage(projectData);
-    const galleryHtml = renderGalleryPage(projectName, processedImages);
+    //const galleryHtml = renderGalleryPage(projectName, processedImages);
     const recommendedStrategyHtml = renderRecommendedStrategyPage(projectData);
     const investmentHighlightHtml = renderInvestmentHighlightPage(projectData);
     const yearlyCashflowHtml = renderYearlyCashflowPage(projectData);
@@ -1335,6 +1396,9 @@ app.get("/download-pdf", async (req, res) => {
     const micromarketDemandAnalysisHtml = await renderMicromarketDemandAnalysisPage(projectData);
     const micromarketSupplyAnalysis1Html = await renderMicromarketSupplyAnalysis1Page(projectData);
     const micromarketSupplyAnalysis2Html = await renderMicromarketSupplyAnalysis2Page(projectData);
+    //const micromarketRentalAnalysisHtml = await renderMicromarketRentalAnalysisPage(projectData);
+    const micromarketResaleAnalysisHtml = await renderMicromarketResaleAnalysisPage(projectData);
+    //const impactScoresHtml = await renderImpactScoresPage(projectData);
 
     // Try a completely different approach - generate individual PDFs for each page and then merge them
     try {
@@ -1362,13 +1426,13 @@ app.get("/download-pdf", async (req, res) => {
       fs.writeFileSync(path.join(pagesDir, "cover.html"), coverHtml);
       fs.writeFileSync(path.join(pagesDir, "disclaimer.html"), disclaimerHtml);
       fs.writeFileSync(path.join(pagesDir, "overview.html"), overviewHtml);
-      fs.writeFileSync(path.join(pagesDir, "details.html"), detailsHtml);
-      fs.writeFileSync(path.join(pagesDir, "specs.html"), specsHtml);
+      // fs.writeFileSync(path.join(pagesDir, "details.html"), detailsHtml);
+      // fs.writeFileSync(path.join(pagesDir, "specs.html"), specsHtml);
       fs.writeFileSync(path.join(pagesDir, "supplyAndDemand.html"), supplyAndDemandHtml);
       fs.writeFileSync(path.join(pagesDir, "pricing.html"), pricingHtml);
-      if (galleryHtml) {
-        fs.writeFileSync(path.join(pagesDir, "gallery.html"), galleryHtml);
-      }
+      // if (galleryHtml) {
+      //   fs.writeFileSync(path.join(pagesDir, "gallery.html"), galleryHtml);
+      // }
       fs.writeFileSync(path.join(pagesDir, "recommendedStrategy.html"), recommendedStrategyHtml);
       fs.writeFileSync(path.join(pagesDir, "investmentHighlight.html"), investmentHighlightHtml);
       fs.writeFileSync(path.join(pagesDir, "yearlyCashflow.html"), yearlyCashflowHtml);
@@ -1385,6 +1449,9 @@ app.get("/download-pdf", async (req, res) => {
       fs.writeFileSync(path.join(pagesDir, 'micromarketDemandAnalysis.html'), micromarketDemandAnalysisHtml);
       fs.writeFileSync(path.join(pagesDir, 'micromarketSupplyAnalysis1.html'), micromarketSupplyAnalysis1Html);
       fs.writeFileSync(path.join(pagesDir, 'micromarketSupplyAnalysis2.html'), micromarketSupplyAnalysis2Html);
+      //fs.writeFileSync(path.join(pagesDir, 'micromarketRentalAnalysis.html'), micromarketRentalAnalysisHtml);
+      fs.writeFileSync(path.join(pagesDir, 'micromarketResaleAnalysis.html'), micromarketResaleAnalysisHtml);
+     // fs.writeFileSync(path.join(pagesDir, 'impactScores.html'), impactScoresHtml);
 
       // Generate PDFs for each page
       const browser = await puppeteer.launch({
@@ -1474,13 +1541,13 @@ app.get("/download-pdf", async (req, res) => {
         await generatePDF("cover.html", "cover.pdf");
         await generatePDF("disclaimer.html", "disclaimer.pdf");
         await generatePDF("overview.html", "overview.pdf");
-        await generatePDF("details.html", "details.pdf");
-        await generatePDF("specs.html", "specs.pdf");
+        // await generatePDF("details.html", "details.pdf");
+        // await generatePDF("specs.html", "specs.pdf");
         await generatePDF("supplyAndDemand.html", "supplyAndDemand.pdf");
         await generatePDF("pricing.html", "pricing.pdf");
-        if (galleryHtml) {
-          await generatePDF("gallery.html", "gallery.pdf");
-        }
+        // if (galleryHtml) {
+        //   await generatePDF("gallery.html", "gallery.pdf");
+        // }
         await generatePDF("recommendedStrategy.html", "recommendedStrategy.pdf");
         await generatePDF("investmentHighlight.html", "investmentHighlight.pdf");
         await generatePDF("yearlyCashflow.html", "yearlyCashflow.pdf");
@@ -1497,6 +1564,9 @@ app.get("/download-pdf", async (req, res) => {
         await generatePDF("micromarketDemandAnalysis.html", "micromarketDemandAnalysis.pdf");
         await generatePDF("micromarketSupplyAnalysis1.html", "micromarketSupplyAnalysis1.pdf");
         await generatePDF("micromarketSupplyAnalysis2.html", "micromarketSupplyAnalysis2.pdf");
+        //await generatePDF("micromarketRentalAnalysis.html", "micromarketRentalAnalysis.pdf");
+        await generatePDF("micromarketResaleAnalysis.html", "micromarketResaleAnalysis.pdf");
+        //await generatePDF("impactScores.html", "impactScores.pdf");
 
         // Merge all PDF
         const { PDFDocument } = require("pdf-lib");
@@ -1558,13 +1628,16 @@ app.get("/download-pdf", async (req, res) => {
           try {
             // Clean up the HTML files
             const filesToClean = [
-              "cover.html", "disclaimer.html", "overview.html", "details.html",
-              "specs.html", "supplyAndDemand.html", "pricing.html", "gallery.html",
-              "recommendedStrategy.html", "investmentHighlight.html", "yearlyCashflow.html",
-              "P&Edevelopment.html", "about.html", "contactUs.html", "masterPlan.html",
-              "unitLevel.html", "projectComparison.html", "performance.html", "evalution.html",
-              "projectRisk.html", "googleReviews.html", "micromarketDemandAnalysis.html",
-              "micromarketSupplyAnalysis1.html", "micromarketSupplyAnalysis2.html"
+              "cover.html", "disclaimer.html","supplyAndDemand.html", "pricing.html", "performance.html", 
+              "overview.html", "masterPlan.html", "unitLevel.html","evalution.html",
+              "projectRisk.html","googleReviews.html", "investmentHighlight.html",
+              "yearlyCashflow.html", "P&Edevelopment.html","micromarketDemandAnalysis.html",
+              "micromarketSupplyAnalysis1.html", "micromarketSupplyAnalysis2.html",
+              //"micromarketRentalAnalysis.html", 
+              "micromarketResaleAnalysis.html",
+               //"impactScores.html",
+               "recommendedStrategy.html", "projectComparison.html",
+               "about.html", "contactUs.html", 
             ];
             
             filesToClean.forEach(file => {

@@ -4,128 +4,218 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TruEstate Investment Report</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
       * {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
+        font-family: 'Montserrat', sans-serif;
       }
 
       @page {
-        size: 1600px 800px;
+        size: 1920px 1080px;
         margin: 0;
       }
 
-      body,
-      html {
-        width: 100%;
-        font-family: Arial, sans-serif;
+      html, body {
+        width: 1920px;
+        height: 1080px;
+        margin: 0;
+        padding: 0;
+        overflow: auto;
+        font-family: 'Montserrat', sans-serif;
         color: #333;
-        background-color: #f5f5f5;
-      }
-
-      .report-container {
-        max-width: 1400px;
-        margin: 0 auto;
-        padding: 20px;
-        position: relative;
-        overflow: hidden;
         background-color: #f5f5f5;
         background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23bdbdbd' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
       }
+
+      .report-container {
+        max-width: 100%;
+        margin: 0 auto;
+        padding: 80px;
+        position: relative;
+      }
+
+      .yellow-accent {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 80px;
+        height: 300px;
+        background-color: #ffd700;
+        z-index: -1;
+      }
+
       .header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 40px;
-      }
-      .whatsapp-button{
-        display: flex;
-        align-items: center;
-        font-size: 20px;
-      }
-      .contact-info img{
-        width: 24px;
-        height: 24px;
-        margin-right: 10px;
+        margin-bottom: 50px;
       }
       
-      .contact-info {
-        display: flex;
-          
-        align-items: center;
-      }
-      .whatsapp-text{
-        font-size: 16px;
-        
-      }
-      .click-here {
-        color: #14823c;
-        padding-left: 10px;
-        text-decoration: underline;
+      h1 {
+        font-size: 72px;
         font-weight: bold;
+        color: #222;
+        font-family: 'Lora', serif;
+       
+      }
+      .estate-score {
+        position: absolute;
+        top: 80px;
+        right: 80px;
+        width: 120px;
+        height: 120px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        z-index: 10;
+      }
+      .estate-score img{
+        width: 120px;
+        height: 120px;
+        justify-content: center;
+        align-items: center;
+       
       }
 
-      h1 {
+      .estate-score::before {
+        content: "";
+        position: absolute;
+        top: -8px;
+        left: -8px;
+        right: -8px;
+        bottom: -8px;
+        z-index: -1;
+      }
+
+      .score-value {
+        justify-content: center;
+        align-items: center;
+        position: absolute;
         font-size: 36px;
-        margin-bottom: 30px;
-        color: #000;
+        font-weight: bold;
+        line-height: 1;
+      }
+      .score-text {
+        font-size: 14px;
+        text-align: center;
+        margin-top: 4px;
+      }
+
+      .score-label {
+        position: absolute;
+        width: 200%;
+        top: -10px;
+        left: -50%;
+        text-align: center;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
       }
 
       .cashflow-table {
         width: 100%;
         border-collapse: collapse;
-        margin-bottom: 20px;
+        overflow: hidden;
       }
 
       .cashflow-table th, 
       .cashflow-table td {
-        padding: 12px 15px;
-        text-align: left;
-        border-bottom: 1px solid #ddd;
+        padding: 25px 30px;
+        text-align: center;
+        border-bottom: 2px solid #B9B9B9;
+        font-size: 24px;
       }
 
       .cashflow-table th {
         font-weight: bold;
+        
+      }
+      .cashflow-table .parameter-cell {
+        text-align: left;
+        font-weight: 600;
+        font-family: 'Montserrat','sans-serif';
+      }
+      .cashflow-table td{
+        font-weight: 400;
+        font-family: 'Lato';
+        align-items: center;
+      }
+      .cashflow-table .net-cash-row {
+        background-color: #DFF4F3;
+        font-weight: 600;
+        font-size: 24px;
+        color: black;
+        font-family: 'Montserrat', sans-serif;
       }
 
-      .net-cash-row {
-        background-color: #e6f7f2;
-        font-weight: bold;
-      }
-      .parameter-cell{
-        font-weight: bold;
+      .cashflow-table .net-cash-row td {
+        background-color: #DFF4F3;
+        font-weight: 600;
+        font-size: 24px;
+        color: black;
+        font-family: 'Montserrat', sans-serif;
       }
 
       .disclaimer {
-        font-size: 12px;
-        color: #666;
-        margin-top: 20px;
+        font-size: 20px;
+        font-weight: 400;
+        color: #515151;
         line-height: 1.5;
+        padding: 30px;
+        font-family: 'Lato';
+      }
+
+      .back-to-top {
+        position: fixed;
+        bottom: 80px;
+        right: 80px;
+        height: 72px;
+        width: 72px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        z-index: 100;
       }
       
+      .back-to-top img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+      
+      .yellow-circle {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 250px;
+        height: 250px;
+        background-color: rgba(255, 193, 7, 0.2);
+        border-radius: 50%;
+        z-index: -1;
+      }
     </style>
   </head>
   <body>
+    <div class="yellow-circle"></div>
+    
     <div class="report-container">
+      <div class="yellow-accent"></div>
+      
       <div class="header">
-        <h1>Yearly Cashflow</h1>
-
-        <div class="contact-info">
-          
-            <img src="../assets/logos/whatsapp.png" alt="WhatsApp" />
-            <div class="whatsapp-button">
-
-              Want to invest? 
-              <a href="#" class="whatsapp-button">
-              <span class="click-here">Click here</span>
-            </a>
-            </div>
-          </a>
+        <h1>Year-wise Cashflows</h1>
+        <div class="estate-score">
+          <div class="score-value">8<span style="font-size: 20px">/10</span></div>
+          <img src="../assets/logos/impactScore.png" alt="impact logo" height="120px" width="120px">
         </div>
       </div>
-
-      
 
       <table class="cashflow-table">
         <thead>
@@ -203,6 +293,8 @@
       </div>
     </div>
 
-    
+    <div class="back-to-top">
+      <img src="../assets/logos/truestate.png" alt="TruEstate Logo" style="width: 100%; height: 100%; object-fit: contain;">
+    </div>
   </body>
 </html>

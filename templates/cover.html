@@ -4,30 +4,39 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TruEstate Investment Report</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+      @page {
+        size: 1920px 1080px;
+        margin: 0;
+      }
+
       * {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
+        font-family: 'Montserrat', sans-serif;
       }
 
-      @page {
-        size: 1600px 800px;
+      html, body {
+        width: 1920px;
+        height: 1080px;
+        padding: 80px;
         margin: 0;
+        padding: 0;
+        overflow: auto;
       }
 
-      body,
-      html {
-        width: 100%;
-        height: 100%;
-        font-family: Arial, sans-serif;
+      body {
         color: white;
-        background-color: #004642;
       }
 
       .report-container {
         width: 100%;
         height: 100%;
+
         position: relative;
         overflow: hidden;
       }
@@ -38,7 +47,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: #004642;
+        background-color: #03453F;
         z-index: 1;
       }
 
@@ -49,48 +58,50 @@
         width: 100%;
         height: 100%;
         z-index: 2;
-        padding: 50px;
+        padding: 80px;
       }
-
-      /* Header removed and replaced with direct logo positioning */
 
       .logo {
         display: flex;
         align-items: center;
-        margin-bottom: 200px;
+        margin-bottom: 250px;
       }
 
-      .logo-icon {
-        margin-right: 15px;
-      }
-
-      .logo-text {
-        font-size: 32px;
-        font-weight: bold;
+      .logo svg {
+        width: 450px;
+        height: auto;
       }
 
       .date {
-        font-size: 20px;
+        font-size: 36px;
         position: absolute;
-        top: 50px;
-        right: 50px;
+        top: 100px;
+        right:100px;
+
+        font-family: 'Lato', sans-serif;
+        font-weight: 700;
       }
 
       .report-info {
-        margin-top:30%;
-        max-width: 50%;
+        margin-top: 30%;
+        max-width: 100%;
       }
 
       .label {
-        font-size: 28px;
-        margin-bottom: 20px;
+        font-size: 72px;
+        margin-bottom: 30px;
+        font-family: 'Lato', sans-serif;
+        font-weight: 500;
       }
 
       .project-name {
-        font-size: 48px;
+        font-size: 120px;
+        display: flex;
         flex-direction: row;
+        width: 100%;
         font-weight: bold;
-        line-height: 1.1;
+        line-height: 1.2;
+        font-family: 'Montserrat', sans-serif;
       }
 
       .blueprint-overlay {
@@ -99,6 +110,7 @@
         right: -20%;
         width: 100%;
         height: 100%;
+        padding:80px;
         background-image: url('../assets/icons/bgBuilding.png');
         background-repeat: no-repeat;
         background-position: right center;
@@ -106,8 +118,6 @@
         opacity: 0.6;
         z-index: 1;
       }
-
-      /* Divider removed as requested */
     </style>
   </head>
   <body>
@@ -118,14 +128,12 @@
       <!-- Blueprint overlay on right side -->
       <div class="blueprint-overlay"></div>
 
-      <!-- Divider removed as requested -->
-
       <!-- Content overlay -->
       <div class="content-overlay">
         <div class="logo">
           <svg
-            width="339"
-            height="72"
+            width="450"
+            height="96"
             viewBox="0 0 339 72"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"

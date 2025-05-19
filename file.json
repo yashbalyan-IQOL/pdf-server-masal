@@ -1,0 +1,120 @@
+{
+    "id": "03HKpDzvkHURf67vf7IL",
+    "amenities": [
+      "electricity",
+      "club house",
+      "outdoor sports facility",
+      "indoor sports facility",
+      "swimming pool",
+      "parks"
+    ],
+    "acknowledgement": "ACK/KA/RERA/1251/308/PR/030223/006795",
+    "configurations": [
+      "4 bhk",
+      "3.5 bhk"
+    ],
+    "possession": "12/2031",
+    "handOverDate": "12/2031",
+    "show": false,
+    "launchDate": "01/2023",
+    "long": 77.84995808559903,
+    "isTitleCleared": null,
+    "reraId": "PRM/KA/RERA/1251/308/PR/150423/005868",
+    "lastUpdated": 1744366254,
+    "isReraApproved": "Approved",
+    "lat": 12.957918644837214,
+    "area": "bengaluru south",
+    "waterSource": "borewell,",
+    "khataType": null,
+    "approvalAuthority": "local planing authority",
+    "assetType": "villa",
+    "totalUnits": 144,
+    "litigation": false,
+    "towerUnits": 1,
+    "location": "sy no.13,14/1,14/2 and 16 situated at Handenahalli Village , Sarjapura Hobli, Anekal Taluk , Anekal , Bengaluru Urban, Karnataka - 562125",
+    "projectName": "evo aeris",
+    "projectLandArea": 43099,
+    "status": "new project launch",
+
+
+
+    "overview":{
+    "devloper":"tata",
+    "stage":"under construction",
+    "currentPrice":"12500/sqft",
+    "micromarket":"HSR",
+    "zone":"North Bangalore"
+    },
+
+    "masterPlan":{"loading":"40%",
+    "uds":"Dec 2025",
+    "projectSize":12000,
+    "openArea":"58%",
+    "constructionQuality":"25 units/Acres",
+    "accessRoadWidth":"80mt",
+    "constructionPartner":"",
+    "projectDensity":"25 units/Acres",
+    "GreenZone":"2 acres",
+    "pendingPhases":"25 units/Acres"
+    },
+
+    "unnitDetails":{
+        "1BHK":{
+            "salableArea":300,
+            "carpetArea":250,
+            "loadingFace":"56%",
+            "price/sqft":12500,
+            "carParking":1,
+            "totalPrice":3750000,
+            "startegy":"Buy 2 sell"
+        },
+        "2BHK":{
+            "salableArea":300,
+            "carpetArea":250,
+            "loadingFace":"56%",
+            "price/sqft":12500,
+            "carParking":1,
+            "totalPrice":3750000,
+            "startegy":"Buy 2 sell"
+        },
+        "3BHK":{
+            "salableArea":300,
+            "carpetArea":250,
+            "loadingFace":"56%",
+            "price/sqft":12500,
+            "carParking":1,
+            "totalPrice":3750000,
+            "startegy":"Buy 2 sell"
+        }
+    },
+    "areaReviw":{
+        "nearsetMetro":"8km",
+        "traffic":"moderate",
+        "airQualityIndex":80,
+        "noiselevel":"75db",
+        "informalSettlement":true,
+        "waterloggingRisk":true,
+        "highTensionLine":"16km"
+    },
+    "RiskEvaluation":{
+        "developerRisk":"low",
+        "delayRisk":"low",
+        "legalRisk":"low",
+        "exitRisk":"low",
+        "marketRisk":"low",
+        "environmentalRisk":"low"
+    },
+    "impactScore":{
+
+    },
+
+    "similarProjects":{
+
+    }
+    
+    
+
+
+    
+    
+}
