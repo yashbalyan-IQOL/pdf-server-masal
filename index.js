@@ -9,6 +9,11 @@ const puppeteer = require("puppeteer");
 const path = require("path");
 const Handlebars = require("handlebars");
 const cors = require("cors");
+const { Query, getDocs } = require("firebase-admin/firestore");
+const { createReport } = require("./investmentReport.js");
+const { formatCostSuffix, formatCost, formatCurrency } = require("./common.js");
+
+
 
 const app = express();
 const port = 3000;
@@ -323,18 +328,211 @@ function renderRecommendedStrategyPage(projectData) {
 }
 
 // Process and render the investment highlight page
-function renderInvestmentHighlightPage(projectData) {
+function renderInvestmentHighlightPage(projectData,data2,response) {
   const template = loadTemplate("investmentHighlight");
+  
   return template({
     PROJECT_NAME: projectData.projectName || "Unnamed Project",
+    XIRR: response?.data?.xirr ,
+    CAGR: (projectData?.cagr),
+    EQUIVALENT_MULTIPLE: response?.data?.equity_multiplier ,
+    HOLDING_PERIOD: 4,
+    TENURE: 20,
+    INTEREST_RATE: data2?.interestRate || 8.5,
+    LOAN_PERCENTAGE: data2?.loanPercentage || 75,
+    CURRENT_PRICE: formatCost(projectData?.commonPricePerSqft || 0),
+    GROSS_PRICE: formatCurrency((projectData?.commonPricePerSqft * projectData?.data[0]?.plotArea) || 0),
+    FUTURE_PRICE: formatCost((data2?.finalPrice / projectData?.data[0]?.plotArea) || 0),
+    SELLING_PRICE: formatCurrency(data2?.finalPrice || 0),
+    TOTAL_INVESTMENT: (formatCurrency(response?.data?.total_investment)),
+    TOTAL_RETURN: (formatCurrency(response?.data?.total_returns)),
   });
 }
 
-// Process and render the yearly cashflow page
-function renderYearlyCashflowPage(projectData) {
+// Process and render the yearly cashflow page (5 years only)
+function renderYearlyCashflowPage(projectData,data2,response) {
+
   const template = loadTemplate("yearlyCashflow");
+  console.log("create report response", response);
+  console.log("create report data2", data2);
+  console.log("Start", process.memoryUsage());
+
+  // Add error handling and fallback data
+  if (!response || !response.data) {
+    console.error("Response or response.data is undefined");
+    return template({
+      PROJECT_NAME: projectData.projectName || "Unnamed Project",
+      TABLE_HEADERS: "<th>No Data Available</th>",
+      TABLE_ROWS: "<tr><td class='parameter-cell'>No data available</td><td>-</td></tr>",
+      TOTAL_YEARS: 0,
+      ESTATE_SCORE: 0
+    });
+  }
+
+  // Use response.data instead of response for cashflows_yearly
+  const fullCashflowsYearly = response.data?.cashflows_yearly || response?.cashflows_yearly || [];
+  const monthlyData = response.data?.monthly_cf || response?.monthly_cf || [];
+  const loanBalance = response.data?.loan_balance || response?.loan_balance || 0;
+
+  // Limit to 5 years only
+  const MAX_YEARS = 5;
+  const cashflowsYearly = fullCashflowsYearly.slice(0, MAX_YEARS);
+
+  console.log("cashflowsYearly (limited to 5)", cashflowsYearly);
+  console.log("monthlyData length", monthlyData.length);
+
+  if (cashflowsYearly.length === 0) {
+    console.error("No cashflows_yearly data found");
+    return template({
+      PROJECT_NAME: projectData.projectName || "Unnamed Project",
+      TABLE_HEADERS: "<th>No Data Available</th>",
+      TABLE_ROWS: "<tr><td class='parameter-cell'>No cashflow data available</td><td>-</td></tr>",
+      TOTAL_YEARS: 0,
+      ESTATE_SCORE: 0
+    });
+  }
+
+  // Initialize rows with exactly 5 years of data
+  let rows = [
+    { header: "Down Payment / Extra Charges", values: new Array(MAX_YEARS).fill(0) },
+    { header: "Interest", values: new Array(MAX_YEARS).fill(0) },
+    { header: "Principal", values: new Array(MAX_YEARS).fill(0) },
+    { header: "EMI Payments", values: new Array(MAX_YEARS).fill(0) },
+    { header: "Payment to Builder", values: new Array(MAX_YEARS).fill(0) },
+    { header: "Sale Proceeds", values: new Array(MAX_YEARS).fill(0) },
+    { header: "Loan Repayment At Sale", values: new Array(MAX_YEARS).fill(0) },
+    { header: "Stamp Duty / Transfer Fees", values: new Array(MAX_YEARS).fill(0) },
+    { header: "Net Cash outflow", values: cashflowsYearly },
+  ];
+
+  // Setting down payment (only in first year)
+  rows[0].values[0] = -data2?.booking_amt || 0;
+
+  // Setting extra_charges (transfer fee / stamp duty & reg charges)
+  for (let index = 0; index < MAX_YEARS; index++) {
+    if (index < cashflowsYearly.length) {
+      const yearIndex = index + 
+        parseInt(monthlyData[0]?.[0]?.split(" ")[1] || "2025") -
+        parseInt(data2?.constructionCompletionDate?.split("-")[0] || "2025");
+      
+      // Add charges in handover year or last year if sold before handover
+      if (yearIndex === 0 || (index === cashflowsYearly.length - 1 && yearIndex < 0)) {
+        rows[7].values[index] = -data2?.charges_value || 0;
+      }
+    }
+  }
+
+  // Set sale proceeds and loan repayment in the last year of our 5-year display
+  const displayLastIndex = Math.min(MAX_YEARS - 1, cashflowsYearly.length - 1);
+  const actualLastIndex = fullCashflowsYearly.length - 1;
+  
+  // Only add sale proceeds if the sale happens within our 5-year display window
+  if (displayLastIndex === actualLastIndex) {
+    rows[5].values[displayLastIndex] = data2?.finalPrice || 0; // sale proceeds
+    rows[6].values[displayLastIndex] = loanBalance ? -loanBalance : 0; // loan repayment at sale
+  }
+
+  // Calculate Interest, Principal, EMI, Payment to builder for each year (limited to 5 years)
+  monthlyData.forEach((monthData) => {
+    if (!monthData || !monthData[0]) return;
+    
+    const year = monthData[0].split(" ")[1];
+    const startYear = monthlyData[0]?.[0]?.split(" ")[1];
+    if (!year || !startYear) return;
+    
+    const yearIndex = parseInt(year) - parseInt(startYear);
+
+    // Only process if within our 5-year display window
+    if (yearIndex >= 0 && yearIndex < MAX_YEARS) {
+      rows[1].values[yearIndex] -= parseFloat(monthData[4] || 0); // Interest
+      rows[2].values[yearIndex] -= parseFloat(monthData[5] || 0); // Principal
+      rows[3].values[yearIndex] -= parseFloat(monthData[3] || 0); // EMI
+      rows[4].values[yearIndex] -= parseFloat(monthData[7] || 0); // Payment to builder
+    }
+  });
+
+  // Helper function to format currency
+  const formatCost = (price) => {
+    if(!price && price!==0) return;
+    
+    price = String(price);
+    let isNegative = false;
+  
+    if (price < 0) {
+      isNegative = true;
+      price = Math.abs(price);
+    }
+  
+    // Convert the price to a string and remove any existing commas
+    let priceStr = price?.toString().replace(/,/g, "");
+  
+    // Split the number into integer and decimal parts
+    let [integerPart, decimalPart] = priceStr.split(".");
+  
+    // Add commas for lakhs and crores
+    let lastThree = integerPart.substring(integerPart.length - 3);
+    let otherNumbers = integerPart.substring(0, integerPart.length - 3);
+  
+    if (otherNumbers !== "") {
+      lastThree = "," + lastThree;
+    }
+  
+    otherNumbers = otherNumbers.replace(/\B(?=(\d{2})+(?!\d))/g, ",");
+  
+    // Combine the formatted integer part with decimal part (if exists)
+    let formattedPrice = `₹${otherNumbers}${lastThree}`;
+    // if (decimalPart) {
+    //   formattedPrice += `.${decimalPart}`;
+    // }
+  
+    if (isNegative) formattedPrice = `-${formattedPrice}`;
+  
+    return formattedPrice;
+  }
+
+  // Generate column headers for exactly 5 years
+  const shortMonth = new Date().toLocaleString("default", { month: "short" });
+  const prevShortMonth = new Date(new Date().setMonth(new Date().getMonth() - 1))
+    .toLocaleString("default", { month: "short" });
+
+  const columnHeaders = [];
+  for (let index = 0; index < MAX_YEARS; index++) {
+    if (index === 0) {
+      columnHeaders.push(`${shortMonth}-Dec ${index + 25}`);
+    } else if (index === MAX_YEARS - 1) {
+      columnHeaders.push(`Jan-${prevShortMonth} ${index + 25}`);
+    } else {
+      columnHeaders.push(`Jan-Dec ${index + 25}`);
+    }
+  }
+
+  // Generate table rows HTML
+  const tableRowsHTML = rows.map((row, rowIndex) => {
+    const isLastRow = rowIndex === rows.length - 1;
+    const rowClass = isLastRow ? 'net-cash-row' : '';
+    
+    const cellsHTML = row.values.slice(0, MAX_YEARS).map((cell) => {
+      const formattedValue = formatCost(cell || 0);
+      return `<td>${formattedValue}</td>`;
+    }).join('');
+
+    return `
+      <tr class="${rowClass}">
+        <td class="parameter-cell">${row.header}</td>
+        ${cellsHTML}
+      </tr>
+    `;
+  }).join('');
+
+  // Generate column headers HTML
+  const headerHTML = columnHeaders.map(header => `<th>${header}</th>`).join('');
+
   return template({
     PROJECT_NAME: projectData.projectName || "Unnamed Project",
+    TABLE_HEADERS: headerHTML,
+    TABLE_ROWS: tableRowsHTML,
+    TOTAL_YEARS: MAX_YEARS,
+    ESTATE_SCORE: Math.round(((response.data?.irr || response?.irr || 26) / 10) * 8)
   });
 }
 
@@ -519,54 +717,11 @@ function renderPerformancePage(projectData) {
 // Process and render the evaluation page
 function renderEvaluationPage(projectData) {
   const template = loadTemplate("evalution");
+
+  console.log("projectData thingsNearProject:", projectData.thingsNearProject);
   return template({
     PROJECT_NAME: projectData.projectName || "Unnamed Project",
-    EVALUATION_DATA: projectData.evaluationData || {
-      factors: [
-        {
-          name: "Nearest Metro",
-          currentStatus: "Yes, 8 km",
-          referenceAvg: "5 km",
-          evaluation: "Good"
-        },
-        {
-          name: "Traffic Density",
-          currentStatus: "No",
-          referenceAvg: "No",
-          evaluation: "Good"
-        },
-        {
-          name: "Air Quality Index",
-          currentStatus: "80",
-          referenceAvg: "95-100",
-          evaluation: "Good"
-        },
-        {
-          name: "Noise Levels",
-          currentStatus: "<75 db",
-          referenceAvg: "~85-90 dB",
-          evaluation: "Good"
-        },
-        {
-          name: "Informal Settlements",
-          currentStatus: "Yes",
-          referenceAvg: "No",
-          evaluation: "Good"
-        },
-        {
-          name: "Waterlogging Risk",
-          currentStatus: "Yes",
-          referenceAvg: "No",
-          evaluation: "Good"
-        },
-        {
-          name: "High Tension Line",
-          currentStatus: "at 16 km, 440 kv",
-          referenceAvg: "32 km",
-          evaluation: "Good"
-        }
-      ]
-    }
+    EVALUATION_DATA: projectData?.thingsNearProject || null,
   });
 }
 
@@ -1360,6 +1515,67 @@ app.get("/download-pdf", async (req, res) => {
         }
       }
     }
+    console.log(projectData.micromarket);
+    
+
+    // Fetch micromarket data
+    const micromarketQuery = db.collection("dummymicromarket")
+      .where("name", "==", projectData.micromarket);
+    const querySnapshot = await micromarketQuery.get();
+    const micromarketDoc = querySnapshot.docs[0];
+    const micromarketData = micromarketDoc ? micromarketDoc.data() : null;
+    console.log("Micromarket data:", micromarketData);
+
+
+
+
+    const tenure = 20;
+    const holdingPeriod = 4;
+    const activeTruReportAreaTab = {
+      price: projectData?.data[0].totalPrice || 120,
+    };
+    let sellingCost=null;
+    if(projectData?.cagr){
+      const cagrToConsider = projectData?.cagr / 100;
+      sellingCost = parseInt(activeTruReportAreaTab?.price * (Math.pow((1 + cagrToConsider), holdingPeriod)));
+    }
+    else{
+      sellingCost = parseInt(1.75 * activeTruReportAreaTab?.price);
+    }
+    //const sellingCost = projectData?.commonPricePerSqft || 120;
+    const interestRate = 8.5;
+    let loanPercentage=85;
+    if(projectData?.assetType === "plot"){
+      loanPercentage = 75;
+    }
+    const selectedCharge = "Stamp Duty"
+    const response = createReport({
+      acquisitionPrice: activeTruReportAreaTab?.price,
+      tenure,
+      holdingPeriod,
+      constructionCompletionDate: `${projectData?.handOverDate.split("/")[1]}-${projectData?.handOverDate.split("/")[0]}-01`,
+      finalPrice: sellingCost,
+      interestRate,
+      loanPercentage,
+      selectedCharge,
+      assetType: projectData?.assetType,
+    });
+  
+    const data2 = {
+      booking_amt: response.data.booking_amount,
+      intrest: response.data.monthly_cf.reduce((sum, currentArray) => {
+        return sum + parseFloat(currentArray[4]);  // total interest
+      }, 0),
+      principal: response.data.monthly_cf.reduce((sum, currentArray) => {
+        return sum + parseFloat(currentArray[5]); // total principal
+      }, 0),
+      constructionCompletionDate: response?.data?.constructionCompletionDate,  // handover date
+      finalPrice: sellingCost,   // final selling cost
+      selectedCharge,  // transfer fee or stamp duty & reg charges
+      charges_value: response.data.charges_value,  // value of the above charge
+      possessionAmount: response.data.possession_amount,
+      amounttNotDisbursed: response.data.amount_not_disbursed,  // loan amount not disbursed till last
+    };
 
     // Render each page from the templates
     const coverHtml = renderCoverPage(projectData);
@@ -1381,8 +1597,8 @@ app.get("/download-pdf", async (req, res) => {
     const pricingHtml = renderPricingPage(projectData);
     //const galleryHtml = renderGalleryPage(projectName, processedImages);
     const recommendedStrategyHtml = renderRecommendedStrategyPage(projectData);
-    const investmentHighlightHtml = renderInvestmentHighlightPage(projectData);
-    const yearlyCashflowHtml = renderYearlyCashflowPage(projectData);
+    const investmentHighlightHtml = renderInvestmentHighlightPage(projectData,data2,response);
+    const yearlyCashflowHtml = renderYearlyCashflowPage(projectData,data2,response);
     const pEDevelopmentHtml = renderPEDevelopmentPage(projectData);
     const aboutHtml = renderAboutPage(projectData);
     const contactUsHtml = renderContactUsPage(projectData);
@@ -1393,11 +1609,11 @@ app.get("/download-pdf", async (req, res) => {
     const evaluationHtml = renderEvaluationPage(projectData);
     const projectRiskHtml = renderProjectRiskPage(projectData);
     const googleReviewsHtml = await renderGoogleReviewsPage(projectData);
-    const micromarketDemandAnalysisHtml = await renderMicromarketDemandAnalysisPage(projectData);
-    const micromarketSupplyAnalysis1Html = await renderMicromarketSupplyAnalysis1Page(projectData);
-    const micromarketSupplyAnalysis2Html = await renderMicromarketSupplyAnalysis2Page(projectData);
+    const micromarketDemandAnalysisHtml = await renderMicromarketDemandAnalysisPage(micromarketData);
+    const micromarketSupplyAnalysis1Html = await renderMicromarketSupplyAnalysis1Page(micromarketData);
+    const micromarketSupplyAnalysis2Html = await renderMicromarketSupplyAnalysis2Page(micromarketData);
     //const micromarketRentalAnalysisHtml = await renderMicromarketRentalAnalysisPage(projectData);
-    const micromarketResaleAnalysisHtml = await renderMicromarketResaleAnalysisPage(projectData);
+    //const micromarketResaleAnalysisHtml = await renderMicromarketResaleAnalysisPage(projectData);
     //const impactScoresHtml = await renderImpactScoresPage(projectData);
 
     // Try a completely different approach - generate individual PDFs for each page and then merge them
@@ -1450,7 +1666,7 @@ app.get("/download-pdf", async (req, res) => {
       fs.writeFileSync(path.join(pagesDir, 'micromarketSupplyAnalysis1.html'), micromarketSupplyAnalysis1Html);
       fs.writeFileSync(path.join(pagesDir, 'micromarketSupplyAnalysis2.html'), micromarketSupplyAnalysis2Html);
       //fs.writeFileSync(path.join(pagesDir, 'micromarketRentalAnalysis.html'), micromarketRentalAnalysisHtml);
-      fs.writeFileSync(path.join(pagesDir, 'micromarketResaleAnalysis.html'), micromarketResaleAnalysisHtml);
+      // fs.writeFileSync(path.join(pagesDir, 'micromarketResaleAnalysis.html'), micromarketResaleAnalysisHtml);
      // fs.writeFileSync(path.join(pagesDir, 'impactScores.html'), impactScoresHtml);
 
       // Generate PDFs for each page
@@ -1565,7 +1781,7 @@ app.get("/download-pdf", async (req, res) => {
         await generatePDF("micromarketSupplyAnalysis1.html", "micromarketSupplyAnalysis1.pdf");
         await generatePDF("micromarketSupplyAnalysis2.html", "micromarketSupplyAnalysis2.pdf");
         //await generatePDF("micromarketRentalAnalysis.html", "micromarketRentalAnalysis.pdf");
-        await generatePDF("micromarketResaleAnalysis.html", "micromarketResaleAnalysis.pdf");
+        // await generatePDF("micromarketResaleAnalysis.html", "micromarketResaleAnalysis.pdf");
         //await generatePDF("impactScores.html", "impactScores.pdf");
 
         // Merge all PDF
@@ -1634,7 +1850,7 @@ app.get("/download-pdf", async (req, res) => {
               "yearlyCashflow.html", "P&Edevelopment.html","micromarketDemandAnalysis.html",
               "micromarketSupplyAnalysis1.html", "micromarketSupplyAnalysis2.html",
               //"micromarketRentalAnalysis.html", 
-              "micromarketResaleAnalysis.html",
+              // "micromarketResaleAnalysis.html",
                //"impactScores.html",
                "recommendedStrategy.html", "projectComparison.html",
                "about.html", "contactUs.html", 

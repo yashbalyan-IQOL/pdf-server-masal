@@ -36,30 +36,87 @@
     "projectLandArea": 43099,
     "status": "new project launch",
 
+    "current Price Impact":"",
+    "Rental Yield":"",
+    "Approved by banks":"",
+    "Project overview impact score":"",
+    "club house size":"",
+    "Loading":"",
+    "UDS":"",
+    "Access road width":"",
+    "Construction Quality":"",
+    "Construction partner":"",
+    "Abortion Rate":"",
+    "Construction Type":"",
+    "GreenZone":"",
+
+    "Total Phases":"",
+    "EOI Form Link":"",
+    "Year wise cashflow impact score":"",
+    "Investment Detail impact score":"",
+
+    "Things Near Project":{
+        "Metro":"",
+        "Traffic Density":"",
+        "Air Quality":"",
+        "Noise Levels":"",
+        "Power Lines":"",
+        "Informal Settlement":"",
+        "Water Logging Risk":"",
+        "Grave yard":"",
+        "Street lighting":"",
+        "Waste Management":"",
+        "Construction activities":"",
+        "Power breakdowns":"",
+        "Tensions between different cultural groups":"",
+        "Slum Area":"",
+        "Cost of living":"",
+        "Network Connectivity":""
+    },
+
+    "projectRisk":{
+        "BuilderRisk":"",
+        "DelayRisk":"",
+        "LegalRisk":"",
+        "ExitRisk":"",
+        "MarketRisk":"",
+        "EnvironmentalRisk":""
+    },
+
+   "Pros":"",
+   "Cons":"",
+   "project comparison for investment":[
+
+   ],
+   "similar projects":[],
+
+
 
 
     "overview":{
     "devloper":"tata",
     "stage":"under construction",
     "currentPrice":"12500/sqft",
-    "micromarket":"HSR",
-    "zone":"North Bangalore"
+    "micromarket":"HSR"
     },
 
-    "masterPlan":{"loading":"40%",
+    "masterPlan":
+    {"loading":"40%",
     "uds":"Dec 2025",
-    "projectSize":12000,
+    "projectSize":12000, 
     "openArea":"58%",
     "constructionQuality":"25 units/Acres",
     "accessRoadWidth":"80mt",
     "constructionPartner":"",
     "projectDensity":"25 units/Acres",
     "GreenZone":"2 acres",
-    "pendingPhases":"25 units/Acres"
+    "pendingPhases":"25 units/Acres",
+    "imageURL":"", //here
     },
 
-    "unnitDetails":{
-        "1BHK":{
+    "unnitDetails":[
+        {
+            "unitType":"1BHK",
             "salableArea":300,
             "carpetArea":250,
             "loadingFace":"56%",
@@ -68,7 +125,8 @@
             "totalPrice":3750000,
             "startegy":"Buy 2 sell"
         },
-        "2BHK":{
+        {
+            "unitType":"2BHK",
             "salableArea":300,
             "carpetArea":250,
             "loadingFace":"56%",
@@ -77,7 +135,8 @@
             "totalPrice":3750000,
             "startegy":"Buy 2 sell"
         },
-        "3BHK":{
+        {
+            "unitType":"3BHK",
             "salableArea":300,
             "carpetArea":250,
             "loadingFace":"56%",
@@ -86,7 +145,7 @@
             "totalPrice":3750000,
             "startegy":"Buy 2 sell"
         }
-    },
+    ],
     "areaReviw":{
         "nearsetMetro":"8km",
         "traffic":"moderate",
@@ -108,13 +167,5 @@
 
     },
 
-    "similarProjects":{
-
-    }
-    
-    
-
-
-    
-    
+    "similarProjects":["",""]  
 }

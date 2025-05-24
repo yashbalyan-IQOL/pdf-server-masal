@@ -1,0 +1,534 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TruEstate Master Plan</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Montserrat', sans-serif;
+      }
+      @page {
+        size: 1920px 1080px;
+        margin: 0;
+      }
+      body,
+      html {
+        width: 1920px;
+        height: 1080px;
+        font-family: 'Montserrat', sans-serif;
+        color: #333;
+        background-color: #f5f5f5;
+        background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23bdbdbd' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+      }
+
+      .page-container {
+        margin: 0 auto;
+        padding: 80px;
+        position: relative;
+        height: 100%;
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+      }
+
+      .title {
+        font-size: 72px;
+        font-weight: bold;
+        color: #000;
+        font-family: 'Lora', serif;
+      }
+
+      .main-content {
+        display: flex;
+        justify-content: space-between;
+      }
+      .estate-score {
+        position: absolute;
+        top: 80px;
+        right: 80px;
+        width: 120px;
+        height: 120px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        z-index: 10;
+      }
+      .estate-score img{
+        width: 120px;
+        height: 120px;
+        justify-content: center;
+        align-items: center;
+       
+      }
+
+      .estate-score::before {
+        content: "";
+        position: absolute;
+        top: -8px;
+        left: -8px;
+        right: -8px;
+        bottom: -8px;
+        border: 2px solid #0E766E;
+        border-radius: 50%;
+        z-index: -1;
+      }
+
+      .score-value {
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        font-size: 36px;
+        font-weight: bold;
+        line-height: 1;
+      }
+      .score-text {
+        font-size: 14px;
+        text-align: center;
+        margin-top: 4px;
+      }
+
+      .score-label {
+        position: absolute;
+        width: 200%;
+        top: -10px;
+        left: -50%;
+        text-align: center;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      .master-plan-image {
+        width: 45%;
+        height: 100%;
+        border-radius: 30px;
+        overflow: auto;
+        position: relative;
+        /* box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); */
+      }
+
+      .master-plan-image img {
+        width: 100%;
+        display: block;
+      }
+
+      .star-icon {
+        position: absolute;
+        right: -30px;
+        top: 50%;
+        width: 80px;
+        height: 80px;
+      }
+
+      .info-container {
+        width: 45%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .info-row {
+        display: flex;
+        margin-bottom: 10px;
+      }
+
+      .info-item {
+        flex: 1;
+        display: flex;
+        align-items: flex-start;
+      }
+
+      .info-item-icon {
+        width: 45px;
+        margin-right: 20px;
+        opacity: 0.8;
+      }
+
+      .info-text {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .info-label {
+        font-size: 20px;
+        font-weight: 600;
+        color: #707070;
+        margin-bottom: 8px;
+        
+      }
+
+      .info-value {
+        font-size: 28px;
+        font-weight: 700;
+        font-family: 'Lato', sans-serif;
+        color: black;
+      }
+
+      /* Impact Indicator Styles */
+      .impact-column {
+        width: 100%;
+        margin-top: 10px;
+        display: flex;
+        gap: 10px;
+        flex-direction: row;
+        align-items: center;
+      }
+
+      .impact-indicator {
+        position: relative;
+        width: 100%;
+        height: 8px;
+        border-radius: 4px;
+        overflow: hidden;
+      }
+
+      .impact-level {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        display: flex;
+      }
+
+      .impact-red {
+        flex: 1;
+        background: linear-gradient(to right, #ff6b6b, #ff9999);
+        border-top-left-radius: 4px;
+        border-bottom-left-radius: 4px;
+      }
+
+      .impact-yellow {
+        flex: 1;
+        background: linear-gradient(to right, #ffe066, #ffd166);
+      }
+
+      .impact-green {
+        flex: 1;
+        background: linear-gradient(to right, #8fffdf, #06d6a0);
+        border-top-right-radius: 4px;
+        border-bottom-right-radius: 4px;
+      }
+
+      .impact-marker {
+        position: absolute;
+        width: 4px;
+        height: 16px;
+        background-color: #000;
+        border-radius: 2px;
+        top: -4px;
+        transform: translateX(-50%);
+      }
+
+      .impact-text {
+        text-align: right;
+        margin-top: 5px;
+        font-size: 24px;
+        font-weight: 600;
+        color: #222;
+      }
+
+      /* Marker positions */
+      .low-impact .impact-marker {
+        left: 16.7%;
+      }
+
+      .medium-impact .impact-marker {
+        left: 50%;
+      }
+
+      .high-impact .impact-marker {
+        left: 83.3%;
+      }
+
+      .score-badge {
+        position: absolute;
+        top: 30px;
+        right: 30px;
+        width: 180px;
+        height: 180px;
+      }
+      .back-to-top {
+      position: fixed;
+      bottom: 80px;
+      right: 80px;
+      height: 72px;
+      width: 72px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      z-index: 100;
+    }
+    
+    .back-to-top img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .p{
+      bottom:80px;
+      left:80px;
+      font-size:20px;
+      font-weight: 500;
+      font-family: "Lato", "sans-serif";
+      color: black;
+    }
+    </style>
+  </head>
+  <body>
+    <div class="page-container">
+      <div class="header">
+        <h1 class="title">Master Plan</h1>
+        <div class="estate-score">
+     
+          <div class="score-value">8<span style="font-size: 20px">/10</span></div>
+          
+          <img src="../assets/logos/impactScore.png" alt="impact logo" height="120px" width="120px">
+        </div>
+      </div>
+
+      <div class="main-content">
+        <div class="master-plan-image">
+          <img src="../assets/images/master-plan.png" alt="Project Master Plan" />
+        </div>
+
+        <div class="info-container">
+          <div class="info-row">
+            <div class="info-item">
+              <img src="../assets/icons/Overview/zone.png" alt="Loading" class="info-item-icon" />
+              <div class="info-text">
+                <div class="info-label">Loading</div>
+                <div class="info-value">---</div>
+                <div class="impact-column">
+                  <div class="impact-indicator high-impact">
+                    <div class="impact-level">
+                      <div class="impact-red"></div>
+                      <div class="impact-yellow"></div>
+                      <div class="impact-green"></div>
+                    </div>
+                    <div class="impact-marker"></div>
+                  </div>
+                  <div class="impact-text">High</div>
+                </div>
+              </div>
+            </div>
+            <div class="info-item">
+              <img src="../assets/icons/masterplan/UDS.png" alt="UDS" class="info-item-icon" />
+              <div class="info-text">
+                <div class="info-label">UDS</div>
+                <div class="info-value">---</div>
+                <div class="impact-column">
+                  <div class="impact-indicator high-impact">
+                    <div class="impact-level">
+                      <div class="impact-red"></div>
+                      <div class="impact-yellow"></div>
+                      <div class="impact-green"></div>
+                    </div>
+                    <div class="impact-marker"></div>
+                  </div>
+                  <div class="impact-text">High</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-item">
+              <img src="../assets/icons/masterplan/units.png" alt="Units" class="info-item-icon" />
+              <div class="info-text">
+                <div class="info-label">Total Units</div>
+                <div class="info-value">---</div>
+                <div class="impact-column">
+                  <div class="impact-indicator high-impact">
+                    <div class="impact-level">
+                      <div class="impact-red"></div>
+                      <div class="impact-yellow"></div>
+                      <div class="impact-green"></div>
+                    </div>
+                    <div class="impact-marker"></div>
+                  </div>
+                  <div class="impact-text">High</div>
+                </div>
+              </div>
+            </div>
+            <div class="info-item">
+              <img src="../assets/icons/masterplan/size.png" alt="Size" class="info-item-icon" />
+              <div class="info-text">
+                <div class="info-label">Project Size</div>
+                <div class="info-value">---</div>
+                <div class="impact-column">
+                  <div class="impact-indicator low-impact">
+                    <div class="impact-level">
+                      <div class="impact-red"></div>
+                      <div class="impact-yellow"></div>
+                      <div class="impact-green"></div>
+                    </div>
+                    <div class="impact-marker"></div>
+                  </div>
+                  <div class="impact-text">Low</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-item">
+              <img src="../assets/icons/masterplan/plant.png" alt="Open Area" class="info-item-icon" />
+              <div class="info-text">
+                <div class="info-label">Open Area</div>
+                <div class="info-value">---</div>
+                <div class="impact-column">
+                  <div class="impact-indicator medium-impact">
+                    <div class="impact-level">
+                      <div class="impact-red"></div>
+                      <div class="impact-yellow"></div>
+                      <div class="impact-green"></div>
+                    </div>
+                    <div class="impact-marker"></div>
+                  </div>
+                  <div class="impact-text">Medium</div>
+                </div>
+              </div>
+            </div>
+            <div class="info-item">
+              <img src="../assets/icons/Overview/stageLogo.png" alt="Quality" class="info-item-icon" />
+              <div class="info-text">
+                <div class="info-label">Construction Quality</div>
+                <div class="info-value">---</div>
+                <div class="impact-column">
+                  <div class="impact-indicator high-impact">
+                    <div class="impact-level">
+                      <div class="impact-red"></div>
+                      <div class="impact-yellow"></div>
+                      <div class="impact-green"></div>
+                    </div>
+                    <div class="impact-marker"></div>
+                  </div>
+                  <div class="impact-text">High</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-item">
+              <img src="../assets/icons/masterplan/road.png" alt="Road Width" class="info-item-icon" />
+              <div class="info-text">
+                <div class="info-label">Access road width</div>
+                <div class="info-value">---</div>
+                <div class="impact-column">
+                  <div class="impact-indicator high-impact">
+                    <div class="impact-level">
+                      <div class="impact-red"></div>
+                      <div class="impact-yellow"></div>
+                      <div class="impact-green"></div>
+                    </div>
+                    <div class="impact-marker"></div>
+                  </div>
+                  <div class="impact-text">High</div>
+                </div>
+              </div>
+            </div>
+            <div class="info-item">
+              <img src="../assets/icons/masterplan/construction.png" alt="Construction" class="info-item-icon" />
+              <div class="info-text">
+                <div class="info-label">Construction Partner</div>
+                <div class="info-value">---</div>
+                <div class="impact-column">
+                  <div class="impact-indicator high-impact">
+                    <div class="impact-level">
+                      <div class="impact-red"></div>
+                      <div class="impact-yellow"></div>
+                      <div class="impact-green"></div>
+                    </div>
+                    <div class="impact-marker"></div>
+                  </div>
+                  <div class="impact-text">High</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-item">
+              <img src="../assets/icons/masterplan/quality.png" alt="Density" class="info-item-icon" />
+              <div class="info-text">
+                <div class="info-label">Project density</div>
+                <div class="info-value">---</div>
+                <div class="impact-column">
+                  <div class="impact-indicator high-impact">
+                    <div class="impact-level">
+                      <div class="impact-red"></div>
+                      <div class="impact-yellow"></div>
+                      <div class="impact-green"></div>
+                    </div>
+                    <div class="impact-marker"></div>
+                  </div>
+                  <div class="impact-text">High</div>
+                </div>
+              </div>
+            </div>
+            <div class="info-item">
+              <img src="../assets/icons/masterplan/green.png" alt="green" class="info-item-icon" />
+              <div class="info-text">
+                <div class="info-label">Green zone</div>
+                <div class="info-value">2.5 Acres</div>
+                <div class="impact-column">
+                  <div class="impact-indicator high-impact">
+                    <div class="impact-level">
+                      <div class="impact-red"></div>
+                      <div class="impact-yellow"></div>
+                      <div class="impact-green"></div>
+                    </div>
+                    <div class="impact-marker"></div>
+                  </div>
+                  <div class="impact-text">High</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-item">
+              <img src="../assets/icons/masterplan/pending.png" alt="pending" class="info-item-icon" />
+              <div class="info-text">
+                <div class="info-label">Pending Phases</div>
+                <div class="info-value">25 units/Acers</div>
+                <div class="impact-column">
+                  <div class="impact-indicator high-impact">
+                    <div class="impact-level">
+                      <div class="impact-red"></div>
+                      <div class="impact-yellow"></div>
+                      <div class="impact-green"></div>
+                    </div>
+                    <div class="impact-marker"></div>
+                  </div>
+                  <div class="impact-text">High</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p>Note: A higher evaluation score means a higher impact on the project’s returns</p>
+
+      <div class="back-to-top">
+        <img src="../assets/logos/truestate.png" alt="TruEstate Logo" style="width: 100%; height: 100%; object-fit: contain;">
+      </div>
+    </div>
+  </body>
+</html>

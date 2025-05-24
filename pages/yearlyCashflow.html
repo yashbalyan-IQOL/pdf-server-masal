@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{PROJECT_NAME}} - TruEstate Investment Report</title>
+    <title>testing - TruEstate Investment Report</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -216,7 +216,7 @@
       <div class="header">
         <h1>Year-wise Cashflows</h1>
         <div class="estate-score">
-          <div class="score-value">{{ESTATE_SCORE}}<span style="font-size: 20px">/10</span></div>
+          <div class="score-value">10<span style="font-size: 20px">/10</span></div>
           <img src="../assets/logos/impactScore.png" alt="impact logo" height="120px" width="120px">
         </div>
       </div>
@@ -225,11 +225,56 @@
         <thead>
             <tr>
                 <th class="parameter-cell">Parameter</th>
-                {{{TABLE_HEADERS}}}
+                <th>May-Dec 25</th><th>Jan-Dec 26</th><th>Jan-Dec 27</th><th>Jan-Dec 28</th><th>Jan-Apr 29</th>
             </tr>
         </thead>
         <tbody>
-            {{{TABLE_ROWS}}}
+            
+      <tr class="">
+        <td class="parameter-cell">Down Payment / Extra Charges</td>
+        <td>-₹23,00,400</td><td>₹0</td><td>₹0</td><td>₹0</td><td>₹0</td>
+      </tr>
+    
+      <tr class="">
+        <td class="parameter-cell">Interest</td>
+        <td>-₹1,28,934</td><td>-₹8,44,507</td><td>-₹13,02,121</td><td>-₹14,74,635</td><td>-₹5,18,124</td>
+      </tr>
+    
+      <tr class="">
+        <td class="parameter-cell">Principal</td>
+        <td>-₹30,434</td><td>-₹2,15,636</td><td>-₹3,68,233</td><td>-₹4,65,004</td><td>-₹1,75,862</td>
+      </tr>
+    
+      <tr class="">
+        <td class="parameter-cell">EMI Payments</td>
+        <td>-₹1,59,369</td><td>-₹10,60,143</td><td>-₹16,70,354</td><td>-₹19,39,640</td><td>-₹6,93,987</td>
+      </tr>
+    
+      <tr class="">
+        <td class="parameter-cell">Payment to Builder</td>
+        <td>₹0</td><td>₹0</td><td>₹0</td><td>₹0</td><td>-₹11,50,200</td>
+      </tr>
+    
+      <tr class="">
+        <td class="parameter-cell">Sale Proceeds</td>
+        <td>₹0</td><td>₹0</td><td>₹0</td><td>₹0</td><td>₹3,03,90,968</td>
+      </tr>
+    
+      <tr class="">
+        <td class="parameter-cell">Loan Repayment At Sale</td>
+        <td>₹0</td><td>₹0</td><td>₹0</td><td>₹0</td><td>-₹1,82,98,228</td>
+      </tr>
+    
+      <tr class="">
+        <td class="parameter-cell">Stamp Duty / Transfer Fees</td>
+        <td>₹0</td><td>₹0</td><td>₹0</td><td>₹0</td><td>-₹4,60,080</td>
+      </tr>
+    
+      <tr class="net-cash-row">
+        <td class="parameter-cell">Net Cash outflow</td>
+        <td>-₹24,59,769</td><td>-₹10,60,143</td><td>-₹16,70,354</td><td>-₹19,39,640</td><td>₹97,88,472</td>
+      </tr>
+    
         </tbody>
     </table>
 
