@@ -265,20 +265,23 @@
 
       .estate-score {
         position: absolute;
-        top: 30px;
-        right: 30px;
+        top: 80px;
+        right: 80px;
         width: 120px;
         height: 120px;
-        background-color: #0E766E;
-        border-radius: 50%;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         color: white;
-        border: 3px solid white;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         z-index: 10;
+      }
+      .estate-score img{
+        width: 120px;
+        height: 120px;
+        justify-content: center;
+        align-items: center;
+       
       }
 
       .estate-score::before {
@@ -294,45 +297,30 @@
       }
 
       .score-value {
+        justify-content: center;
+        align-items: center;
+        position: absolute;
         font-size: 36px;
         font-weight: bold;
         line-height: 1;
       }
-
       .score-text {
         font-size: 14px;
         text-align: center;
         margin-top: 4px;
       }
 
-      .estate-score-container {
-        position: relative;
-        width: 120px;
-        height: 120px;
-      }
-      
       .score-label {
         position: absolute;
         width: 200%;
-        top: -25px;
+        top: -10px;
         left: -50%;
         text-align: center;
         font-size: 12px;
         text-transform: uppercase;
         letter-spacing: 1px;
-        color: white;
       }
-
-      .score-footer {
-        position: absolute;
-        width: 200%;
-        bottom: -8px;
-        left: -50%;
-        text-align: center;
-        font-size: 14px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-      }
+      
     </style>
   </head>
   <body>
@@ -340,12 +328,12 @@
     <div class="yellow-circle"></div>
     
     <div class="header">
-      <h1>Evaluation of Project's Surroundings</h1>
-      <div class="whatsapp-banner">
-        <div class="whatsapp-icon">
-          <img src="../assets/logos/whatsapp.png" alt="WhatsApp Icon" height="45px" width="45px">
-        </div>
-        Want to invest? <a href="#" class="link">Click here</a>
+      <h1>Project - Area Review</h1>
+      <div class="estate-score">
+     
+        <div class="score-value">{{TRUEESTATE_SCORE}}<span style="font-size: 20px">/10</span></div>
+        
+        <img src="../assets/logos/impactScore.png" alt="impact logo" height="120px" width="120px">
       </div>
     </div>
 
@@ -363,12 +351,7 @@
 
       <div class="project-image">
         <img src="../assets/images/evalutionplaceholder.png" alt="Project Aerial View" height="45px" width="45px">
-        <div class="estate-score">
-          <!-- <div class="score-label">TruEstate Score</div>
-          <div class="score-value">8<span style="font-size: 20px">/10</span></div>
-          <div class="score-text">Impact<br>Score</div> -->
-          <img src="../assets/icons/imactLogo.png" alt="Project Aerial View" height="45px" width="45px">
-        </div>
+       
       </div>
     </div>
     

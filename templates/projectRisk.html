@@ -294,20 +294,23 @@
 
       .estate-score {
         position: absolute;
-        top: 60px;
-        right: 60px;
+        top: 80px;
+        right: 80px;
         width: 120px;
         height: 120px;
-        background-color: #0E766E;
-        border-radius: 50%;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         color: white;
-        border: 3px solid white;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         z-index: 10;
+      }
+      .estate-score img{
+        width: 120px;
+        height: 120px;
+        justify-content: center;
+        align-items: center;
+       
       }
 
       .estate-score::before {
@@ -323,11 +326,13 @@
       }
 
       .score-value {
+        justify-content: center;
+        align-items: center;
+        position: absolute;
         font-size: 36px;
         font-weight: bold;
         line-height: 1;
       }
-
       .score-text {
         font-size: 14px;
         text-align: center;
@@ -375,8 +380,10 @@
     <div class="header">
       <h1>Project Risk</h1>
       <div class="estate-score">
+     
+        <div class="score-value">{{OVERALL_RISK_SCORE}}<span style="font-size: 20px">/10</span></div>
         
-        <img src="../assets/icons/imactLogo.png" alt="Estate Score" height="120px" width="120px">
+        <img src="../assets/logos/impactScore.png" alt="impact logo" height="120px" width="120px">
       </div>
     </div>
 

@@ -87,9 +87,9 @@
 
       .overall-rating {
         width: auto;
+        height: 778px;
         margin-right: 50px;
         padding: 48px;
-        height: 100%;
         border: 4px solid white;
         background-color: #fff9f3;
         border-radius: 20px;
@@ -219,6 +219,8 @@
       .reviews-list {
         flex-grow: 1;
         margin-left: 20px;
+        font-size: 20px;
+        padding-top: 20px;
       }
 
       .review-categories {
@@ -325,20 +327,23 @@
 
       .estate-score {
         position: absolute;
-        top: 60px;
-        right: 60px;
+        top: 80px;
+        right: 80px;
         width: 120px;
         height: 120px;
-        background-color: #0e766e;
-        border-radius: 50%;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         color: white;
-        border: 3px solid white;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         z-index: 10;
+      }
+      .estate-score img{
+        width: 120px;
+        height: 120px;
+        justify-content: center;
+        align-items: center;
+       
       }
 
       .estate-score::before {
@@ -348,17 +353,19 @@
         left: -8px;
         right: -8px;
         bottom: -8px;
-        border: 2px solid #0e766e;
+        
         border-radius: 50%;
         z-index: -1;
       }
 
       .score-value {
+        justify-content: center;
+        align-items: center;
+        position: absolute;
         font-size: 36px;
         font-weight: bold;
         line-height: 1;
       }
-
       .score-text {
         font-size: 14px;
         text-align: center;
@@ -399,12 +406,9 @@
     <div class="header">
       <h1>Google Reviews of {{projectName}}</h1>
       <div class="estate-score">
-        <img
-          src="../assets/icons/imactLogo.png"
-          alt="impact logo"
-          height="120px"
-          width="120px"
-        />
+        <div class="score-value">8<span style="font-size: 20px">/10</span></div>
+        
+        <img src="../assets/logos/impactScore.png" alt="impact logo" height="120px" width="120px">
       </div>
     </div>
 

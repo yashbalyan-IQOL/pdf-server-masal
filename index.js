@@ -913,34 +913,20 @@ function renderEvaluationPage(projectData) {
     `;
   }).join('');
 
-  // Calculate TruEstate Score
-  const calculateTrueEstateScore = (data) => {
-    const impactScores = { low: 3, medium: 2, high: 1 };
-    const validData = data.filter(item => item.impact && item.impact.trim() !== '');
-    
-    if (validData.length === 0) return 8; // Default score if no valid impact data
-    
-    const totalScore = validData.reduce((sum, item) => {
-      return sum + (impactScores[item.impact.toLowerCase()] || 2); // Default to medium if unknown
-    }, 0);
-    const maxScore = validData.length * 3;
-    return Math.round((totalScore / maxScore) * 10);
-  };
 
-  const trueEstateScore = calculateTrueEstateScore(processedData);
 
   console.log("Processed evaluation data:", {
     originalData: thingsNearProjectData,
     processedData,
     tableRowsHTML,
-    trueEstateScore,
+   
     availableFactors: Object.keys(thingsNearProjectData)
   });
 
   return template({
     PROJECT_NAME: projectData.projectName || "Unnamed Project",
     TABLE_ROWS_HTML: tableRowsHTML,
-    TRUEESTATE_SCORE: trueEstateScore,
+    TRUEESTATE_SCORE: projectData?.projectAreaReviewImpactScore || 8,
     EVALUATION_DATA_JSON: JSON.stringify(processedData) // Keep this for any remaining client-side needs
   });
 }
@@ -1044,35 +1030,20 @@ function renderProjectRiskPage(projectData) {
     .map(([riskKey, riskValue]) => createRiskCard(riskKey, riskValue))
     .join('');
 
-  // Calculate overall risk score (optional)
-  function calculateOverallRiskScore(risks) {
-    const riskScores = { low: 3, medium: 2, high: 1, na: 2.5 }; // NA gets neutral score
-    const validRisks = risks.filter(([_, value]) => value.toLowerCase() !== 'na');
-    
-    if (validRisks.length === 0) return 8; // Default if no valid risks
-    
-    const totalScore = validRisks.reduce((sum, [_, value]) => {
-      return sum + (riskScores[value.toLowerCase()] || 2);
-    }, 0);
-    
-    const maxScore = validRisks.length * 3;
-    return Math.round((totalScore / maxScore) * 10);
-  }
-
-  const overallRiskScore = calculateOverallRiskScore(sortedRisks);
+  
 
   // Log processed data for debugging
   console.log("Risk Dashboard Data Processing:", {
     originalRiskData: riskData,
     sortedRisks,
-    overallRiskScore,
+    
     generatedCardsCount: sortedRisks.length
   });
 
   return template({
     PROJECT_NAME: projectData.projectName || "Unnamed Project",
     RISK_CARDS_HTML: riskCardsHTML,
-    OVERALL_RISK_SCORE: overallRiskScore,
+    OVERALL_RISK_SCORE: projectData.projectRiskImpactScore || 8,
     RISK_DATA_JSON: JSON.stringify(riskData) // Keep for any remaining client-side needs
   });
 }
