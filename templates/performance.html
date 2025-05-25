@@ -153,6 +153,24 @@
         border-radius: 50%;
         z-index: -1;
       }
+      .back-to-top {
+      position: fixed;
+      bottom: 80px;
+      right: 80px;
+      height: 72px;
+      width: 72px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      z-index: 100;
+    }
+    
+    .back-to-top img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
     </style>
   </head>
   <body>
@@ -162,13 +180,13 @@
     <div class="yellow-circle"></div>
     
     <div class="header">
-      <h1>Performance of Similar Projects </h1>
-      <div class="whatsapp-banner">
+      <h1>Similar Project Performance in the Micromarket</h1>
+      <!-- <div class="whatsapp-banner">
         <div class="whatsapp-icon">
           <img src="../assets/logos/whatsapp.png" alt="WhatsApp Icon" height="45px" width="45px"/>
         </div>
         Want to invest? <a href="#" class="link">Click here</a>
-      </div>
+      </div> -->
     </div>
 
     <table class="comparison-table">
@@ -189,16 +207,16 @@
       <tr>
         <td>Total Area</td>
         <td class="highlighted-column">₹1.25 Crs</td>
-        <td>₹1.25 Crs</td>
-        <td>₹1.25 Crs</td>
-        <td>₹1.25 Crs</td>
+        <td>1500 Sqft</td>
+        <td>1500 Sqft</td>
+        <td>1500 Sqft</td>
       </tr>
       <tr>
         <td>Launch Date</td>
-        <td class="highlighted-column">Undervalued</td>
-        <td>Undervalued</td>
-        <td>Undervalued</td>
-        <td>Undervalued</td>
+        <td class="highlighted-column">2018</td>
+        <td>2018</td>
+        <td>2018</td>
+        <td>2018</td>
       </tr>
       <tr>
         <td>Launch Price</td>
@@ -223,11 +241,14 @@
       </tr>
       <tr>
         <td>Rental Yield</td>
-        <td class="highlighted-column">₹87.25 Lac</td>
-        <td>₹87.25 Lac</td>
-        <td>₹87.25 Lac</td>
-        <td>₹87.25 Lac</td>
+        <td class="highlighted-column">8.72%</td>
+        <td>8.72%</td>
+        <td>8.72%</td>
+        <td>8.72%</td>
       </tr>
     </table>
+    <div class="back-to-top">
+      <img src="../assets/logos/truestate.png" alt="TruEstate Logo" style="width: 100%; height: 100%; object-fit: contain;">
+    </div>
   </body>
 </html>

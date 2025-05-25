@@ -4,15 +4,19 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TruEstate Investment Report</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
       * {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
+        font-family: 'Lora', serif;
       }
 
       @page {
-        size: 1600px 800px;
+        size: 1920px 1080px;
         margin: 0;
       }
 
@@ -26,17 +30,17 @@
 
       .report-container {
         width: 100%;
-        max-height: 100vh;
+        padding: 80px;
         position: relative;
-        overflow: hidden;
+        overflow: auto;
         background-color: #f5f5f5;
         background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23bdbdbd' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
       }
 
       .content {
-        max-width: 1400px;
+       
         margin: 0 auto;
-        padding: 40px 20px;
+       
       }
 
       .header {
@@ -49,9 +53,12 @@
       
 
       .contact-info {
+        position: absolute;
+        right: 80px;
         display: flex;
-        flex-direction: row;
         align-items: center;
+        font-size: 28px;
+        font-family: 'Lato', sans-serif;
       }
 
       .contact-info .whatsapp {
@@ -70,28 +77,33 @@
       }
 
       .contact-info .whatsapp .click-here {
-        color: #45bdb5;
-        font-weight: bold;
+        font-size: 28px;
+        color: #148880;
+        text-decoration: none;
+        font-weight: 500;
       }
 
       .section-title {
-        font-size: 48px;
+        font-size: 72px;
         font-weight: bold;
         margin-bottom: 30px;
         color: #222;
       }
 
       .strategy-title {
-        font-size: 36px;
+        font-size: 48px;
         font-weight: bold;
         margin-bottom: 20px;
+        font-family: 'Montserrat', sans-serif;
+        color: black;
       }
 
       .strategy-description {
-        font-size: 18px;
+        font-size: 28px;
         line-height: 1.6;
         margin-bottom: 40px;
         max-width: 90%;
+        font-family: 'Lato', sans-serif;
       }
 
       .metrics-container {
@@ -102,8 +114,8 @@
       }
 
       .metric {
-        width: 220px;
-        height: 220px;
+        width: 310px;
+        height: 310px;
         border-radius: 50%;
         display: flex;
         flex-direction: column;
@@ -115,25 +127,25 @@
         
       }
       .metric img{
-        width: 40px;
-        height: 40px;
+        width: 50px;
+        height: 50px;
         margin-bottom: 10px;
       }
 
       .metric-1 {
-        background-color: rgba(255, 236, 179, 0.8);
+        background-color: #F7EAB6;
       }
 
       .metric-2 {
-        background-color: rgba(209, 196, 233, 0.8);
+        background-color: #D1B1FF;
       }
 
       .metric-3 {
-        background-color: rgba(178, 235, 242, 0.8);
+        background-color: #DFF4F3;
       }
 
       .metric-4 {
-        background-color: rgba(237, 137, 145, 0.8);
+        background-color: #FFADAF;
       }
 
       .metric-icon {
@@ -143,24 +155,36 @@
       }
 
       .metric-value {
-        font-size: 28px;
+        font-size: 32px;
         font-weight: bold;
         margin-bottom: 5px;
       }
 
       .metric-label {
-        font-size: 16px;
+        font-size: 24px;
+        font-family: 'Lato', sans-serif;
       }
 
-      .decoration {
-        position: absolute;
-        right: 0;
-        top: 0;
-        width: 200px;
-        height: 200px;
-        background-color: #FFAB00;
-        border-radius: 0 0 0 100%;
-        z-index: -1;
+      
+      .back-to-top {
+        position: fixed;
+        bottom: 80px;
+        right: 80px;
+        width: 60px;
+        height: 60px;
+        
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+        z-index: 100;
+      }
+
+      .back-to-top svg {
+        width: 30px;
+        height: 30px;
+        fill: white;
       }
 
       @media (max-width: 768px) {
@@ -183,22 +207,22 @@
       <div class="decoration"></div>
       <div class="content">
         <div class="header">
-          <div class="section-title">Recommended Strategy</div>
-          <div class="contact-info">
-              <img src="../assets/logos/whatsapp.png" alt="WhatsApp">
+          <div class="section-title">Recommended Investment Strategy</div>
+          <!-- <div class="contact-info">
+              <img src="../assets/logos/whatsapp.png" alt="WhatsApp" width="70px" height="70px">
               Want to invest? 
                 <a href="#" class="whatsapp">
               <span class="click-here">Click here</span></a>
             </a>
-          </div>
+          </div> -->
         </div>
 
         
         
         <div class="strategy-title">Buy 2 Sell</div>
         <div class="strategy-description">
-          The Buy to Sell strategy is a popular real estate approach where investors purchase a property and sell it later at a higher price. The goal is to wait for the right market conditions to maximize profit and get the best return on investment.
-        </div>
+          A buy-to-sell strategy involves investing early in pre-launch properties with the intent to sell the unit closer to project completion or post-launch, capitalizing on price appreciation during the construction phase.
+         </div>
         
         <div class="metrics-container">
           <div class="metric metric-1">
@@ -226,11 +250,9 @@
           </div>
         </div>
         
-        <div class="wave-decoration">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" style="display: block; width: 100%;">
-            <path fill="#FFF8E1" fill-opacity="0.5" d="M0,128L60,117.3C120,107,240,85,360,96C480,107,600,149,720,149.3C840,149,960,107,1080,90.7C1200,75,1320,85,1380,90.7L1440,96L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z"></path>
-          </svg>
-        </div>
+      </div>
+      <div class="back-to-top">
+        <img src="../assets/logos/truestate.png" alt="back to top" height="100px" width="100px"/>
       </div>
     </div>
   </body>

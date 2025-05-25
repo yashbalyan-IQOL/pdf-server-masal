@@ -375,129 +375,16 @@
     <div class="header">
       <h1>Project Risk</h1>
       <div class="estate-score">
-        <!-- <div class="score-label">TruEstate Score</div>
-        <div class="score-value">8<span style="font-size: 20px">/10</span></div>
-        <div class="score-text">Impact<br>Score</div> -->
+        
         <img src="../assets/icons/imactLogo.png" alt="Estate Score" height="120px" width="120px">
       </div>
     </div>
 
-    <div class="risk-cards-container">
-      <!-- Builder Risk Card - Medium -->
-      <div class="risk-card">
-        <div class="gauge-container">
-          <div class="gauge-center-label">Medium</div>
-          <svg class="gauge-svg" viewBox="0 0 300 150">
-            <path class="gauge-svg-path-low" d="M 30 130 A 120 120 0 0 1 90 35" />
-            <path class="gauge-svg-path-medium" d="M 90 35 A 120 120 0 0 1 210 35" />
-            <path class="gauge-svg-path-high" d="M 210 35 A 120 120 0 0 1 270 130" />
-          </svg>
-          <div class="gauge-needle medium"></div>
-          <div class="gauge-labels">
-            <span class="gauge-label-left">Low</span>
-            <span class="gauge-label-right">High</span>
-          </div>
-        </div>
-        <div class="risk-title">Builder Risk</div>
-        <div class="risk-value">Medium</div>
+    
+      <div class="risk-cards-container">
+        {{{RISK_CARDS_HTML}}}
       </div>
-
-      <!-- Delay Risk Card - Low -->
-      <div class="risk-card">
-        <div class="gauge-container">
-          <div class="gauge-center-label">Medium</div>
-          <svg class="gauge-svg" viewBox="0 0 300 150">
-            <path class="gauge-svg-path-low" d="M 30 130 A 120 120 0 0 1 90 35" />
-            <path class="gauge-svg-path-medium" d="M 90 35 A 120 120 0 0 1 210 35" />
-            <path class="gauge-svg-path-high" d="M 210 35 A 120 120 0 0 1 270 130" />
-          </svg>
-          <div class="gauge-needle low"></div>
-          <div class="gauge-labels">
-            <span class="gauge-label-left">Low</span>
-            <span class="gauge-label-right">High</span>
-          </div>
-        </div>
-        <div class="risk-title">Delay Risk</div>
-        <div class="risk-value">Low</div>
-      </div>
-
-      <!-- Legal Risk Card - NA -->
-      <div class="risk-card">
-        <div class="gauge-container">
-          <div class="gauge-center-label">Medium</div>
-          <svg class="gauge-svg" viewBox="0 0 300 150">
-            <path class="gauge-svg-path-low" d="M 30 130 A 120 120 0 0 1 90 35" />
-            <path class="gauge-svg-path-medium" d="M 90 35 A 120 120 0 0 1 210 35" />
-            <path class="gauge-svg-path-high" d="M 210 35 A 120 120 0 0 1 270 130" />
-          </svg>
-          <div class="gauge-needle na"></div>
-          <!-- <div class="na-text">NA</div> -->
-          <div class="gauge-labels">
-            <span class="gauge-label-left">Low</span>
-            <span class="gauge-label-right">High</span>
-          </div>
-        </div>
-        <div class="risk-title">Legal Risk</div>
-        <div class="risk-value">NA</div>
-      </div>
-
-      <!-- Exit Risk Card - High -->
-      <div class="risk-card">
-        <div class="gauge-container">
-          <div class="gauge-center-label">Medium</div>
-          <svg class="gauge-svg" viewBox="0 0 300 150">
-            <path class="gauge-svg-path-low" d="M 30 130 A 120 120 0 0 1 90 35" />
-            <path class="gauge-svg-path-medium" d="M 90 35 A 120 120 0 0 1 210 35" />
-            <path class="gauge-svg-path-high" d="M 210 35 A 120 120 0 0 1 270 130" />
-          </svg>
-          <div class="gauge-needle high"></div>
-          <div class="gauge-labels">
-            <span class="gauge-label-left">Low</span>
-            <span class="gauge-label-right">High</span>
-          </div>
-        </div>
-        <div class="risk-title">Exit Risk</div>
-        <div class="risk-value">High</div>
-      </div>
-
-      <!-- Market Risk Card - Medium -->
-      <div class="risk-card">
-        <div class="gauge-container">
-          <div class="gauge-center-label">Medium</div>
-          <svg class="gauge-svg" viewBox="0 0 300 150">
-            <path class="gauge-svg-path-low" d="M 30 130 A 120 120 0 0 1 90 35" />
-            <path class="gauge-svg-path-medium" d="M 90 35 A 120 120 0 0 1 210 35" />
-            <path class="gauge-svg-path-high" d="M 210 35 A 120 120 0 0 1 270 130" />
-          </svg>
-          <div class="gauge-needle medium"></div>
-          <div class="gauge-labels">
-            <span class="gauge-label-left">Low</span>
-            <span class="gauge-label-right">High</span>
-          </div>
-        </div>
-        <div class="risk-title">Market Risk</div>
-        <div class="risk-value">Medium</div>
-      </div>
-
-      <!-- Environmental Risk Card - Low -->
-      <div class="risk-card">
-        <div class="gauge-container">
-          <div class="gauge-center-label">Medium</div>
-          <svg class="gauge-svg" viewBox="0 0 300 150">
-            <path class="gauge-svg-path-low" d="M 30 130 A 120 120 0 0 1 90 35" />
-            <path class="gauge-svg-path-medium" d="M 90 35 A 120 120 0 0 1 210 35" />
-            <path class="gauge-svg-path-high" d="M 210 35 A 120 120 0 0 1 270 130" />
-          </svg>
-          <div class="gauge-needle low"></div>
-          <div class="gauge-labels">
-            <span class="gauge-label-left">Low</span>
-            <span class="gauge-label-right">High</span>
-          </div>
-        </div>
-        <div class="risk-title">Environmental Risk</div>
-        <div class="risk-value">Low</div>
-      </div>
-    </div>
+    
 
     
   </body>

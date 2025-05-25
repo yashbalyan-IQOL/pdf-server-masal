@@ -179,7 +179,7 @@
 
       /* Impact Indicator Styles */
       .impact-column {
-        width: 100%;
+        width: 144px;
         margin-top: 10px;
         display: flex;
         gap: 10px;
@@ -303,7 +303,7 @@
 
       <div class="main-content">
         <div class="master-plan-image">
-          <img src="../assets/images/master-plan.png" alt="Project Master Plan" />
+          <img src="{{MASTER_PLAN_IMAGE}}" alt="Project Master Plan" />
         </div>
 
         <div class="info-container">
@@ -330,7 +330,7 @@
               <img src="../assets/icons/masterplan/UDS.png" alt="UDS" class="info-item-icon" />
               <div class="info-text">
                 <div class="info-label">UDS</div>
-                <div class="info-value">{{UDS_DATE}}</div>
+                <div class="info-value">{{UDS}}</div>
                 <div class="impact-column">
                   <div class="impact-indicator high-impact">
                     <div class="impact-level">
@@ -486,7 +486,7 @@
               <img src="../assets/icons/masterplan/green.png" alt="green" class="info-item-icon" />
               <div class="info-text">
                 <div class="info-label">Green zone</div>
-                <div class="info-value">2.5 Acres</div>
+                <div class="info-value">{{GREEN_ZONE}} Acres</div>
                 <div class="impact-column">
                   <div class="impact-indicator high-impact">
                     <div class="impact-level">
@@ -507,7 +507,7 @@
               <img src="../assets/icons/masterplan/pending.png" alt="pending" class="info-item-icon" />
               <div class="info-text">
                 <div class="info-label">Pending Phases</div>
-                <div class="info-value">25 units/Acers</div>
+                <div class="info-value">{{PENDING_PHASES}}</div>
                 <div class="impact-column">
                   <div class="impact-indicator high-impact">
                     <div class="impact-level">

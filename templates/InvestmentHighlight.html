@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TruEstate Investment Highlight</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
     <style>
       * {
         margin: 0;
@@ -18,15 +22,18 @@
       html {
         width: 100%;
         height: 100%;
-        font-family: Arial, sans-serif;
+        font-family: 'Montserrat', sans-serif;
         color: #333;
         background-color: #f5f5f5;
       }
-
-      .page-container {
-        
-        margin: 0 auto;
+      body {
         padding: 80px;
+        background-color: #f5f5f5;
+        background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23bdbdbd' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+      }
+
+      .page-container { 
+        margin: 0 auto;
         position: relative;
       }
 
@@ -48,9 +55,10 @@
       }
 
       .title {
-        font-size: 42px;
+        font-size:72px;
         font-weight: bold;
-        color: #222;
+        color: black;
+        font-family: 'Lora', serif;
       }
 
       .contact-info {
@@ -58,29 +66,62 @@
         align-items: center;
       }
 
-      .contact-info .whatsapp {
+      .estate-score {
+        position: absolute;
+        top: 60px;
+        right: 60px;
+        width: 120px;
+        height: 120px;
+        background-color: #0E766E;
+        border-radius: 50%;
         display: flex;
+        flex-direction: column;
+        justify-content: center;
         align-items: center;
-        padding: 10px 15px;
-        border-radius: 30px;
-        text-decoration: none;
-        color: #333;
+        color: white;
+        border: 3px solid white;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        z-index: 10;
       }
 
-      .contact-info .whatsapp img {
-        width: 24px;
-        height: 24px;
-        margin-right: 10px;
+      .estate-score::before {
+        content: "";
+        position: absolute;
+        top: -8px;
+        left: -8px;
+        right: -8px;
+        bottom: -8px;
+        border: 2px solid #0E766E;
+        border-radius: 50%;
+        z-index: -1;
       }
 
-      .contact-info .whatsapp .click-here {
-        color: #2c7e2f;
+      .score-value {
+        font-size: 36px;
         font-weight: bold;
+        line-height: 1;
+      }
+
+      .score-text {
+        font-size: 14px;
+        text-align: center;
+        margin-top: 4px;
+      }
+
+      .score-label {
+        position: absolute;
+        width: 200%;
+        top: -10px;
+        left: -50%;
+        text-align: center;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
       }
 
       .subtitle {
-        font-size: 18px;
-        color: #555;
+        font-size: 28px;
+        color: #767676;
         margin-bottom: 30px;
       }
 
@@ -95,10 +136,10 @@
         flex: 1;
         display: flex;
         flex-direction: row;
-        background-color: #f9e1c7;
+        background-color: #FFE1BF;
         border-radius: 15px;
         padding: 30px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        gap:32px;
         position: relative;
       }
 
@@ -118,7 +159,7 @@
         top: 10%;
         height: 80%;
         width: 1px;
-        background-color: #9e9b9b;
+        background-color: #FFE1BF;
       }
 
       .card-left {
@@ -136,8 +177,9 @@
       }
 
       .card-title {
-        font-size: 24px;
-        font-weight: normal;
+        font-size: 28px;
+        font-weight: 600;
+        
         margin-bottom: 30px;
         color: #000;
       }
@@ -158,8 +200,9 @@
       }
 
       .price-label {
-        font-size: 20px;
+        font-size: 24px;
         margin-bottom: 10px;
+        font-weight: 600;
         color: #000;
       }
 
@@ -170,13 +213,14 @@
       }
 
       .metrics-container {
-        background-color: #eceff1;
+        background-color: #EBEBEB;
         border-radius: 15px;
-        padding: 20px 30px;
+        padding: 40px 30px;
         display: flex;
         justify-content: space-between;
         margin-bottom: 30px;
         flex-wrap: wrap;
+        font-family: 'Lato', sans-serif;
       }
 
       .metric {
@@ -194,13 +238,15 @@
       }
 
       .metric-label {
-        font-size: 14px;
-        color: #555;
+        font-size: 24px;
+        font-weight: 600;
+        color: black;
       }
 
       .project-approval {
-        font-size: 22px;
-        color: #555;
+        font-size: 28px;
+        font-weight: bold;
+        color: #5C5C5C;
         margin-bottom: 15px;
       }
       .project-approval-container{
@@ -220,16 +266,10 @@
       }
 
       .bank-logo {
-        height: 30px;
+        height: 50px;
       }
 
-      .score-badge {
-        position: absolute;
-        top: 80px;
-        right: 50px;
-        width: 120px;
-        height: 120px;
-      }
+      
 
       @media (max-width: 768px) {
         .cards-container {
@@ -266,19 +306,14 @@
 
       <div class="header">
         <h1 class="title">Investment Highlight</h1>
-        <div class="contact-info">
-          <a href="https://wa.me/918444999770" class="whatsapp">
-            
-            <img src="../assets/logos/whatsapp.png" alt="WhatsApp" />
-            <span
-              >Want to invest? <span class="click-here">Click here</span></span
-            >
-          </a>
+        <div class="estate-score">
+        
+          <img src="../assets/icons/imactLogo.png" alt="Estate Score" height="120px" width="120px">
         </div>
       </div>
 
       <p class="subtitle">
-        Figures are calculated for a unit of 3BHK+2T measuring 1200 Sq ft
+        Figures are calculated for a unit of {{asset}} measuring {{area}}
       </p>
 
       <div class="cards-container">
@@ -367,11 +402,7 @@
         </div>
       </div>
 
-      <img
-        src="../assets/icons/imactLogo.png"
-        alt="TruEstate Score: 8/10 Impact Score"
-        class="score-badge"
-      />
+      
     </div>
   </body>
 </html>

@@ -246,66 +246,24 @@
 
         <div class="right-section">
           <table class="info-table">
-            <tr>
-              <th>Parameter</th>
-              <th>1BHK</th>
-              <th>2BHK</th>
-              <th>3BHK</th>
-            </tr>
-            <tr>
-              <td>Saleable Area</td>
-              <td>2120 Sqft</td>
-              <td>2120 Sqft</td>
-              <td>2120 Sqft</td>
-            </tr>
-            <tr>
-              <td>Carpet Area</td>
-              <td>1800 Sqft</td>
-              <td>1800 Sqft</td>
-              <td>1800 Sqft</td>
-            </tr>
-            <tr>
-              <td>Loading</td>
-              <td>56%</td>
-              <td>56%</td>
-              <td>56%</td>
-            </tr>
-            <tr>
-              <td>Price / Sqft of SBU</td>
-              <td>₹2,500 /Sq ft</td>
-              <td>₹2,500 /Sq ft</td>
-              <td>₹2,500 /Sq ft</td>
-            </tr>
-            <tr>
-              <td>Price / Sqft of CA</td>
-              <td>₹2,500 /Sq ft</td>
-              <td>₹2,500 /Sq ft</td>
-              <td>₹2,500 /Sq ft</td>
-            </tr>
-            <tr>
-              <td>Car Parking</td>
-              <td>0</td>
-              <td>2</td>
-              <td>3</td>
-            </tr>
-            <tr>
-              <td>Total Price</td>
-              <td>₹1.32 Crs</td>
-              <td>₹1.32 Crs</td>
-              <td>₹1.32 Crs</td>
-            </tr>
-            <tr>
-              <td>Strategy</td>
-              <td>Buy 2 Sell</td>
-              <td>Buy 2 Rent</td>
-              <td>3</td>
-            </tr>
-            <tr class="score-row">
-              <td>TruEstate Score</td>
-              <td>3/10</td>
-              <td>3/10</td>
-              <td>3/10</td>
-            </tr>
+            <thead>
+              <tr>
+                <th>Parameter</th>
+                {{#each CONFIGURATIONS}}
+                <th>{{this}}</th>
+                {{/each}}
+              </tr>
+            </thead>
+            <tbody>
+              {{#each TABLE_DATA}}
+              <tr{{#if this.isScore}} class="score-row"{{/if}}>
+                <td>{{this.label}}</td>
+                {{#each ../PROCESSED_CONFIGS}}
+                <td>{{lookup this ../key}}</td>
+                {{/each}}
+              </tr>
+              {{/each}}
+            </tbody>
           </table>
         </div>
       </div>

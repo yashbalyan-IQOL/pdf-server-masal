@@ -350,14 +350,16 @@
     </div>
 
     <div class="content-container">
-      <table class="evaluation-table" id="evaluationTable">
+      <table class="evaluation-table">
         <tr>
           <th>Factor</th>
           <th>Current Status</th>
           <th>Reference Avg.</th>
           <th>Evaluation</th>
         </tr>
+        {{{TABLE_ROWS_HTML}}}
       </table>
+
 
       <div class="project-image">
         <img src="../assets/images/evalutionplaceholder.png" alt="Project Aerial View" height="45px" width="45px">
@@ -372,104 +374,5 @@
     
     <div class="yellow-corner"></div>
 
-    <script>
-      // Parse the evaluation data from your template variable
-      const projectData = JSON.parse('{{{EVALUATION_DATA}}}');
-
-      // Reference values mapping
-      const referenceValues = {
-        metro: '5 km',
-        trafficDensity: 'Low',
-        airQuality: '95-100',
-        noiseLevels: '~85-90 dB',
-        powerLines: '32 km',
-        informalSettlement: 'No',
-        waterLoggingRisk: 'No'
-      };
-
-      // Function to format current status value
-      function formatCurrentStatus(item) {
-        let displayValue = item.value;
-        
-        // Add unit if available
-        if (item.unit && !item.distance) {
-          displayValue += ' ' + item.unit;
-        }
-        
-        // Add distance for certain fields
-        if (item.distance && item.unit) {
-          displayValue = item.distance + ' ' + item.unit;
-        }
-        
-        // Capitalize first letter for text values
-        if (typeof displayValue === 'string' && !displayValue.match(/^\d/)) {
-          displayValue = displayValue.charAt(0).toUpperCase() + displayValue.slice(1);
-        }
-        
-        return displayValue;
-      }
-
-      // Function to create impact indicator HTML
-      function createImpactIndicator(impact) {
-        const impactLevel = impact.toLowerCase();
-        return `
-          <div class="impact-indicator">
-            <div class="impact-level">
-              <div class="impact-red"></div>
-              <div class="impact-yellow"></div>
-              <div class="impact-green"></div>
-            </div>
-            <div class="impact-marker ${impactLevel}"></div>
-            <div class="gauge-labels">
-              <span class="gauge-label-left">Low</span>
-              <span class="gauge-label-right">High</span>
-            </div>
-          </div>
-          ${impact.charAt(0).toUpperCase() + impact.slice(1)}
-        `;
-      }
-
-      // Function to render the table
-      function renderEvaluationTable() {
-        const tableBody = document.getElementById('evaluationTable');
-        
-        // Filter data to show only the main factors that match your original template
-        const mainFactors = ['metro', 'trafficDensity', 'airQuality', 'noiseLevels', 'informalSettlement', 'waterLoggingRisk', 'powerLines'];
-        
-        const filteredData = projectData.filter(item => mainFactors.includes(item.field));
-        
-        filteredData.forEach(item => {
-          const row = document.createElement('tr');
-          
-          // Determine the factor label
-          let factorLabel = item.label;
-          if (item.field === 'powerLines') {
-            factorLabel = 'High Tension Line';
-          } else if (item.field === 'informalSettlement') {
-            factorLabel = 'Informal Settlements';
-          } else if (item.field === 'airQuality') {
-            factorLabel = 'Air Quality Index';
-          } else if (item.field === 'metro') {
-            factorLabel = 'Nearest Metro';
-          }
-          
-          row.innerHTML = `
-            <td>${factorLabel}</td>
-            <td>${formatCurrentStatus(item)}</td>
-            <td>${referenceValues[item.field] || 'N/A'}</td>
-            <td class="evaluation-result">
-              ${createImpactIndicator(item.impact)}
-            </td>
-          `;
-          
-          tableBody.appendChild(row);
-        });
-      }
-
-      // Render the table when the page loads
-      document.addEventListener('DOMContentLoaded', function() {
-        renderEvaluationTable();
-      });
-    </script>
   </body>
 </html>

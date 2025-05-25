@@ -163,6 +163,7 @@ function renderCoverPage(projectData) {
   return template({
     PROJECT_NAME: projectData.projectName || "Unnamed Project",
     UPDATED_DATE: formattedDate1 || formattedDate,
+    RERA_ID: projectData.reraId || "N/A",
   });
 }
 
@@ -307,13 +308,13 @@ function renderOverviewPage(projectData, firstImage) {
     PROJECT_NAME: projectData.projectName || "---",
     DEVELOPER: projectData.developerName || "---", // Replace with actual data if available
     STAGE: projectData.status || "--",
-    CURRENT_PRICE: projectData.currentPrice || "--", // Replace with actual data if available
+    CURRENT_PRICE: projectData.commonPricePerSqft  || "--", // Replace with actual data if available
     CONFIGURATIONS: configurationsText,
     LAUNCH_DATE: projectData.launchDate || "---",
     HANDOVER_DATE: projectData.handOverDate || "---",
     ASSET_TYPE: projectData.assetType || "--",
     WATER_SOURCE: projectData.waterSource || "--",
-    MICROMARKET: projectData.mircomarket || "--",
+    MICROMARKET: projectData?.micromarket || "--",
     ZONE: projectData.area || "--", // Replace with actual data if available
     PROPERTY_IMAGE: imageUrl,
   });
@@ -346,6 +347,8 @@ function renderInvestmentHighlightPage(projectData,data2,response) {
     SELLING_PRICE: formatCurrency(data2?.finalPrice || 0),
     TOTAL_INVESTMENT: (formatCurrency(response?.data?.total_investment)),
     TOTAL_RETURN: (formatCurrency(response?.data?.total_returns)),
+    asset : projectData?.configurations[0]|| "3BHK",
+    area : projectData?.data[0].plotArea || 0,
   });
 }
 
@@ -355,9 +358,9 @@ function renderYearlyCashflowPage(projectData,data2,response) {
   const template = loadTemplate("yearlyCashflow");
   console.log("create report response", response);
   console.log("create report data2", data2);
-  console.log("Start", process.memoryUsage());
+  
 
-  // Add error handling and fallback data
+  
   if (!response || !response.data) {
     console.error("Response or response.data is undefined");
     return template({
@@ -508,6 +511,9 @@ function renderYearlyCashflowPage(projectData,data2,response) {
 
   // Generate table rows HTML
   const tableRowsHTML = rows.map((row, rowIndex) => {
+    if (row.header === "Interest" || row.header === "Principal") {
+      return ""; // skip rendering this row
+    }
     const isLastRow = rowIndex === rows.length - 1;
     const rowClass = isLastRow ? 'net-cash-row' : '';
     
@@ -557,62 +563,108 @@ function renderContactUsPage(projectData) {
   const template = loadTemplate("contactUs");
   return template({
     PROJECT_NAME: projectData.projectName || "Unnamed Project",
+    LINK : projectData.eoiFormLink || "---",
   });
 }
 
 // Process and render the master plan page
 function renderMasterPlanPage(projectData, masterPlanImage) {
   const template = loadTemplate("masterPlan");
+  console.log("projectData image", projectData?.masterPlan[0]);
   return template({
     PROJECT_NAME: projectData.projectName || "---",
     LOADING: projectData.loading || "---",
-    UDS_DATE: projectData.udsDate || "---",
+    UDS: projectData.uds || "---",
     TOTAL_UNITS: projectData.totalUnits || "---",
-    PROJECT_SIZE: projectData.projectSize || "---",
-    OPEN_AREA: projectData.openArea || "---",
+    PROJECT_SIZE: projectData.projectLandArea || "---",
+    OPEN_AREA: projectData.openAreaPercentage || "---",
     CONSTRUCTION_QUALITY: projectData.constructionQuality || "---",
-    ROAD_WIDTH: projectData.roadWidth || "---",
+    ROAD_WIDTH: projectData.accessRoadWidth || "---",
     CONSTRUCTION_PARTNER: projectData.constructionPartner || "---",
     PROJECT_DENSITY: projectData.projectDensity || "---",
-    MASTER_PLAN_IMAGE: masterPlanImage || "../assets/images/master-plan.png"
+    MASTER_PLAN_IMAGE: projectData?.masterPlan[0] || "../assets/images/master-plan.png",
+    PENDING_PHASES: projectData.pendingPhases || "---",
+    GREEN_ZONE: projectData.greenZone || "---",
+    // COMPLETED_PHASES: projectData.completedPhases || "---",
+    // UNDER_CONSTRUCTION_PHASES: projectData.underConstructionPhases || "---",
   });
 }
 
-// Process and render the unit level page
 function renderUnitLevelPage(projectData, unitLevelImage) {
   const template = loadTemplate("unitLevel");
+  
+  // Process the data first
+  const assetType = projectData?.assetType || "apartment";
+  
+  const processedConfigs = projectData.data.map((item, index) => {
+    const configName = projectData.configurations[index];
+    
+    if (assetType === 'apartment') {
+      const superBuiltUpArea = item.superBuiltUpArea || 0;
+      const carpetArea = item.carpetArea || Math.round(superBuiltUpArea * 0.75);
+      const loading = projectData.loading || 56;
+      const pricePerSqftSBU = superBuiltUpArea > 0 ? item.totalPrice / superBuiltUpArea : 0;
+      const pricePerSqftCA = carpetArea > 0 ? item.totalPrice / carpetArea : 0;
+      
+      return {
+        type: configName,
+        saleableArea: `${superBuiltUpArea} Sqft`,
+        carpetArea: `${carpetArea} Sqft`,
+        loading: `${loading}%`,
+        pricePerSqftSBU: `₹${Math.round(pricePerSqftSBU).toLocaleString()} /Sq ft`,
+        pricePerSqftCA: `₹${Math.round(pricePerSqftCA).toLocaleString()} /Sq ft`,
+        carParking: item.carParking || "---",
+        totalPrice: `₹${(item.totalPrice / 10000000).toFixed(2)} Crs`,
+        strategy:item.strategy || "---",
+        recommendation: item.recommendation || "---"
+      };
+    } else {
+      const plotArea = item.plotArea || 0;
+      const pricePerSqft = plotArea > 0 ? item.totalPrice / plotArea : 0;
+      
+      return {
+        type: configName,
+        plotArea: `${plotArea} Sqft`,
+        pricePerSqft: `₹${Math.round(pricePerSqft).toLocaleString()} /Sq ft`,
+        totalPrice: `₹${(item.totalPrice / 10000000).toFixed(2)} Crs`,
+        strategy: item.strategy || "---",
+        recommendation: item.recommendation || "---"
+      };
+    }
+  });
+
+  // Create rows and columns data structure instead of HTML strings
+  const apartmentTableData = [
+    { label: 'Saleable Area', key: 'saleableArea', isScore: false },
+    { label: 'Carpet Area', key: 'carpetArea', isScore: false },
+    { label: 'Loading', key: 'loading', isScore: false },
+    { label: 'Price / Sqft of SBU', key: 'pricePerSqftSBU', isScore: false },
+    { label: 'Price / Sqft of CA', key: 'pricePerSqftCA', isScore: false },
+    { label: 'Car Parking', key: 'carParking', isScore: false },
+    { label: 'Total Price', key: 'totalPrice', isScore: false },
+    { label: 'Strategy', key: 'strategy', isScore: false },
+    { label: 'TruEstate Recommendation', key: 'recommendation', isScore: true }
+  ];
+  
+  const plotTableData = [
+    { label: 'Plot Area', key: 'plotArea', isScore: false },
+    { label: 'Price / Sqft', key: 'pricePerSqft', isScore: false },
+    { label: 'Total Price', key: 'totalPrice', isScore: false },
+    { label: 'Strategy', key: 'strategy', isScore: false },
+    { label: 'TruEstate Recommendation', key: 'recommendation', isScore: true }
+  ];
+
+  const tableData = assetType === 'apartment' ? apartmentTableData : plotTableData;
+
   return template({
-    PROJECT_NAME: projectData.projectName || "---",
+    PROJECT_NAME: projectData.projectName || "Project Plan",
     UNIT_LEVEL_IMAGE: unitLevelImage || "../assets/images/unitLevel.png",
-    UNIT_CONFIGS: projectData.unitConfigs || [
-      {
-        type: "1BHK",
-        saleableArea: "2120 Sqft",
-        carpetArea: "1800 Sqft",
-        loading: "56%",
-        pricePerSqftSBU: "₹2,500 /Sq ft",
-        pricePerSqftCA: "₹2,500 /Sq ft"
-      },
-      {
-        type: "2BHK",
-        saleableArea: "2120 Sqft",
-        carpetArea: "1800 Sqft",
-        loading: "56%",
-        pricePerSqftSBU: "₹2,500 /Sq ft",
-        pricePerSqftCA: "₹2,500 /Sq ft"
-      },
-      {
-        type: "3BHK",
-        saleableArea: "2120 Sqft",
-        carpetArea: "1800 Sqft",
-        loading: "56%",
-        pricePerSqftSBU: "₹2,500 /Sq ft",
-        pricePerSqftCA: "₹2,500 /Sq ft"
-      }
-    ]
+    CONFIGURATIONS: projectData.configurations,
+    TABLE_DATA: tableData,
+    PROCESSED_CONFIGS: processedConfigs,
+    ASSET_TYPE: assetType
   });
 }
-
 // Process and render the project comparison page
 function renderProjectComparisonPage(projectData) {
   const template = loadTemplate("projectComparison");
@@ -718,52 +770,310 @@ function renderPerformancePage(projectData) {
 function renderEvaluationPage(projectData) {
   const template = loadTemplate("evalution");
 
-  console.log("projectData thingsNearProject:", projectData.thingsNearProject);
+  // Reference values mapping
+  const referenceValues = {
+    metro: '5 km',
+    trafficDensity: 'Low',
+    airQuality: '95-100',
+    noiseLevels: '~85-90 dB',
+    powerLines: '32 km',
+    informalSettlement: 'No',
+    waterLoggingRisk: 'No',
+    constructionActivities: 'Low',
+    costOfLiving: 'Medium',
+    graveYard: 'No',
+    networkConnectivity: 'Good',
+    powerBreakdowns: 'Rare',
+    slumArea: 'No',
+    streetLighting: 'Good',
+    tensionsBetweenDifferentCulturalGroups: 'No',
+    wasteManagement: 'Good'
+  };
+
+  // Factor label mapping
+  const factorLabels = {
+    metro: 'Nearest Metro',
+    trafficDensity: 'Traffic Density',
+    airQuality: 'Air Quality Index',
+    noiseLevels: 'Noise Levels',
+    powerLines: 'High Tension Line',
+    informalSettlement: 'Informal Settlements',
+    waterLoggingRisk: 'Water Logging Risk',
+    constructionActivities: 'Construction Activities',
+    costOfLiving: 'Cost of Living',
+    graveYard: 'Graveyard Nearby',
+    networkConnectivity: 'Network Connectivity',
+    powerBreakdowns: 'Power Breakdowns',
+    slumArea: 'Slum Area',
+    streetLighting: 'Street Lighting',
+    tensionsBetweenDifferentCulturalGroups: 'Cultural Tensions',
+    wasteManagement: 'Waste Management'
+  };
+
+  // Unit mapping for different factors
+  const unitMapping = {
+    metro: 'km',
+    powerLines: 'km',
+    airQuality: 'AQI',
+    noiseLevels: 'dB'
+  };
+
+  // Function to format current status value
+  function formatCurrentStatus(fieldKey, value) {
+    if (!value || value.trim() === '') {
+      return 'N/A';
+    }
+    
+    let displayValue = value;
+    
+    // Add appropriate units based on field type
+    if (unitMapping[fieldKey] && !isNaN(value)) {
+      displayValue += ' ' + unitMapping[fieldKey];
+    }
+    
+    // Capitalize first letter for text values
+    if (typeof displayValue === 'string' && !displayValue.match(/^\d/)) {
+      displayValue = displayValue.charAt(0).toUpperCase() + displayValue.slice(1);
+    }
+    
+    return displayValue;
+  }
+
+  // Function to create impact indicator HTML
+  function createImpactIndicator(impact) {
+    if (!impact || impact.trim() === '') {
+      return `
+        <div class="impact-indicator">
+          <div class="impact-level">
+            <div class="impact-red"></div>
+            <div class="impact-yellow"></div>
+            <div class="impact-green"></div>
+          </div>
+          <div class="impact-marker medium"></div>
+          <div class="gauge-labels">
+            <span class="gauge-label-left">Low</span>
+            <span class="gauge-label-right">High</span>
+          </div>
+        </div>
+        N/A
+      `;
+    }
+
+    const impactLevel = impact.toLowerCase();
+    return `
+      <div class="impact-indicator">
+        <div class="impact-level">
+          <div class="impact-red"></div>
+          <div class="impact-yellow"></div>
+          <div class="impact-green"></div>
+        </div>
+        <div class="impact-marker ${impactLevel}"></div>
+        <div class="gauge-labels">
+          <span class="gauge-label-left">Low</span>
+          <span class="gauge-label-right">High</span>
+        </div>
+      </div>
+      ${impact.charAt(0).toUpperCase() + impact.slice(1)}
+    `;
+  }
+
+  // Process evaluation data from the new nested format
+  const thingsNearProjectData = projectData?.thingsNearProject || {};
+  
+  // Filter and convert to array format for processing
+  const mainFactors = ['metro', 'trafficDensity', 'airQuality', 'noiseLevels', 'informalSettlement', 'waterLoggingRisk', 'powerLines'];
+  
+  // Convert object structure to array and filter main factors
+  const processedData = Object.entries(thingsNearProjectData)
+    .filter(([fieldKey, _]) => mainFactors.includes(fieldKey))
+    .map(([fieldKey, fieldData]) => ({
+      field: fieldKey,
+      impact: fieldData?.impact || '',
+      value: fieldData?.value || '',
+      label: factorLabels[fieldKey] || fieldKey
+    }))
+    .filter(item => item.impact !== '' || item.value !== ''); // Only include items with some data
+
+  // Generate table rows HTML
+  const tableRowsHTML = processedData.map(item => {
+    const factorLabel = factorLabels[item.field] || item.label;
+    const currentStatus = formatCurrentStatus(item.field, item.value);
+    const referenceValue = referenceValues[item.field] || 'N/A';
+    const impactHTML = createImpactIndicator(item.impact);
+
+    return `
+      <tr>
+        <td>${factorLabel}</td>
+        <td>${currentStatus}</td>
+        <td>${referenceValue}</td>
+        <td class="evaluation-result">
+          ${impactHTML}
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  // Calculate TruEstate Score
+  const calculateTrueEstateScore = (data) => {
+    const impactScores = { low: 3, medium: 2, high: 1 };
+    const validData = data.filter(item => item.impact && item.impact.trim() !== '');
+    
+    if (validData.length === 0) return 8; // Default score if no valid impact data
+    
+    const totalScore = validData.reduce((sum, item) => {
+      return sum + (impactScores[item.impact.toLowerCase()] || 2); // Default to medium if unknown
+    }, 0);
+    const maxScore = validData.length * 3;
+    return Math.round((totalScore / maxScore) * 10);
+  };
+
+  const trueEstateScore = calculateTrueEstateScore(processedData);
+
+  console.log("Processed evaluation data:", {
+    originalData: thingsNearProjectData,
+    processedData,
+    tableRowsHTML,
+    trueEstateScore,
+    availableFactors: Object.keys(thingsNearProjectData)
+  });
+
   return template({
     PROJECT_NAME: projectData.projectName || "Unnamed Project",
-    EVALUATION_DATA: projectData?.thingsNearProject || null,
+    TABLE_ROWS_HTML: tableRowsHTML,
+    TRUEESTATE_SCORE: trueEstateScore,
+    EVALUATION_DATA_JSON: JSON.stringify(processedData) // Keep this for any remaining client-side needs
   });
 }
 
 // Process and render the project risk page
 function renderProjectRiskPage(projectData) {
   const template = loadTemplate("projectRisk");
+
+  // Risk data mapping and configuration
+  const riskConfig = {
+    BuilderRisk: {
+      title: 'Builder Risk',
+      order: 1
+    },
+    DelayRisk: {
+      title: 'Delay Risk',  
+      order: 2
+    },
+    LegalRisk: {
+      title: 'Legal Risk',
+      order: 3
+    },
+    ExitRisk: {
+      title: 'Exit Risk',
+      order: 4
+    },
+    MarketRisk: {
+      title: 'Market Risk',
+      order: 5
+    },
+    EnvironmentalRisk: {
+      title: 'Environmental Risk',
+      order: 6
+    }
+  };
+
+  // Function to get needle class based on risk level
+  function getNeedleClass(riskLevel) {
+    const level = riskLevel.toLowerCase();
+    switch(level) {
+      case 'low': return 'low';
+      case 'medium': return 'medium';
+      case 'high': return 'high';
+      case 'na': 
+      case 'n/a': 
+      case 'not applicable': return 'na';
+      default: return 'na';
+    }
+  }
+
+  // Function to get center label based on risk level
+  function getCenterLabel(riskLevel) {
+    const level = riskLevel.toLowerCase();
+    if (level === 'na' || level === 'n/a' || level === 'not applicable') {
+      return 'NA';
+    }
+    return riskLevel.charAt(0).toUpperCase() + riskLevel.slice(1);
+  }
+
+  // Function to create a single risk card HTML
+  function createRiskCard(riskKey, riskValue) {
+    const config = riskConfig[riskKey];
+    if (!config) return ''; // Skip unknown risk types
+
+    const needleClass = getNeedleClass(riskValue);
+    const centerLabel = getCenterLabel(riskValue);
+    const displayValue = riskValue.charAt(0).toUpperCase() + riskValue.slice(1);
+
+    return `
+      <div class="risk-card">
+        <div class="gauge-container">
+          <div class="gauge-center-label">${centerLabel}</div>
+          <svg class="gauge-svg" viewBox="0 0 300 150">
+            <path class="gauge-svg-path-low" d="M 30 130 A 120 120 0 0 1 90 35" />
+            <path class="gauge-svg-path-medium" d="M 90 35 A 120 120 0 0 1 210 35" />
+            <path class="gauge-svg-path-high" d="M 210 35 A 120 120 0 0 1 270 130" />
+          </svg>
+          <div class="gauge-needle ${needleClass}"></div>
+          ${needleClass === 'na' ? '<div class="na-text">NA</div>' : ''}
+          <div class="gauge-labels">
+            <span class="gauge-label-left">Low</span>
+            <span class="gauge-label-right">High</span>
+          </div>
+        </div>
+        <div class="risk-title">${config.title}</div>
+        <div class="risk-value">${displayValue}</div>
+      </div>
+    `;
+  }
+
+  // Process risk data
+  const riskData = projectData?.projectRisk || {};
+  
+  // Convert risk data to array and sort by order
+  const sortedRisks = Object.entries(riskData)
+    .filter(([key, value]) => riskConfig[key]) // Only include configured risks
+    .sort(([keyA], [keyB]) => riskConfig[keyA].order - riskConfig[keyB].order);
+
+  // Generate risk cards HTML
+  const riskCardsHTML = sortedRisks
+    .map(([riskKey, riskValue]) => createRiskCard(riskKey, riskValue))
+    .join('');
+
+  // Calculate overall risk score (optional)
+  function calculateOverallRiskScore(risks) {
+    const riskScores = { low: 3, medium: 2, high: 1, na: 2.5 }; // NA gets neutral score
+    const validRisks = risks.filter(([_, value]) => value.toLowerCase() !== 'na');
+    
+    if (validRisks.length === 0) return 8; // Default if no valid risks
+    
+    const totalScore = validRisks.reduce((sum, [_, value]) => {
+      return sum + (riskScores[value.toLowerCase()] || 2);
+    }, 0);
+    
+    const maxScore = validRisks.length * 3;
+    return Math.round((totalScore / maxScore) * 10);
+  }
+
+  const overallRiskScore = calculateOverallRiskScore(sortedRisks);
+
+  // Log processed data for debugging
+  console.log("Risk Dashboard Data Processing:", {
+    originalRiskData: riskData,
+    sortedRisks,
+    overallRiskScore,
+    generatedCardsCount: sortedRisks.length
+  });
+
   return template({
     PROJECT_NAME: projectData.projectName || "Unnamed Project",
-    RISK_DATA: projectData.riskData || {
-      risks: [
-        {
-          title: "Builder Risk",
-          value: "Medium",
-          level: "medium"
-        },
-        {
-          title: "Delay Risk",
-          value: "Low",
-          level: "low"
-        },
-        {
-          title: "Legal Risk",
-          value: "NA",
-          level: "na"
-        },
-        {
-          title: "Exit Risk",
-          value: "High",
-          level: "high"
-        },
-        {
-          title: "Market Risk",
-          value: "Medium",
-          level: "medium"
-        },
-        {
-          title: "Environmental Risk",
-          value: "Low",
-          level: "low"
-        }
-      ]
-    }
+    RISK_CARDS_HTML: riskCardsHTML,
+    OVERALL_RISK_SCORE: overallRiskScore,
+    RISK_DATA_JSON: JSON.stringify(riskData) // Keep for any remaining client-side needs
   });
 }
 
@@ -1010,6 +1320,17 @@ async function renderImpactScoresPage(projectData) {
   const template = await loadTemplate('ImpactScores');
   return template({
     projectName: projectData?.projectName || 'Sample Project',
+    ProjectOverViewImpactScore: projectData?.projectOverviewImpactScore || 8,
+    ProjectAreaReviewImpactScore: projectData?.projectAreaReviewImpactScore || 8,
+    ProjectUnitDetailImpactScore: projectData?.projectUnitDetailImpactScore || 8,
+    ProjectPerformanceImpactScore: projectData?.projectPerformanceImpactScore || 8,
+    ProjectRiskImpactScore: projectData?.projectRiskImpactScore || 8,
+    ProjectPricingImpactScore: projectData?.investmentDetailImpactScore|| 8,
+    ProjectAmenitiesImpactScore: projectData?.projectAmenitiesImpactScore || 8,
+    ProjectLocationImpactScore: projectData?.projectLocationImpactScore || 8,
+    ProjectDeveloperImpactScore: projectData?.projectDeveloperImpactScore || 8,
+    YearWiseCashflowImpactScore: projectData?.yearWiseCashflowImpactScore || 8,
+    FutureAreaDevelopmentImpactScore: projectData?.futureAreaDevelopmentImpactScore || 8,
     impactScores: projectData?.impactScores || {
       overallScore: 8,
       categories: [
@@ -1612,9 +1933,9 @@ app.get("/download-pdf", async (req, res) => {
     const micromarketDemandAnalysisHtml = await renderMicromarketDemandAnalysisPage(micromarketData);
     const micromarketSupplyAnalysis1Html = await renderMicromarketSupplyAnalysis1Page(micromarketData);
     const micromarketSupplyAnalysis2Html = await renderMicromarketSupplyAnalysis2Page(micromarketData);
-    //const micromarketRentalAnalysisHtml = await renderMicromarketRentalAnalysisPage(projectData);
-    //const micromarketResaleAnalysisHtml = await renderMicromarketResaleAnalysisPage(projectData);
-    //const impactScoresHtml = await renderImpactScoresPage(projectData);
+    const micromarketRentalAnalysisHtml = await renderMicromarketRentalAnalysisPage(projectData);
+    const micromarketResaleAnalysisHtml = await renderMicromarketResaleAnalysisPage(projectData);
+    const impactScoresHtml = await renderImpactScoresPage(projectData);
 
     // Try a completely different approach - generate individual PDFs for each page and then merge them
     try {
@@ -1641,33 +1962,31 @@ app.get("/download-pdf", async (req, res) => {
       // Write the HTML files to disk
       fs.writeFileSync(path.join(pagesDir, "cover.html"), coverHtml);
       fs.writeFileSync(path.join(pagesDir, "disclaimer.html"), disclaimerHtml);
-      fs.writeFileSync(path.join(pagesDir, "overview.html"), overviewHtml);
-      // fs.writeFileSync(path.join(pagesDir, "details.html"), detailsHtml);
-      // fs.writeFileSync(path.join(pagesDir, "specs.html"), specsHtml);
+      
+      
       fs.writeFileSync(path.join(pagesDir, "supplyAndDemand.html"), supplyAndDemandHtml);
       fs.writeFileSync(path.join(pagesDir, "pricing.html"), pricingHtml);
-      // if (galleryHtml) {
-      //   fs.writeFileSync(path.join(pagesDir, "gallery.html"), galleryHtml);
-      // }
-      fs.writeFileSync(path.join(pagesDir, "recommendedStrategy.html"), recommendedStrategyHtml);
-      fs.writeFileSync(path.join(pagesDir, "investmentHighlight.html"), investmentHighlightHtml);
-      fs.writeFileSync(path.join(pagesDir, "yearlyCashflow.html"), yearlyCashflowHtml);
-      fs.writeFileSync(path.join(pagesDir, "P&Edevelopment.html"), pEDevelopmentHtml);
-      fs.writeFileSync(path.join(pagesDir, "about.html"), aboutHtml);
-      fs.writeFileSync(path.join(pagesDir, "contactUs.html"), contactUsHtml);
+      fs.writeFileSync(path.join(pagesDir, 'performance.html'), performanceHtml);
+      fs.writeFileSync(path.join(pagesDir, "overview.html"), overviewHtml);
       fs.writeFileSync(path.join(pagesDir, 'masterPlan.html'), masterPlanHtml);
       fs.writeFileSync(path.join(pagesDir, 'unitLevel.html'), unitLevelHtml);
-      fs.writeFileSync(path.join(pagesDir, 'projectComparison.html'), projectComparisonHtml);
-      fs.writeFileSync(path.join(pagesDir, 'performance.html'), performanceHtml);
       fs.writeFileSync(path.join(pagesDir, 'evalution.html'), evaluationHtml);
       fs.writeFileSync(path.join(pagesDir, 'projectRisk.html'), projectRiskHtml);
       fs.writeFileSync(path.join(pagesDir, 'googleReviews.html'), googleReviewsHtml);
+      fs.writeFileSync(path.join(pagesDir, "investmentHighlight.html"), investmentHighlightHtml);
+      fs.writeFileSync(path.join(pagesDir, "yearlyCashflow.html"), yearlyCashflowHtml);
+      fs.writeFileSync(path.join(pagesDir, "P&Edevelopment.html"), pEDevelopmentHtml);
       fs.writeFileSync(path.join(pagesDir, 'micromarketDemandAnalysis.html'), micromarketDemandAnalysisHtml);
       fs.writeFileSync(path.join(pagesDir, 'micromarketSupplyAnalysis1.html'), micromarketSupplyAnalysis1Html);
       fs.writeFileSync(path.join(pagesDir, 'micromarketSupplyAnalysis2.html'), micromarketSupplyAnalysis2Html);
-      //fs.writeFileSync(path.join(pagesDir, 'micromarketRentalAnalysis.html'), micromarketRentalAnalysisHtml);
-      // fs.writeFileSync(path.join(pagesDir, 'micromarketResaleAnalysis.html'), micromarketResaleAnalysisHtml);
-     // fs.writeFileSync(path.join(pagesDir, 'impactScores.html'), impactScoresHtml);
+      fs.writeFileSync(path.join(pagesDir, 'micromarketRentalAnalysis.html'), micromarketRentalAnalysisHtml);
+      fs.writeFileSync(path.join(pagesDir, 'micromarketResaleAnalysis.html'), micromarketResaleAnalysisHtml);
+      fs.writeFileSync(path.join(pagesDir, 'impactScores.html'), impactScoresHtml);
+      fs.writeFileSync(path.join(pagesDir, "recommendedStrategy.html"), recommendedStrategyHtml);
+      
+      fs.writeFileSync(path.join(pagesDir, 'projectComparison.html'), projectComparisonHtml);
+      fs.writeFileSync(path.join(pagesDir, "about.html"), aboutHtml);
+      fs.writeFileSync(path.join(pagesDir, "contactUs.html"), contactUsHtml);
 
       // Generate PDFs for each page
       const browser = await puppeteer.launch({
@@ -1756,33 +2075,29 @@ app.get("/download-pdf", async (req, res) => {
         // Generate PDFs for each page
         await generatePDF("cover.html", "cover.pdf");
         await generatePDF("disclaimer.html", "disclaimer.pdf");
-        await generatePDF("overview.html", "overview.pdf");
-        // await generatePDF("details.html", "details.pdf");
-        // await generatePDF("specs.html", "specs.pdf");
         await generatePDF("supplyAndDemand.html", "supplyAndDemand.pdf");
         await generatePDF("pricing.html", "pricing.pdf");
-        // if (galleryHtml) {
-        //   await generatePDF("gallery.html", "gallery.pdf");
-        // }
-        await generatePDF("recommendedStrategy.html", "recommendedStrategy.pdf");
-        await generatePDF("investmentHighlight.html", "investmentHighlight.pdf");
-        await generatePDF("yearlyCashflow.html", "yearlyCashflow.pdf");
-        await generatePDF("P&Edevelopment.html", "P&Edevelopment.pdf");
-        await generatePDF("about.html", "about.pdf");
-        await generatePDF("contactUs.html", "contactUs.pdf");
+        await generatePDF("performance.html", "performance.pdf");
+        await generatePDF("overview.html", "overview.pdf");
         await generatePDF("masterPlan.html", "masterPlan.pdf");
         await generatePDF("unitLevel.html", "unitLevel.pdf");
-        await generatePDF("projectComparison.html", "projectComparison.pdf");
-        await generatePDF("performance.html", "performance.pdf");
         await generatePDF("evalution.html", "evalution.pdf");
         await generatePDF("projectRisk.html", "projectRisk.pdf");
         await generatePDF("googleReviews.html", "googleReviews.pdf");
+        await generatePDF("investmentHighlight.html", "investmentHighlight.pdf");
+        await generatePDF("yearlyCashflow.html", "yearlyCashflow.pdf");
+        await generatePDF("P&Edevelopment.html", "P&Edevelopment.pdf");
         await generatePDF("micromarketDemandAnalysis.html", "micromarketDemandAnalysis.pdf");
         await generatePDF("micromarketSupplyAnalysis1.html", "micromarketSupplyAnalysis1.pdf");
         await generatePDF("micromarketSupplyAnalysis2.html", "micromarketSupplyAnalysis2.pdf");
-        //await generatePDF("micromarketRentalAnalysis.html", "micromarketRentalAnalysis.pdf");
-        // await generatePDF("micromarketResaleAnalysis.html", "micromarketResaleAnalysis.pdf");
-        //await generatePDF("impactScores.html", "impactScores.pdf");
+        await generatePDF("micromarketRentalAnalysis.html", "micromarketRentalAnalysis.pdf");
+        await generatePDF("micromarketResaleAnalysis.html", "micromarketResaleAnalysis.pdf");
+        await generatePDF("impactScores.html", "impactScores.pdf");
+        await generatePDF("recommendedStrategy.html", "recommendedStrategy.pdf");
+        await generatePDF("projectComparison.html", "projectComparison.pdf");
+        await generatePDF("about.html", "about.pdf");
+        await generatePDF("contactUs.html", "contactUs.pdf");
+        
 
         // Merge all PDF
         const { PDFDocument } = require("pdf-lib");
@@ -1849,9 +2164,9 @@ app.get("/download-pdf", async (req, res) => {
               "projectRisk.html","googleReviews.html", "investmentHighlight.html",
               "yearlyCashflow.html", "P&Edevelopment.html","micromarketDemandAnalysis.html",
               "micromarketSupplyAnalysis1.html", "micromarketSupplyAnalysis2.html",
-              //"micromarketRentalAnalysis.html", 
-              // "micromarketResaleAnalysis.html",
-               //"impactScores.html",
+              "micromarketRentalAnalysis.html", 
+              "micromarketResaleAnalysis.html",
+              "impactScores.html",
                "recommendedStrategy.html", "projectComparison.html",
                "about.html", "contactUs.html", 
             ];
