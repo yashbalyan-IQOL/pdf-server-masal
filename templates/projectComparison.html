@@ -6,8 +6,11 @@
     <title>Projects Comparison For Investment</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
+    <link
+    href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Montserrat:wght@400;500;600;700&family=Lato:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
       @page {
         size: 1920px 1080px;
         margin: 0;
@@ -90,6 +93,13 @@
         font-size: 24px;
       }
 
+      .comparison-table td {
+        font-family: 'Lato', sans-serif;
+      }
+      .comparison-table td:first-child {
+        font-family: 'Montserrat', sans-serif;
+        text-align: left;
+      }
       .comparison-table th {
         background-color: #f8f8f8;
         color: #333;
@@ -154,6 +164,24 @@
         font-size: 60px;
         color: #FFB74D;
       }
+      .back-to-top {
+      position: fixed;
+      bottom: 80px;
+      right: 80px;
+      height: 72px;
+      width: 72px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      z-index: 100;
+    }
+    
+    .back-to-top img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
     </style>
   </head>
   <body>
@@ -163,92 +191,78 @@
     
     <div class="header">
       <h1>Projects Comparison For investment</h1>
-      <div class="whatsapp-banner">
-        <div class="whatsapp-icon">
-          <img src="../assets/logos/whatsapp.png" alt="WhatsApp Icon" height="45px" width="45px"/>
-        </div>
-        Want to invest? <a href="#" class="link">Click here</a>
-      </div>
     </div>
 
     <table class="comparison-table">
       <tr>
         <th>Type</th>
-        <th>Birla Trimaya</th>
-        <th>Tata Caranctic</th>
-        <th>Assetz Ragam</th>
-        <th>Prestige Rain Tree</th>
+        {{#each projectData.projects}}
+        <th>{{this.name}}</th>
+        {{/each}}
       </tr>
       <tr>
         <td>Configuration</td>
-        <td>2, 3 & 4 BHKs</td>
-        <td>2, 3 & 4 BHKs</td>
-        <td>2, 3 & 4 BHKs</td>
-        <td>2, 3 & 4 BHKs</td>
+        {{#each projectData.projects}}
+        <td>{{this.config}}</td>
+        {{/each}}
       </tr>
       <tr>
         <td>Gross buying Price</td>
-        <td>₹1.25 Crs</td>
-        <td>₹1.25 Crs</td>
-        <td>₹1.25 Crs</td>
-        <td>₹1.25 Crs</td>
+        {{#each projectData.projects}}
+        <td>{{this.price}}</td>
+        {{/each}}
       </tr>
       <tr>
         <td>Value</td>
-        <td>Undervalued</td>
-        <td>Undervalued</td>
-        <td>Undervalued</td>
-        <td>Undervalued</td>
+        {{#each projectData.projects}}
+        <td>{{this.value}}</td>
+        {{/each}}
       </tr>
       <tr>
         <td>Current Price (per sq.ft)</td>
-        <td>₹12,500</td>
-        <td>₹12,500</td>
-        <td>₹12,500</td>
-        <td>₹12,500</td>
+        {{#each projectData.projects}}
+        <td>{{this.currentPrice}} Sqft</td>
+        {{/each}}
       </tr>
       <tr>
         <td>Future Expected Price (Per sq. ft.)</td>
-        <td>₹14,500</td>
-        <td>₹14,500</td>
-        <td>₹14,500</td>
-        <td>₹14,500</td>
+        {{#each projectData.projects}}
+        <td>{{this.futurePrice}} Sqft</td>
+        {{/each}}
       </tr>
       <tr>
         <td>Title clearance / Project Risk</td>
-        <td>Low</td>
-        <td>Low</td>
-        <td class="high-risk">High</td>
-        <td>Low</td>
+        {{#each projectData.projects}}
+        <td>{{this.risk}}</td>
+        {{/each}}
       </tr>
       <tr>
         <td>CAGR</td>
-        <td>9.8%</td>
-        <td>9.8%</td>
-        <td>9.8%</td>
-        <td>9.8%</td>
+        {{#each projectData.projects}}
+        <td>{{this.cagr}}</td>
+        {{/each}}
       </tr>
       <tr class="irr-row">
         <td>IRR (4 years from launch date)</td>
-        <td>18.25%</td>
-        <td>18.25%</td>
-        <td>18.25%</td>
-        <td>18.25%</td>
+        {{#each projectData.projects}}
+        <td>{{this.irr}}</td>
+        {{/each}}
       </tr>
       <tr>
         <td>Net Cash Outflow- 85% Loan (In Lacs)</td>
-        <td>₹87 Lac</td>
-        <td>₹87 Lac</td>
-        <td>₹87 Lac</td>
-        <td>₹87 Lac</td>
+        {{#each projectData.projects}}
+        <td>{{this.cashOutflow}}</td>
+        {{/each}}
       </tr>
       <tr class="profit-row">
         <td>Total expected profit (In Lacs)</td>
-        <td>28 mn Sqft</td>
-        <td>28 mn Sqft</td>
-        <td>28 mn Sqft</td>
-        <td>28 mn Sqft</td>
+        {{#each projectData.projects}}
+        <td>{{this.profit}}</td>
+        {{/each}}
       </tr>
     </table>
+    <div class="back-to-top">
+      <img src="../assets/logos/truestate.png" alt="TruEstate Logo" style="width: 100%; height: 100%; object-fit: contain;">
+  </div>
   </body>
 </html>

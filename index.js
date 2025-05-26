@@ -329,13 +329,18 @@ function renderRecommendedStrategyPage(projectData) {
 }
 
 // Process and render the investment highlight page
-function renderInvestmentHighlightPage(projectData,data2,response) {
+function renderInvestmentHighlightPage(projectData, data2, response) {
   const template = loadTemplate("investmentHighlight");
-  
+
+  const assetContext = projectData?.assetType === "apartment" || projectData?.assetType === "villa"
+    ? `${projectData?.configurations[0]} measuring ${projectData?.data[0]?.superBuiltUpArea} sq.ft`
+    : projectData?.assetType === "plot"
+      ? `${projectData?.configurations[0]} `: "3BHK measuring 1200 sq.ft"
+      
   return template({
     PROJECT_NAME: projectData.projectName || "Unnamed Project",
-    XIRR: response?.data?.xirr ,
-    CAGR: (projectData?.cagr),
+    XIRR: response?.data?.xirr,
+    CAGR: projectData?.cagr,
     EQUIVALENT_MULTIPLE: response?.data?.equity_multiplier ,
     HOLDING_PERIOD: 4,
     TENURE: 20,
@@ -347,8 +352,9 @@ function renderInvestmentHighlightPage(projectData,data2,response) {
     SELLING_PRICE: formatCurrency(data2?.finalPrice || 0),
     TOTAL_INVESTMENT: (formatCurrency(response?.data?.total_investment)),
     TOTAL_RETURN: (formatCurrency(response?.data?.total_returns)),
-    asset : projectData?.configurations[0]|| "3BHK",
-    area : projectData?.data[0].plotArea || 0,
+    asset : assetContext,
+    TRUEESTATE_SCORE: response?.data?.impact_score || 1,
+    
   });
 }
 
@@ -570,23 +576,29 @@ function renderContactUsPage(projectData) {
 // Process and render the master plan page
 function renderMasterPlanPage(projectData, masterPlanImage) {
   const template = loadTemplate("masterPlan");
-  console.log("projectData image", projectData?.masterPlan[0]);
+  
+  // Default values for master plan data
+  const defaultMasterPlan = "../assets/images/master-plan.png";
+  
+  // Safely access masterPlan data with fallbacks
+  const masterPlanUrl = projectData?.masterPlan?.[0] || masterPlanImage || defaultMasterPlan;
+  
   return template({
-    PROJECT_NAME: projectData.projectName || "---",
-    LOADING: projectData.loading || "---",
-    UDS: projectData.uds || "---",
-    TOTAL_UNITS: projectData.totalUnits || "---",
-    PROJECT_SIZE: projectData.projectLandArea || "---",
-    OPEN_AREA: projectData.openAreaPercentage || "---",
-    CONSTRUCTION_QUALITY: projectData.constructionQuality || "---",
-    ROAD_WIDTH: projectData.accessRoadWidth || "---",
-    CONSTRUCTION_PARTNER: projectData.constructionPartner || "---",
-    PROJECT_DENSITY: projectData.projectDensity || "---",
-    MASTER_PLAN_IMAGE: projectData?.masterPlan[0] || "../assets/images/master-plan.png",
-    PENDING_PHASES: projectData.pendingPhases || "---",
-    GREEN_ZONE: projectData.greenZone || "---",
-    // COMPLETED_PHASES: projectData.completedPhases || "---",
-    // UNDER_CONSTRUCTION_PHASES: projectData.underConstructionPhases || "---",
+    PROJECT_NAME: projectData?.projectName || "---",
+    LOADING: projectData?.loading || "---",
+    UDS: projectData?.uds || "---",
+    UDS_IMPACT: projectData?.udsImpactScore || 'medium',
+    TOTAL_UNITS: projectData?.totalUnits || "---",
+    PROJECT_SIZE: projectData?.projectLandArea || "---",
+    OPEN_AREA: projectData?.openAreaPercentage || "---",
+    CONSTRUCTION_QUALITY: projectData?.constructionQuality || "---",
+    ROAD_WIDTH: projectData?.accessRoadWidth || "---",
+    CONSTRUCTION_PARTNER: projectData?.constructionPartner || "---",
+    PROJECT_DENSITY: projectData?.projectDensity || "---",
+    MASTER_PLAN_IMAGE: masterPlanUrl,
+    PENDING_PHASES: projectData?.pendingPhases || "---",
+    GREEN_ZONE: projectData?.greenZone || "---",
+    TRUEESTATE_SCORE: projectData?.projectOverviewImpactScore || 8
   });
 }
 
@@ -666,74 +678,113 @@ function renderUnitLevelPage(projectData, unitLevelImage) {
   });
 }
 // Process and render the project comparison page
-function renderProjectComparisonPage(projectData) {
+async function renderProjectComparisonPage(propertyData) {
   const template = loadTemplate("projectComparison");
-  return template({
-    PROJECT_NAME: projectData.projectName || "Unnamed Project",
-    COMPARISON_DATA: projectData.comparisonData || {
-      projects: [
-        {
-          name: "Birla Trimaya",
-          config: "2, 3 & 4 BHKs",
-          price: "₹1.25 Crs",
-          value: "Undervalued",
-          currentPrice: "₹12,500",
-          futurePrice: "₹14,500",
-          risk: "Low",
-          cagr: "9.8%",
-          irr: "18.25%",
-          cashOutflow: "₹87 Lac",
-          profit: "28 mn Sqft"
-        },
-        {
-          name: "Tata Caranctic",
-          config: "2, 3 & 4 BHKs",
-          price: "₹1.25 Crs",
-          value: "Undervalued",
-          currentPrice: "₹12,500",
-          futurePrice: "₹14,500",
-          risk: "Low",
-          cagr: "9.8%",
-          irr: "18.25%",
-          cashOutflow: "₹87 Lac",
-          profit: "28 mn Sqft"
-        },
-        {
-          name: "Assetz Ragam",
-          config: "2, 3 & 4 BHKs",
-          price: "₹1.25 Crs",
-          value: "Undervalued",
-          currentPrice: "₹12,500",
-          futurePrice: "₹14,500",
-          risk: "High",
-          cagr: "9.8%",
-          irr: "18.25%",
-          cashOutflow: "₹87 Lac",
-          profit: "28 mn Sqft"
-        },
-        {
-          name: "Prestige Rain Tree",
-          config: "2, 3 & 4 BHKs",
-          price: "₹1.25 Crs",
-          value: "Undervalued",
-          currentPrice: "₹12,500",
-          futurePrice: "₹14,500",
-          risk: "Low",
-          cagr: "9.8%",
-          irr: "18.25%",
-          cashOutflow: "₹87 Lac",
-          profit: "28 mn Sqft"
-        }
-      ]
+
+  // Default comparison data if none exists
+  const defaultProjects = [
+    {
+      name: "Birla Trimaya",
+      config: "2, 3 & 4 BHKs",
+      price: "₹1.25 Crs",
+      value: "Undervalued",
+      currentPrice: "₹12,500",
+      futurePrice: "₹14,500",
+      risk: "Low",
+      cagr: "9.8%",
+      irr: "18.25%",
+      cashOutflow: "₹87 Lac",
+      profit: "28 mn Sqft"
+    },
+    {
+      name: "Tata Caranctic",
+      config: "2, 3 & 4 BHKs",
+      price: "₹1.25 Crs",
+      value: "Undervalued",
+      currentPrice: "₹12,500",
+      futurePrice: "₹14,500",
+      risk: "Low",
+      cagr: "9.8%",
+      irr: "18.25%",
+      cashOutflow: "₹87 Lac",
+      profit: "28 mn Sqft"
     }
-  });
+  ];
+
+  // If no comparison data exists, return template with default data
+  if (!propertyData?.projectComparison) {
+    return template({
+      PROJECT_NAME: propertyData?.projectName || "Unnamed Project",
+      projectData: { projects: defaultProjects }
+    });
+  }
+
+  let projects = [];
+  const risk = (value) => {
+    if (!value) return "Low";
+    if (value < 4) return "Low";
+    if (value <= 7) return "Medium";
+    return "High";
+  };
+
+  try {
+    // Process each comparison item
+    for (let i = 1; i <= 3; i++) {
+      const projectID = propertyData?.projectComparison[`project${i}`]?.id;
+      if (!projectID) continue;
+
+      const projectDoc = await db.collection("assetData").doc(projectID).get();
+      if (!projectDoc.exists) continue;
+
+      const project = projectDoc.data();
+      projects.push({
+        name: project.projectName  || "Unknown Project",
+        config: project.configurations?.join(", ") || "---",
+        value: project.truValue || "---",
+        currentPrice: project.commonPricePerSqft || "---",
+        futurePrice: formatCost(parseInt(project?.commonPricePerSqft * (Math.pow((1 + (project?.cagr / 100)), 4))))|| "---",
+        cagr: project.cagr || "---",
+        irr: project.irr || "---",
+        cashOutflow: project.cashOutflow || "---",
+        profit: project.profit || "---",
+        risk: risk(project.projectRiskImpactScore),
+        netcashflow: project.netCashflow || "---",
+        price: project.price || "---"
+      });
+    }
+
+    // If no projects were successfully processed, use defaults
+    if (projects.length === 0) {
+      projects = defaultProjects;
+    }
+
+    return template({
+      PROJECT_NAME: propertyData.projectName || "Unnamed Project",
+      projectData: { projects }
+    });
+  } catch (error) {
+    console.error("Error processing project comparison:", error);
+    // Return default data if there's an error
+    return template({
+      PROJECT_NAME: propertyData.projectName || "Unnamed Project",
+      projectData: { projects: defaultProjects }
+    });
+  }
 }
 
 // Process and render the performance page
-function renderPerformancePage(projectData) {
+async function renderPerformancePage(projectData) {
   const template = loadTemplate("performance");
+
+  // const projectComparisonData = projectData?.projectComparison;
+
+  // const projectDoc = await db.collection("assetData").doc(projectComparisonData.project1.value).get();
+  // const projectOptions = projectDoc.data().configurations;
+
+
   return template({
     PROJECT_NAME: projectData.projectName || "Unnamed Project",
+    
     PERFORMANCE_DATA: projectData.performanceData || {
       metrics: [
         {
@@ -1124,11 +1175,12 @@ async function renderGoogleReviewsPage(projectData) {
 }
 
 // Process and render the micromarket demand analysis page
-async function renderMicromarketDemandAnalysisPage(projectData) {
+async function renderMicromarketDemandAnalysisPage(micromarketData) {
   const template = await loadTemplate('MicromarketDemandAnalysis');
   return template({
-    projectName: projectData?.projectName || 'Sample Project',
-    micromarketData: projectData?.micromarketData || {
+    projectName: micromarketData?.projectName || 'Sample Project',
+    TRUEESTATE_SCORE: micromarketData?.demandImpactScore || 8,
+    micromarketData: micromarketData?.micromarketData || {
       demandAnalysis: {
         currentDemand: '16%',
         futureDemand: '24%',
@@ -1171,11 +1223,12 @@ async function renderMicromarketDemandAnalysisPage(projectData) {
 }
 
 // Process and render the micromarket supply analysis page 1
-async function renderMicromarketSupplyAnalysis1Page(projectData) {
-  const template = await loadTemplate('MircomarketSupplyAnalysis1');
+async function renderMicromarketSupplyAnalysis1Page(micromarketData) {
+  const template = await loadTemplate('MicromarketSupplyAnalysis1');
   return template({
-    projectName: projectData?.projectName || 'Sample Project',
-    supplyData: projectData?.supplyData || {
+    projectName: micromarketData?.projectName || 'Sample Project',
+    TRUEESTATE_SCORE: micromarketData?.supplyImpactScore || 8,
+    supplyData: micromarketData?.supplyData || {
       parameters: [
         {
           name: 'Devanahalli Business Park',
@@ -1215,11 +1268,12 @@ async function renderMicromarketSupplyAnalysis1Page(projectData) {
 }
 
 // Process and render the micromarket supply analysis page 2
-async function renderMicromarketSupplyAnalysis2Page(projectData) {
+async function renderMicromarketSupplyAnalysis2Page(micromarketData) {
   const template = await loadTemplate('MicromarketSupplyAnalysis2');
   return template({
-    projectName: projectData?.projectName || 'Sample Project',
-    supplyData2: projectData?.supplyData2 || {
+    TRUEESTATE_SCORE: micromarketData?.supplyImpactScore || 8,
+
+    supplyData2: micromarketData?.supplyData2 || {
       parameters: [
         {
           name: 'Devanahalli Business Park',
@@ -1289,19 +1343,39 @@ async function renderMicromarketResaleAnalysisPage(projectData) {
 // Process and render the impact scores page
 async function renderImpactScoresPage(projectData) {
   const template = await loadTemplate('ImpactScores');
+  const impact = (value) =>{
+    if(value >= 8){
+      return 'high';
+    }else if(value >= 4){
+      return 'medium';
+    }else{
+      return 'low';
+    }
+  }
   return template({
     projectName: projectData?.projectName || 'Sample Project',
     ProjectOverViewImpactScore: projectData?.projectOverviewImpactScore || 8,
+    ProjectOverViewImpactScoreClass: impact(projectData?.projectOverviewImpactScore) || 'high',
     ProjectAreaReviewImpactScore: projectData?.projectAreaReviewImpactScore || 8,
+    ProjectAreaReviewImpactScoreClass: impact(projectData?.projectAreaReviewImpactScore) || 'high',
     ProjectUnitDetailImpactScore: projectData?.projectUnitDetailImpactScore || 8,
+    ProjectUnitDetailImpactScoreClass: impact(projectData?.projectUnitDetailImpactScore) || 'high',
     ProjectPerformanceImpactScore: projectData?.projectPerformanceImpactScore || 8,
+    ProjectPerformanceImpactScoreClass: impact(projectData?.projectPerformanceImpactScore) || 'high',
     ProjectRiskImpactScore: projectData?.projectRiskImpactScore || 8,
+    ProjectRiskImpactScoreClass: impact(projectData?.projectRiskImpactScore) || 'high',
     ProjectPricingImpactScore: projectData?.investmentDetailImpactScore|| 8,
+    ProjectPricingImpactScoreClass: impact(projectData?.investmentDetailImpactScore) || 'high',
     ProjectAmenitiesImpactScore: projectData?.projectAmenitiesImpactScore || 8,
+    ProjectAmenitiesImpactScoreClass: impact(projectData?.projectAmenitiesImpactScore) || 'high',
     ProjectLocationImpactScore: projectData?.projectLocationImpactScore || 8,
+    ProjectLocationImpactScoreClass: impact(projectData?.projectLocationImpactScore) || 'high',
     ProjectDeveloperImpactScore: projectData?.projectDeveloperImpactScore || 8,
+    ProjectDeveloperImpactScoreClass: impact(projectData?.projectDeveloperImpactScore) || 'high',
     YearWiseCashflowImpactScore: projectData?.yearWiseCashflowImpactScore || 8,
+    YearWiseCashflowImpactScoreClass: impact(projectData?.yearWiseCashflowImpactScore) || 'high',
     FutureAreaDevelopmentImpactScore: projectData?.futureAreaDevelopmentImpactScore || 8,
+    FutureAreaDevelopmentImpactScoreClass: impact(projectData?.futureAreaDevelopmentImpactScore) || 'high',
     impactScores: projectData?.impactScores || {
       overallScore: 8,
       categories: [
@@ -1931,33 +2005,43 @@ app.get("/download-pdf", async (req, res) => {
       }
 
       // Write the HTML files to disk
-      fs.writeFileSync(path.join(pagesDir, "cover.html"), coverHtml);
-      fs.writeFileSync(path.join(pagesDir, "disclaimer.html"), disclaimerHtml);
+      fs.writeFileSync(path.join(pagesDir, "cover.html"), await coverHtml);
+      fs.writeFileSync(path.join(pagesDir, "disclaimer.html"), await disclaimerHtml);
+      fs.writeFileSync(path.join(pagesDir, "supplyAndDemand.html"), await supplyAndDemandHtml);
+      fs.writeFileSync(path.join(pagesDir, "pricing.html"), await pricingHtml);
+      fs.writeFileSync(path.join(pagesDir, 'performance.html'), await performanceHtml);
+      fs.writeFileSync(path.join(pagesDir, "overview.html"), await overviewHtml);
+      fs.writeFileSync(path.join(pagesDir, 'masterPlan.html'), await masterPlanHtml);
+      fs.writeFileSync(path.join(pagesDir, 'unitLevel.html'), await unitLevelHtml);
+
+      // Only write evaluation.html if thingsNearProject exists
+      if (projectData?.thingsNearProject) {
+        fs.writeFileSync(path.join(pagesDir, 'evaluation.html'), await evaluationHtml);
+      }
+
+      // Only write projectRisk.html if projectRisk exists
+      if (projectData?.projectRisk) {
+        fs.writeFileSync(path.join(pagesDir, 'projectRisk.html'), await projectRiskHtml);
+      }
+
+      fs.writeFileSync(path.join(pagesDir, 'googleReviews.html'), await googleReviewsHtml);
+      fs.writeFileSync(path.join(pagesDir, "investmentHighlight.html"), await investmentHighlightHtml);
+      fs.writeFileSync(path.join(pagesDir, "yearlyCashflow.html"), await yearlyCashflowHtml);
       
-      
-      fs.writeFileSync(path.join(pagesDir, "supplyAndDemand.html"), supplyAndDemandHtml);
-      fs.writeFileSync(path.join(pagesDir, "pricing.html"), pricingHtml);
-      fs.writeFileSync(path.join(pagesDir, 'performance.html'), performanceHtml);
-      fs.writeFileSync(path.join(pagesDir, "overview.html"), overviewHtml);
-      fs.writeFileSync(path.join(pagesDir, 'masterPlan.html'), masterPlanHtml);
-      fs.writeFileSync(path.join(pagesDir, 'unitLevel.html'), unitLevelHtml);
-      fs.writeFileSync(path.join(pagesDir, 'evalution.html'), evaluationHtml);
-      fs.writeFileSync(path.join(pagesDir, 'projectRisk.html'), projectRiskHtml);
-      fs.writeFileSync(path.join(pagesDir, 'googleReviews.html'), googleReviewsHtml);
-      fs.writeFileSync(path.join(pagesDir, "investmentHighlight.html"), investmentHighlightHtml);
-      fs.writeFileSync(path.join(pagesDir, "yearlyCashflow.html"), yearlyCashflowHtml);
-      fs.writeFileSync(path.join(pagesDir, "P&Edevelopment.html"), pEDevelopmentHtml);
-      fs.writeFileSync(path.join(pagesDir, 'micromarketDemandAnalysis.html'), micromarketDemandAnalysisHtml);
-      fs.writeFileSync(path.join(pagesDir, 'micromarketSupplyAnalysis1.html'), micromarketSupplyAnalysis1Html);
-      fs.writeFileSync(path.join(pagesDir, 'micromarketSupplyAnalysis2.html'), micromarketSupplyAnalysis2Html);
-      fs.writeFileSync(path.join(pagesDir, 'micromarketRentalAnalysis.html'), micromarketRentalAnalysisHtml);
-      fs.writeFileSync(path.join(pagesDir, 'micromarketResaleAnalysis.html'), micromarketResaleAnalysisHtml);
-      fs.writeFileSync(path.join(pagesDir, 'impactScores.html'), impactScoresHtml);
-      fs.writeFileSync(path.join(pagesDir, "recommendedStrategy.html"), recommendedStrategyHtml);
-      
-      fs.writeFileSync(path.join(pagesDir, 'projectComparison.html'), projectComparisonHtml);
-      fs.writeFileSync(path.join(pagesDir, "about.html"), aboutHtml);
-      fs.writeFileSync(path.join(pagesDir, "contactUs.html"), contactUsHtml);
+      if(micromarketData){
+        fs.writeFileSync(path.join(pagesDir, "P&Edevelopment.html"), await pEDevelopmentHtml);
+        fs.writeFileSync(path.join(pagesDir, 'micromarketDemandAnalysis.html'), await micromarketDemandAnalysisHtml);
+        fs.writeFileSync(path.join(pagesDir, 'micromarketSupplyAnalysis1.html'), await micromarketSupplyAnalysis1Html);
+        fs.writeFileSync(path.join(pagesDir, 'micromarketSupplyAnalysis2.html'), await micromarketSupplyAnalysis2Html);
+        fs.writeFileSync(path.join(pagesDir, 'micromarketRentalAnalysis.html'), await micromarketRentalAnalysisHtml);
+        fs.writeFileSync(path.join(pagesDir, 'micromarketResaleAnalysis.html'), await micromarketResaleAnalysisHtml);
+      }
+
+      fs.writeFileSync(path.join(pagesDir, 'impactScores.html'), await impactScoresHtml);
+      fs.writeFileSync(path.join(pagesDir, "recommendedStrategy.html"), await recommendedStrategyHtml);
+      fs.writeFileSync(path.join(pagesDir, 'projectComparison.html'), await projectComparisonHtml);
+      fs.writeFileSync(path.join(pagesDir, "about.html"), await aboutHtml);
+      fs.writeFileSync(path.join(pagesDir, "contactUs.html"), await contactUsHtml);
 
       // Generate PDFs for each page
       const browser = await puppeteer.launch({
@@ -1979,6 +2063,13 @@ app.get("/download-pdf", async (req, res) => {
         // Helper function to generate PDF for a page
         async function generatePDF(htmlFile, pdfFile) {
           try {
+            // Check if the HTML file exists before trying to generate PDF
+            const htmlPath = path.join(pagesDir, htmlFile);
+            if (!fs.existsSync(htmlPath)) {
+              console.log(`Skipping ${htmlFile} - file does not exist`);
+              return;
+            }
+
             const page = await browser.newPage();
             await page.setViewport({
               width: 1920,
@@ -1993,7 +2084,7 @@ app.get("/download-pdf", async (req, res) => {
               });
             });
 
-            await page.goto(`file://${path.join(pagesDir, htmlFile)}`, {
+            await page.goto(`file://${htmlPath}`, {
               waitUntil: ['networkidle0', 'domcontentloaded'],
               timeout: 30000
             });
@@ -2052,17 +2143,30 @@ app.get("/download-pdf", async (req, res) => {
         await generatePDF("overview.html", "overview.pdf");
         await generatePDF("masterPlan.html", "masterPlan.pdf");
         await generatePDF("unitLevel.html", "unitLevel.pdf");
-        await generatePDF("evalution.html", "evalution.pdf");
-        await generatePDF("projectRisk.html", "projectRisk.pdf");
+        
+        // Only generate evaluation.pdf if the HTML file exists
+        if (projectData?.thingsNearProject) {
+          await generatePDF("evaluation.html", "evaluation.pdf");
+        }
+        
+        // Only generate projectRisk.pdf if the HTML file exists
+        if (projectData?.projectRisk) {
+          await generatePDF("projectRisk.html", "projectRisk.pdf");
+        }
+
         await generatePDF("googleReviews.html", "googleReviews.pdf");
         await generatePDF("investmentHighlight.html", "investmentHighlight.pdf");
         await generatePDF("yearlyCashflow.html", "yearlyCashflow.pdf");
-        await generatePDF("P&Edevelopment.html", "P&Edevelopment.pdf");
-        await generatePDF("micromarketDemandAnalysis.html", "micromarketDemandAnalysis.pdf");
-        await generatePDF("micromarketSupplyAnalysis1.html", "micromarketSupplyAnalysis1.pdf");
-        await generatePDF("micromarketSupplyAnalysis2.html", "micromarketSupplyAnalysis2.pdf");
-        await generatePDF("micromarketRentalAnalysis.html", "micromarketRentalAnalysis.pdf");
-        await generatePDF("micromarketResaleAnalysis.html", "micromarketResaleAnalysis.pdf");
+        
+        if(micromarketData){
+          await generatePDF("P&Edevelopment.html", "P&Edevelopment.pdf");
+          await generatePDF("micromarketDemandAnalysis.html", "micromarketDemandAnalysis.pdf");
+          await generatePDF("micromarketSupplyAnalysis1.html", "micromarketSupplyAnalysis1.pdf");
+          await generatePDF("micromarketSupplyAnalysis2.html", "micromarketSupplyAnalysis2.pdf");
+          await generatePDF("micromarketRentalAnalysis.html", "micromarketRentalAnalysis.pdf");
+          await generatePDF("micromarketResaleAnalysis.html", "micromarketResaleAnalysis.pdf");
+        }
+
         await generatePDF("impactScores.html", "impactScores.pdf");
         await generatePDF("recommendedStrategy.html", "recommendedStrategy.pdf");
         await generatePDF("projectComparison.html", "projectComparison.pdf");

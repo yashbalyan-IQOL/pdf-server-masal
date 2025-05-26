@@ -6,7 +6,10 @@
     <title>TruEstate Impact Scores - Summary</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Montserrat:wght@400;500;600;700&family=Lato:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <style>
       @page {
         size: 1920px 1080px;
@@ -138,6 +141,17 @@
         height: 25px;
         background-color: #333;
         border-radius: 4px;
+       
+      }
+      .low-impact .impact-marker {
+        left: 16.7%;
+      }
+
+      .medium-impact .impact-marker {
+        left: 50%;
+      }
+
+      .high-impact .impact-marker {
         left: 83.3%;
       }
       
@@ -209,7 +223,7 @@
             <tr>
                 <td>Project (Overview, Master Plan and Unit Detail)</td>
                 <td class="impact-column">
-                    <div class="impact-indicator">
+                    <div class="impact-indicator {{ProjectOverViewImpactScoreClass}}-impact">
                         <div class="impact-level">
                             <div class="impact-red"></div>
                             <div class="impact-yellow"></div>
@@ -217,14 +231,14 @@
                         </div>
                         <div class="impact-marker"></div>
                     </div>
-                    <div class="impact-text">High</div>
+                    <div class="impact-text">{{ProjectOverViewImpactScoreClass}}</div>
                 </td>
                 <td>{{ProjectOverViewImpactScore}}</td>
             </tr>
             <tr>
                 <td>Project - Area Review</td>
                 <td class="impact-column">
-                    <div class="impact-indicator">
+                    <div class="impact-indicator {{ProjectAreaReviewImpactScoreClass}}-impact">
                         <div class="impact-level">
                             <div class="impact-red"></div>
                             <div class="impact-yellow"></div>
@@ -232,29 +246,29 @@
                         </div>
                         <div class="impact-marker"></div>
                     </div>
-                    <div class="impact-text">High</div>
+                    <div class="impact-text">{{ProjectAreaReviewImpactScoreClass}}</div>
                 </td>
                 <td>{{ProjectAreaReviewImpactScore}}</td>
             </tr>
             <tr>
                 <td>Project - Risk Evaluation</td>
                 <td class="impact-column">
-                    <div class="impact-indicator">
-                        <div class="impact-level">
+                    <div class="impact-indicator {{ProjectRiskImpactScoreClass}}-impact">
+                        <div class="impact-level ">
                             <div class="impact-red"></div>
                             <div class="impact-yellow"></div>
                             <div class="impact-green"></div>
                         </div>
                         <div class="impact-marker"></div>
                     </div>
-                    <div class="impact-text">High</div>
+                    <div class="impact-text">{{ProjectRiskImpactScoreClass}}</div>
                 </td>
-                <td>{{ProjectUnitDetailImpactScore}}</td>
+                <td>{{ProjectRiskImpactScore}}</td>
             </tr>
             <tr>
                 <td>Project - Developer Review on Google</td>
                 <td class="impact-column">
-                    <div class="impact-indicator">
+                    <div class="impact-indicator {{ProjectPerformanceImpactScoreClass}}-impact">
                         <div class="impact-level">
                             <div class="impact-red"></div>
                             <div class="impact-yellow"></div>
@@ -262,14 +276,14 @@
                         </div>
                         <div class="impact-marker"></div>
                     </div>
-                    <div class="impact-text">High</div>
+                    <div class="impact-text">{{ProjectPerformanceImpactScoreClass}}</div>
                 </td>
                 <td>{{ProjectPerformanceImpactScore}}</td>
             </tr>
             <tr>
                 <td>Project - Investment Details</td>
                 <td class="impact-column">
-                    <div class="impact-indicator">
+                    <div class="impact-indicator {{ProjectPricingImpactScoreClass}}-impact">
                         <div class="impact-level">
                             <div class="impact-red"></div>
                             <div class="impact-yellow"></div>
@@ -277,14 +291,14 @@
                         </div>
                         <div class="impact-marker"></div>
                     </div>
-                    <div class="impact-text">High</div>
+                    <div class="impact-text">{{ProjectPricingImpactScoreClass}}</div>
                 </td>
                 <td>{{ProjectPricingImpactScore}}</td>
             </tr>
             <tr>
                 <td>Year-wise Cashflows</td>
                 <td class="impact-column">
-                    <div class="impact-indicator">
+                    <div class="impact-indicator {{YearWiseCashflowImpactScoreClass}}-impact">
                         <div class="impact-level">
                             <div class="impact-red"></div>
                             <div class="impact-yellow"></div>
@@ -292,14 +306,14 @@
                         </div>
                         <div class="impact-marker"></div>
                     </div>
-                    <div class="impact-text">High</div>
+                    <div class="impact-text">{{YearWiseCashflowImpactScoreClass}}</div>
                 </td>
                 <td>{{YearWiseCashflowImpactScore}}</td>
             </tr>
             <tr>
                 <td>Future Area Development Plans</td>
                 <td class="impact-column">
-                    <div class="impact-indicator">
+                    <div class="impact-indicator {{FutureAreaDevelopmentImpactScoreClass}}-impact">
                         <div class="impact-level">
                             <div class="impact-red"></div>
                             <div class="impact-yellow"></div>
@@ -307,14 +321,14 @@
                         </div>
                         <div class="impact-marker"></div>
                     </div>
-                    <div class="impact-text">High</div>
+                    <div class="impact-text">{{FutureAreaDevelopmentImpactScoreClass}}</div>
                 </td>
                 <td>{{FutureAreaDevelopmentImpactScore}}</td>
             </tr>
             <tr>
                 <td>Micromarket - Demand Analysis</td>
                 <td class="impact-column">
-                    <div class="impact-indicator">
+                    <div class="impact-indicator {{MicromarketDemandAnalysisImpactScoreClass}}-impact">
                         <div class="impact-level">
                             <div class="impact-red"></div>
                             <div class="impact-yellow"></div>
@@ -322,14 +336,14 @@
                         </div>
                         <div class="impact-marker"></div>
                     </div>
-                    <div class="impact-text">High</div>
+                    <div class="impact-text">{{MicromarketDemandAnalysisImpactScoreClass}}</div>
                 </td>
                 <td>{{MicromarketDemandAnalysisImpactScore}}</td>
             </tr>
             <tr>
                 <td>Micromarket - Supply Analysis</td>
                 <td class="impact-column">
-                    <div class="impact-indicator">
+                    <div class="impact-indicator {{MicromarketSupplyAnalysisImpactScoreClass}}-impact">
                         <div class="impact-level">
                             <div class="impact-red"></div>
                             <div class="impact-yellow"></div>
@@ -337,14 +351,14 @@
                         </div>
                         <div class="impact-marker"></div>
                     </div>
-                    <div class="impact-text">High</div>
+                    <div class="impact-text">{{MicromarketSupplyAnalysisImpactScoreClass}}</div>
                 </td>
                 <td>{{MicromarketSupplyAnalysisImpactScore}}</td>
             </tr>
             <tr>
                 <td>Micromarket - Rental Analysis</td>
                 <td class="impact-column">
-                    <div class="impact-indicator">
+                    <div class="impact-indicator {{MicromarketRentalAnalysisImpactScoreClass}}-impact">
                         <div class="impact-level">
                             <div class="impact-red"></div>
                             <div class="impact-yellow"></div>
@@ -352,14 +366,14 @@
                         </div>
                         <div class="impact-marker"></div>
                     </div>
-                    <div class="impact-text">High</div>
+                    <div class="impact-text">{{MicromarketRentalAnalysisImpactScoreClass}}</div>
                 </td>
                 <td>{{MicromarketRentalAnalysisImpactScore}}</td>
             </tr>
             <tr>
                 <td>Micromarket - Resale Analysis</td>
                 <td class="impact-column">
-                    <div class="impact-indicator">
+                    <div class="impact-indicator {{MicromarketResaleAnalysisImpactScoreClass}}-impact">
                         <div class="impact-level">
                             <div class="impact-red"></div>
                             <div class="impact-yellow"></div>
@@ -367,7 +381,7 @@
                         </div>
                         <div class="impact-marker"></div>
                     </div>
-                    <div class="impact-text">High</div>
+                    <div class="impact-text">{{MicromarketResaleAnalysisImpactScoreClass}}</div>
                 </td>
                 <td>{{MicromarketResaleAnalysisImpactScore}}</td>
             </tr>

@@ -6,8 +6,10 @@
     <title>TruEstate Investment Highlight</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-  
+    <link
+    href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Montserrat:wght@400;500;600;700&family=Lato:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
     <style>
       * {
         margin: 0;
@@ -68,20 +70,23 @@
 
       .estate-score {
         position: absolute;
-        top: 60px;
-        right: 60px;
+        top: 80px;
+        right: 80px;
         width: 120px;
         height: 120px;
-        background-color: #0E766E;
-        border-radius: 50%;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         color: white;
-        border: 3px solid white;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         z-index: 10;
+      }
+      .estate-score img{
+        width: 120px;
+        height: 120px;
+        justify-content: center;
+        align-items: center;
+       
       }
 
       .estate-score::before {
@@ -91,17 +96,19 @@
         left: -8px;
         right: -8px;
         bottom: -8px;
-        border: 2px solid #0E766E;
+        
         border-radius: 50%;
         z-index: -1;
       }
 
       .score-value {
+        justify-content: center;
+        align-items: center;
+        position: absolute;
         font-size: 36px;
         font-weight: bold;
         line-height: 1;
       }
-
       .score-text {
         font-size: 14px;
         text-align: center;
@@ -241,6 +248,7 @@
         font-size: 24px;
         font-weight: 600;
         color: black;
+        font-family: 'Lato', sans-serif;
       }
 
       .project-approval {
@@ -307,13 +315,15 @@
       <div class="header">
         <h1 class="title">Investment Highlight</h1>
         <div class="estate-score">
-        
-          <img src="../assets/icons/imactLogo.png" alt="Estate Score" height="120px" width="120px">
+     
+          <div class="score-value">{{TRUEESTATE_SCORE}}<span style="font-size: 20px">/10</span></div>
+          
+          <img src="../assets/logos/impactScore.png" alt="impact logo" height="120px" width="120px">
         </div>
       </div>
 
       <p class="subtitle">
-        Figures are calculated for a unit of {{asset}} measuring {{area}}
+        Figures are calculated for a unit of {{asset}} 
       </p>
 
       <div class="cards-container">
