@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TruEstate Investment Highlight</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+    href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Montserrat:wght@400;500;600;700&family=Lato:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      @page {
+        size: 1920px 1080px;
+        margin: 0;
+      }
+      body,
+      html {
+        width: 100%;
+        height: 100%;
+        font-family: 'Montserrat', sans-serif;
+        color: #333;
+        background-color: #f5f5f5;
+      }
+      body {
+        padding: 80px;
+        background-color: #f5f5f5;
+        background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23bdbdbd' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+      }
+
+      .page-container { 
+        margin: 0 auto;
+        position: relative;
+      }
+
+      .yellow-accent {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 60px;
+        height: 200px;
+        background-color: #ffd700;
+        z-index: -1;
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+      }
+
+      .title {
+        font-size:72px;
+        font-weight: bold;
+        color: black;
+        font-family: 'Lora', serif;
+      }
+
+      .contact-info {
+        display: flex;
+        align-items: center;
+      }
+
+      .estate-score {
+        position: absolute;
+        top: 80px;
+        right: 80px;
+        width: 120px;
+        height: 120px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        z-index: 10;
+      }
+      .estate-score img{
+        width: 120px;
+        height: 120px;
+        justify-content: center;
+        align-items: center;
+       
+      }
+
+      .estate-score::before {
+        content: "";
+        position: absolute;
+        top: -8px;
+        left: -8px;
+        right: -8px;
+        bottom: -8px;
+        
+        border-radius: 50%;
+        z-index: -1;
+      }
+
+      .score-value {
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        font-size: 36px;
+        font-weight: bold;
+        line-height: 1;
+      }
+      .score-text {
+        font-size: 14px;
+        text-align: center;
+        margin-top: 4px;
+      }
+
+      .score-label {
+        position: absolute;
+        width: 200%;
+        top: -10px;
+        left: -50%;
+        text-align: center;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .subtitle {
+        font-size: 28px;
+        color: #767676;
+        margin-bottom: 30px;
+      }
+
+      .cards-container {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 30px;
+        gap: 20px;
+      }
+
+      .card {
+        flex: 1;
+        display: flex;
+        flex-direction: row;
+        background-color: #FFE1BF;
+        border-radius: 15px;
+        padding: 30px;
+        gap:32px;
+        position: relative;
+      }
+
+      /* Add vertical separator line */
+      .card-left {
+        display: flex;
+        flex-direction: column;
+        width: 50%;
+        padding-right: 30px;
+        position: relative;
+      }
+
+      .card-left::after {
+        content: "";
+        position: absolute;
+        right: 0;
+        top: 10%;
+        height: 80%;
+        width: 1px;
+        background-color: #FFE1BF;
+      }
+
+      .card-left {
+        display: flex;
+        flex-direction: column;
+        width: 50%;
+        padding-right: 30px;
+      }
+
+      .card-right {
+        display: flex;
+        flex-direction: column;
+        width: 50%;
+        padding-left: 30px;
+      }
+
+      .card-title {
+        font-size: 28px;
+        font-weight: 600;
+        
+        margin-bottom: 30px;
+        color: #000;
+      }
+
+      .card-value {
+        font-size: 48px;
+        font-weight: bold;
+        margin-bottom: 30px;
+        color: #000;
+      }
+
+      .positive-value {
+        color: #2c7e2f;
+      }
+
+      .price-container {
+        margin-bottom: 30px;
+      }
+
+      .price-label {
+        font-size: 24px;
+        margin-bottom: 10px;
+        font-weight: 600;
+        color: #000;
+      }
+
+      .price-value {
+        font-size: 30px;
+        font-weight: bold;
+        color: #000;
+      }
+
+      .metrics-container {
+        background-color: #EBEBEB;
+        border-radius: 15px;
+        padding: 40px 30px;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+        font-family: 'Lato', sans-serif;
+      }
+
+      .metric {
+        text-align: center;
+        justify-content: center;
+        padding: 10px;
+        flex: 1;
+        min-width: 120px;
+      }
+
+      .metric-value {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+
+      .metric-label {
+        font-size: 24px;
+        font-weight: 600;
+        color: black;
+        font-family: 'Lato', sans-serif;
+      }
+
+      .project-approval {
+        font-size: 28px;
+        font-weight: bold;
+        color: #5C5C5C;
+        margin-bottom: 15px;
+      }
+      .project-approval-container{
+        display: flex;
+        flex-direction: row;
+        
+        align-items: center;
+        
+      }
+
+
+      .banks-container {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding-left: 30px;
+      }
+
+      .bank-logo {
+        height: 50px;
+      }
+
+      
+
+      @media (max-width: 768px) {
+        .cards-container {
+          flex-direction: column;
+        }
+
+        .metrics-container {
+          flex-direction: column;
+        }
+
+        .metric {
+          width: 100%;
+          margin-bottom: 15px;
+        }
+
+        .title {
+          font-size: 36px;
+          margin-left: 50px;
+        }
+
+        .subtitle {
+          margin-left: 50px;
+        }
+
+        .yellow-accent {
+          width: 40px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page-container">
+      <div class="yellow-accent"></div>
+
+      <div class="header">
+        <h1 class="title">Investment Highlight</h1>
+        <div class="estate-score">
+     
+          <div class="score-value">{{TRUEESTATE_SCORE}}<span style="font-size: 20px">/10</span></div>
+          
+          <img src="../assets/logos/impactScore.png" alt="impact logo" height="120px" width="120px">
+        </div>
+      </div>
+
+      <p class="subtitle">
+        Figures are calculated for a unit of {{asset}} 
+      </p>
+
+      <div class="cards-container">
+        <div class="card">
+          <div class="card-left">
+            <h2 class="card-title">Investment Cashflow</h2>
+            <div class="card-value">{{TOTAL_INVESTMENT}} </div>
+          </div>
+
+          <div class="card-right">
+            <div class="price-container">
+              <div class="price-label">Current Price:</div>
+              <div class="price-value">{{CURRENT_PRICE}}Sqft </div>
+            </div>
+
+            <div class="price-container">
+              <div class="price-label">Gross Price:</div>
+              <div class="price-value">{{GROSS_PRICE}} </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-left">
+            <h2 class="card-title">Total Return</h2>
+            <div class="card-value positive-value">+{{TOTAL_RETURN}} </div>
+          </div>
+
+          <div class="card-right">
+            <div class="price-container">
+              <div class="price-label">Future Price:</div>
+              <div class="price-value">{{FUTURE_PRICE}}Sqft </div>
+            </div>
+
+            <div class="price-container">
+              <div class="price-label">Selling Price:</div>
+              <div class="price-value">{{SELLING_PRICE}} </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="metrics-container">
+        <div class="metric">
+          <div class="metric-label">XIRR</div>
+          <div class="metric-value">{{XIRR}}%</div>
+        </div>
+
+        <div class="metric">
+          <div class="metric-label">CAGR</div>
+          <div class="metric-value">{{CAGR}}%</div>
+        </div>
+
+        <div class="metric">
+          <div class="metric-label">Equ. Multiple</div>
+          <div class="metric-value">{{EQUIVALENT_MULTIPLE}}</div>
+        </div>
+
+        <div class="metric">
+          <div class="metric-label">Interest Rate</div>
+          <div class="metric-value">{{INTEREST_RATE}}%</div>
+        </div>
+
+        <div class="metric">
+          <div class="metric-label">Loan</div>
+          <div class="metric-value">{{LOAN_PERCENTAGE}}%</div>
+        </div>
+
+        <div class="metric">
+          
+          <div class="metric-label">Holding Period</div>
+          <div class="metric-value">{{HOLDING_PERIOD}} Years</div>
+        </div>
+      </div>
+
+      <div class="project-approval-container">
+        <div class="project-approval">Project approved by:</div>
+        <div class="banks-container">
+          
+          <img src="../assets/logos/SBI.png" alt="SBI" class="bank-logo" />
+          <img
+            src="../assets/logos/axis.png"
+            alt="Axis Bank"
+            class="bank-logo"
+          />
+        </div>
+      </div>
+
+      
+    </div>
+  </body>
+</html>
