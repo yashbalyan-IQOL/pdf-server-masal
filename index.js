@@ -12,6 +12,7 @@ const cors = require("cors");
 const { Query, getDocs } = require("firebase-admin/firestore");
 const { createReport } = require("./investmentReport.js");
 const { formatCostSuffix, formatCost, formatCurrency } = require("./common.js");
+const { fetchAllAssetData } = require("./script.js");
 
 const app = express();
 const port = 3000;
@@ -2651,6 +2652,16 @@ app.get("/test-save-pdf", async (req, res) => {
       error: "Failed to generate and save PDF",
       details: error.message,
     });
+  }
+});
+
+app.get("/makeallpdf", async (req, res) => {
+  try {
+    fetchAllAssetData(db, admin);
+    res.status(200).send("PDF generation started");
+  } catch (error) {
+    console.error("Error in makeallpdf route:", error);
+    res.status(500).send("Failed to generate PDFs");
   }
 });
 
