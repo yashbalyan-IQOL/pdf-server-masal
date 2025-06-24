@@ -1371,7 +1371,7 @@ async function renderGoogleReviewsPage(projectData) {
 
 // Process and render the micromarket demand analysis page
 async function renderMicromarketDemandAnalysisPage(micromarketData) {
-  const template = await loadTemplate("MicromarketDemandAnalysis");
+  const template = await loadTemplate("micromarketDemandAnalysis");
   return template({
     projectName: micromarketData?.projectName || "Sample Project",
     TRUEESTATE_SCORE: micromarketData?.demandImpactScore || 8,
@@ -1667,7 +1667,7 @@ function getEmptySupplyAnalysis() {
 
 // Process and render the micromarket supply analysis page 2
 async function renderMicromarketSupplyAnalysis2Page(projectData) {
-  const template = await loadTemplate("MicromarketSupplyAnalysis2");
+  const template = await loadTemplate("micromarketSupplyAnalysis2");
 
   const microMarket = projectData.micromarket;
 
@@ -1860,7 +1860,7 @@ function getDefaultSupplyData2() {
 
 // Process and render the micromarket rental analysis page
 async function renderMicromarketRentalAnalysisPage(projectData) {
-  const template = await loadTemplate("MicromarketRentalAnalysis");
+  const template = await loadTemplate("micromarketRentalAnalysis");
   return template({
     projectName: projectData?.projectName || "Sample Project",
     rentalAnalysisData: projectData?.rentalAnalysisData || {
@@ -1874,7 +1874,7 @@ async function renderMicromarketRentalAnalysisPage(projectData) {
 
 // Process and render the micromarket resale analysis page
 async function renderMicromarketResaleAnalysisPage(projectData) {
-  const template = await loadTemplate("MicromarketResaleAnalysis");
+  const template = await loadTemplate("micromarketResaleAnalysis");
   return template({
     projectName: projectData?.projectName || "Sample Project",
     resaleAnalysisData: projectData?.resaleAnalysisData || {
@@ -1888,7 +1888,7 @@ async function renderMicromarketResaleAnalysisPage(projectData) {
 
 // Process and render the impact scores page
 async function renderImpactScoresPage(projectData, micromarketData) {
-  const template = await loadTemplate("ImpactScores");
+  const template = await loadTemplate("impactScores");
   const impact = (value) => {
     if (value >= 8) {
       return "High";
@@ -2067,356 +2067,6 @@ function renderHtmlTemplate(projectName) {
   return html;
 }
 
-// Create a project details HTML template
-function renderProjectDetailsTemplate(projectData) {
-  // Extract images from all nested objects
-  const allImages = extractImagesFromNestedObjects(projectData);
-  // // console.log(`Found ${allImages.length} images in the project data`);
-
-  let html = `
-  <!DOCTYPE html>
-  <html lang="en">
-    <head>
-      <meta charset="UTF-8">
-      <title>Property Details</title>
-      <style>
-        body {
-          font-family: 'Arial', sans-serif;
-          padding: 40px;
-          color: #333;
-          background-color: #f9f9f9;
-        }
-        h1 {
-          color: #2c3e50;
-          border-bottom: 2px solid #3498db;
-          padding-bottom: 10px;
-          font-size: 28px;
-          text-transform: uppercase;
-        }
-        .header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 20px;
-        }
-        .property-title {
-          font-size: 24px;
-          color: #2c3e50;
-        }
-        .rera-approval {
-          color: #27ae60;
-          font-weight: bold;
-          padding: 5px 10px;
-          border-radius: 4px;
-          background-color: #e8f8f0;
-          border: 1px solid #27ae60;
-        }
-        .section {
-          background-color: white;
-          border-radius: 8px;
-          box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-          padding: 20px;
-          margin-bottom: 30px;
-        }
-        .section-title {
-          font-size: 18px;
-          font-weight: bold;
-          color: #2c3e50;
-          margin-bottom: 15px;
-          border-bottom: 1px solid #eee;
-          padding-bottom: 10px;
-        }
-        .property-info {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 15px;
-        }
-        .property {
-          margin-bottom: 10px;
-        }
-        .property-name {
-          font-weight: bold;
-          color: #7f8c8d;
-          display: block;
-          margin-bottom: 3px;
-          font-size: 12px;
-          text-transform: uppercase;
-        }
-        .property-value {
-          font-size: 16px;
-          color: #2c3e50;
-        }
-        .amenities-container {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 10px;
-          margin-top: 10px;
-        }
-        .amenity {
-          background-color: #edf2f7;
-          padding: 8px 12px;
-          border-radius: 20px;
-          font-size: 14px;
-          color: #4a5568;
-        }
-        .config-container {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 15px;
-          margin-top: 10px;
-        }
-        .config {
-          background-color: #e3f2fd;
-          border: 1px solid #bbdefb;
-          padding: 10px 15px;
-          border-radius: 6px;
-          font-size: 15px;
-          color: #1565c0;
-          font-weight: bold;
-        }
-        .location-map {
-          width: 100%;
-          height: 300px;
-          background-color: #eee;
-          border-radius: 8px;
-          margin-top: 15px;
-          border: 1px solid #ddd;
-        }
-        .status-tag {
-          display: inline-block;
-          background-color: #ff9800;
-          color: white;
-          padding: 5px 10px;
-          border-radius: 4px;
-          font-size: 14px;
-          text-transform: uppercase;
-        }
-        .footer {
-          text-align: center;
-          margin-top: 40px;
-          color: #95a5a6;
-          font-size: 12px;
-        }
-        .image-gallery {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 20px;
-          margin-top: 20px;
-        }
-        .image-container {
-          width: 100%;
-          background-color: #fff;
-          border-radius: 8px;
-          overflow: hidden;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .image-container img {
-          width: 100%;
-          height: auto;
-          display: block;
-        }
-        @media print {
-          .page-break {
-            page-break-before: always;
-          }
-          body {
-            padding: 20px;
-          }
-          .section {
-            break-inside: avoid;
-          }
-        }
-      </style>
-    </head>
-    <body>
-      <div class="header">
-        <h1>${projectData.projectName || "Property Details"}</h1>
-        ${
-          projectData.isReraApproved === "Approved"
-            ? `<div class="rera-approval">RERA Approved</div>`
-            : ""
-        }
-      </div>
-      
-      <div class="section">
-        <div class="section-title">Project Overview</div>
-        <div class="property-info">
-          <div class="property">
-            <span class="property-name">Project Status</span>
-            <span class="property-value">
-              <span class="status-tag">${projectData.status || "N/A"}</span>
-            </span>
-          </div>
-          <div class="property">
-            <span class="property-name">Asset Type</span>
-            <span class="property-value">${
-              projectData.assetType
-                ? projectData.assetType.toUpperCase()
-                : "N/A"
-            }</span>
-          </div>
-          <div class="property">
-            <span class="property-name">Area</span>
-            <span class="property-value">${projectData.area || "N/A"}</span>
-          </div>
-          <div class="property">
-            <span class="property-name">Project Land Area</span>
-            <span class="property-value">${
-              projectData.projectLandArea
-                ? projectData.projectLandArea + " sqft"
-                : "N/A"
-            }</span>
-          </div>
-          <div class="property">
-            <span class="property-name">Launch Date</span>
-            <span class="property-value">${
-              projectData.launchDate || "N/A"
-            }</span>
-          </div>
-          <div class="property">
-            <span class="property-name">Possession Date</span>
-            <span class="property-value">${
-              projectData.possession || "N/A"
-            }</span>
-          </div>
-          <div class="property">
-            <span class="property-name">Total Units</span>
-            <span class="property-value">${
-              projectData.totalUnits || "N/A"
-            }</span>
-          </div>
-        </div>
-      </div>
-      
-      <div class="section">
-        <div class="section-title">Configurations</div>
-        <div class="config-container">
-          ${
-            projectData.configurations && projectData.configurations.length > 0
-              ? projectData.configurations
-                  .map(
-                    (config) => `
-              <div class="config">${config}</div>
-            `
-                  )
-                  .join("")
-              : '<div class="property-value">No configurations available</div>'
-          }
-        </div>
-      </div>
-      
-      <div class="section">
-        <div class="section-title">Amenities</div>
-        <div class="amenities-container">
-          ${
-            projectData.amenities && projectData.amenities.length > 0
-              ? projectData.amenities
-                  .map(
-                    (amenity) => `
-              <div class="amenity">${amenity}</div>
-            `
-                  )
-                  .join("")
-              : '<div class="property-value">No amenities available</div>'
-          }
-        </div>
-      </div>
-      
-      <div class="section">
-        <div class="section-title">Location & Details</div>
-        <div class="property">
-          <span class="property-name">Address</span>
-          <span class="property-value">${projectData.location || "N/A"}</span>
-        </div>
-        <div class="property">
-          <span class="property-name">Water Source</span>
-          <span class="property-value">${
-            projectData.waterSource || "N/A"
-          }</span>
-        </div>
-        <div class="property">
-          <span class="property-name">RERA ID</span>
-          <span class="property-value">${projectData.reraId || "N/A"}</span>
-        </div>
-        <div class="property">
-          <span class="property-name">Acknowledgement</span>
-          <span class="property-value">${
-            projectData.acknowledgement || "N/A"
-          }</span>
-        </div>
-        <div class="property">
-          <span class="property-name">Approval Authority</span>
-          <span class="property-value">${
-            projectData.approvalAuthority || "N/A"
-          }</span>
-        </div>
-        <div class="property">
-          <span class="property-name">Handover Date</span>
-          <span class="property-value">${
-            projectData.handOverDate || "N/A"
-          }</span>
-        </div>
-        ${
-          projectData.lat && projectData.long
-            ? `
-          <div class="property">
-            <span class="property-name">Coordinates</span>
-            <span class="property-value">Lat: ${projectData.lat}, Long: ${projectData.long}</span>
-          </div>
-          <div class="location-map">
-            <img src="https://maps.googleapis.com/maps/api/staticmap?center=${projectData.lat},${projectData.long}&zoom=15&size=600x300&maptype=roadmap&markers=color:red%7C${projectData.lat},${projectData.long}&key=YOUR_API_KEY" width="100%" height="100%" alt="Property location map">
-          </div>
-        `
-            : ""
-        }
-      </div>
-      
-      <div class="section">
-        <div class="section-title">Legal Information</div>
-        <div class="property-info">
-          <div class="property">
-            <span class="property-name">Title Cleared</span>
-            <span class="property-value">${
-              projectData.isTitleCleared !== null
-                ? projectData.isTitleCleared
-                : "N/A"
-            }</span>
-          </div>
-          <div class="property">
-            <span class="property-name">Khata Type</span>
-            <span class="property-value">${
-              projectData.khataType !== null ? projectData.khataType : "N/A"
-            }</span>
-          </div>
-          <div class="property">
-            <span class="property-name">Litigation</span>
-            <span class="property-value">${
-              projectData.litigation !== null
-                ? projectData.litigation
-                  ? "Yes"
-                  : "No"
-                : "N/A"
-            }</span>
-          </div>
-        </div>
-      </div>
-      
-      ${allImages.length > 0 ? createImageGalleryHTML(allImages) : ""}
-      
-      <div class="footer">
-        This document was generated on ${new Date().toLocaleDateString()} and contains property information as recorded in our database. 
-        Last Updated: ${
-          projectData.lastUpdated
-            ? new Date(projectData.lastUpdated * 1000).toLocaleDateString()
-            : "Unknown"
-        }
-      </div>
-    </body>
-  </html>
-  `;
-
-  return html;
-}
 
 // PDF download route with Investment Report title
 app.get("/download-pdf", async (req, res) => {
@@ -2852,8 +2502,8 @@ app.get("/download-pdf", async (req, res) => {
             "micromarketDemandAnalysis.pdf"
           );
           await generatePDF(
-            "mircomarketSupplyAnalysis1.html",
-            "mircomarketSupplyAnalysis1.pdf"
+            "MircomarketSupplyAnalysis1.html",
+            "MircomarketSupplyAnalysis1.pdf"
           );
           await generatePDF(
             "micromarketSupplyAnalysis2.html",
