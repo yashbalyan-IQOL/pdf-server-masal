@@ -11,7 +11,12 @@ const Handlebars = require("handlebars");
 const cors = require("cors");
 const { Query, getDocs } = require("firebase-admin/firestore");
 const { createReport } = require("./investmentReport.js");
-const { formatCostSuffix, formatCost, formatCurrency } = require("./common.js");
+const {
+  formatCostSuffix,
+  formatCost,
+  formatCurrency,
+  toCapitalizedWords,
+} = require("./common.js");
 const { fetchAllAssetData } = require("./script.js");
 
 const app = express();
@@ -53,13 +58,13 @@ const bucket = admin.storage().bucket("masal-db-6cc78.appspot.com");
 // Helper function to get signed URL
 async function getSignedUrl(path) {
   try {
-    console.log("Getting signed URL for path:", path);
+    // console.log("Getting signed URL for path:", path);
     const file = bucket.file(path);
     const [url] = await file.getSignedUrl({
       action: "read",
       expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
     });
-    console.log("Generated signed URL:", url);
+    // console.log("Generated signed URL:", url);
     return url;
   } catch (error) {
     console.error("Error generating signed URL:", error);
@@ -161,9 +166,10 @@ function renderCoverPage(projectData) {
     return `${day} ${month} ${year}`;
   };
   const formattedDate1 = formatTimestampDate(projectData.lastUpdated);
-  console.log("Date aaj ki", formattedDate1);
+  // console.log("Date aaj ki", formattedDate1);
   return template({
-    PROJECT_NAME: projectData.projectName || "Unnamed Project",
+    PROJECT_NAME:
+      toCapitalizedWords(projectData.projectName) || "Unnamed Project",
     UPDATED_DATE: formattedDate1 || formattedDate,
     RERA_ID: projectData.reraId || "N/A",
   });
@@ -307,17 +313,17 @@ function renderOverviewPage(projectData, firstImage) {
   const imageUrl = firstImage || "placeholder-image.jpg";
 
   return template({
-    PROJECT_NAME: projectData.projectName || "---",
-    DEVELOPER: projectData.developerName || "---", // Replace with actual data if available
-    STAGE: projectData.status || "--",
-    CURRENT_PRICE: projectData.commonPricePerSqft || "--", // Replace with actual data if available
+    PROJECT_NAME: toCapitalizedWords(projectData.projectName) || "-",
+    DEVELOPER: toCapitalizedWords(projectData.developerName) || "-", // Replace with actual data if available
+    STAGE: projectData.status || "-",
+    CURRENT_PRICE: projectData.commonPricePerSqft || "-", // Replace with actual data if available
     CONFIGURATIONS: configurationsText,
-    LAUNCH_DATE: projectData.launchDate || "---",
-    HANDOVER_DATE: projectData.handOverDate || "---",
-    ASSET_TYPE: projectData.assetType || "--",
-    WATER_SOURCE: projectData.waterSource || "--",
-    MICROMARKET: projectData?.micromarket || "--",
-    ZONE: projectData.area || "--", // Replace with actual data if available
+    LAUNCH_DATE: projectData.launchDate || "-",
+    HANDOVER_DATE: projectData.handOverDate || "-",
+    ASSET_TYPE: projectData.assetType || "-",
+    WATER_SOURCE: projectData.waterSource || "-",
+    MICROMARKET: toCapitalizedWords(projectData?.micromarket) || "-",
+    ZONE: projectData.area || "-", // Replace with actual data if available
     PROPERTY_IMAGE: imageUrl,
   });
 }
@@ -368,8 +374,8 @@ function renderInvestmentHighlightPage(projectData, data2, response) {
 // Process and render the yearly cashflow page (5 years only)
 function renderYearlyCashflowPage(projectData, data2, response) {
   const template = loadTemplate("yearlyCashflow");
-  console.log("create report response", response);
-  console.log("create report data2", data2);
+  // console.log("create report response", response);
+  // console.log("create report data2", data2);
 
   if (!response || !response.data) {
     console.error("Response or response.data is undefined");
@@ -393,9 +399,6 @@ function renderYearlyCashflowPage(projectData, data2, response) {
   // Limit to 5 years only
   const MAX_YEARS = 5;
   const cashflowsYearly = fullCashflowsYearly.slice(0, MAX_YEARS);
-
-  console.log("cashflowsYearly (limited to 5)", cashflowsYearly);
-  console.log("monthlyData length", monthlyData.length);
 
   if (cashflowsYearly.length === 0) {
     console.error("No cashflows_yearly data found");
@@ -577,10 +580,11 @@ function renderYearlyCashflowPage(projectData, data2, response) {
 }
 
 // Process and render the P&E development page
-function renderPEDevelopmentPage(projectData) {
+function renderPEDevelopmentPage(micromarketData) {
   const template = loadTemplate("P&Edevelopment");
+  // console.log(micromarketData?.proposed_existing_development?.land_use_categories,"PEDevelopmentData");
   return template({
-    PROJECT_NAME: projectData.projectName || "Unnamed Project",
+    data: micromarketData || "-",
   });
 }
 
@@ -609,11 +613,10 @@ function renderMasterPlanPage(projectData, masterPlanImage) {
   const defaultMasterPlan = "../assets/images/master-plan.png";
 
   // Safely access masterPlan data with fallbacks
-  const masterPlanUrl =
-    projectData?.masterPlan?.[0] || masterPlanImage || defaultMasterPlan;
+  const masterPlanUrl = projectData?.masterPlan?.[0] || defaultMasterPlan;
 
   return template({
-    PROJECT_NAME: projectData?.projectName || "---",
+    PROJECT_NAME: toCapitalizedWords(projectData?.projectName) || "---",
     LOADING: projectData?.loading || "---",
     UDS: projectData?.uds || "---",
     UDS_IMPACT: projectData?.udsImpactScore || "medium",
@@ -715,34 +718,33 @@ function renderUnitLevelPage(projectData, unitLevelImage) {
 // Process and render the project comparison page
 async function renderProjectComparisonPage(propertyData) {
   const template = loadTemplate("projectComparison");
-
+  const Score = (value) => {
+    if (!value) return "Low";
+    if (value < 4) return "Low";
+    if (value <= 7) return "Medium";
+    return "High";
+  };
   // Default comparison data if none exists
   const defaultProjects = [
     {
-      name: "Birla Trimaya",
-      config: "2, 3 & 4 BHKs",
-      price: "₹1.25 Crs",
-      value: "Undervalued",
-      currentPrice: "₹12,500",
-      futurePrice: "₹14,500",
-      risk: "Low",
-      cagr: "9.8%",
-      irr: "18.25%",
-      cashOutflow: "₹87 Lac",
-      profit: "28 mn Sqft",
-    },
-    {
-      name: "Tata Caranctic",
-      config: "2, 3 & 4 BHKs",
-      price: "₹1.25 Crs",
-      value: "Undervalued",
-      currentPrice: "₹12,500",
-      futurePrice: "₹14,500",
-      risk: "Low",
-      cagr: "9.8%",
-      irr: "18.25%",
-      cashOutflow: "₹87 Lac",
-      profit: "28 mn Sqft",
+      name: toCapitalizedWords(propertyData.projectName) || "Unknown Project",
+      config: propertyData.configurations?.join(", ") || "---",
+      value: propertyData.truValue || "---",
+      currentPrice: propertyData.commonPricePerSqft || "---",
+      futurePrice:
+        formatCost(
+          parseInt(
+            propertyData?.commonPricePerSqft *
+              Math.pow(1 + propertyData?.cagr / 100, 4)
+          )
+        ) || "---",
+      cagr: propertyData.cagr || "---",
+      irr: propertyData.irr || "---",
+      cashOutflow: propertyData.cashOutflow || "---",
+      profit: propertyData.profit || "---",
+      risk: Score(propertyData?.projectRiskImpactScore),
+      netcashflow: propertyData.netCashflow || "---",
+      price: propertyData.price || "---",
     },
   ];
 
@@ -755,12 +757,6 @@ async function renderProjectComparisonPage(propertyData) {
   }
 
   let projects = [];
-  const risk = (value) => {
-    if (!value) return "Low";
-    if (value < 4) return "Low";
-    if (value <= 7) return "Medium";
-    return "High";
-  };
 
   try {
     // Process each comparison item
@@ -773,7 +769,7 @@ async function renderProjectComparisonPage(propertyData) {
 
       const project = projectDoc.data();
       projects.push({
-        name: project.projectName || "Unknown Project",
+        name: toCapitalizedWords(project.projectName) || "Unknown Project",
         config: project.configurations?.join(", ") || "---",
         value: project.truValue || "---",
         currentPrice: project.commonPricePerSqft || "---",
@@ -782,20 +778,43 @@ async function renderProjectComparisonPage(propertyData) {
             parseInt(
               project?.commonPricePerSqft * Math.pow(1 + project?.cagr / 100, 4)
             )
-          ) || "---",
-        cagr: project.cagr || "---",
-        irr: project.irr || "---",
-        cashOutflow: project.cashOutflow || "---",
-        profit: project.profit || "---",
-        risk: risk(project.projectRiskImpactScore),
-        netcashflow: project.netCashflow || "---",
-        price: project.price || "---",
+          ) || "-",
+        cagr: project.cagr || "-",
+        irr: project.irr || "-",
+        cashOutflow: project.cashOutflow || "-",
+        profit: project.profit || "-",
+        risk: project?.projectRiskImpactScore
+          ? Score(project?.projectRiskImpactScore)
+          : "-",
+        netcashflow: project.netCashflow || "-",
+        price: project.price || "-",
       });
     }
 
     // If no projects were successfully processed, use defaults
     if (projects.length === 0) {
       projects = defaultProjects;
+    } else {
+      projects.push({
+        name: toCapitalizedWords(propertyData.projectName) || "Unknown Project",
+        config: propertyData.configurations?.join(", ") || "---",
+        value: propertyData.truValue || "---",
+        currentPrice: propertyData.commonPricePerSqft || "---",
+        futurePrice:
+          formatCost(
+            parseInt(
+              propertyData?.commonPricePerSqft *
+                Math.pow(1 + propertyData?.cagr / 100, 4)
+            )
+          ) || "---",
+        cagr: propertyData.cagr || "---",
+        irr: propertyData.irr || "---",
+        cashOutflow: propertyData.cashOutflow || "---",
+        profit: propertyData.profit || "---",
+        risk: Score(propertyData?.projectRiskImpactScore),
+        netcashflow: propertyData.netCashflow || "---",
+        price: propertyData.price || "---",
+      });
     }
 
     return template({
@@ -812,48 +831,152 @@ async function renderProjectComparisonPage(propertyData) {
   }
 }
 
-// Process and render the performance page
+// Process and render the performance page with real Firebase data
 async function renderPerformancePage(projectData) {
   const template = loadTemplate("performance");
 
-  // const projectComparisonData = projectData?.projectComparison;
+  // Default project data for fallback
+  const defaultProjectData = {
+    projectName: "Unknown Project",
+    microMarket: "---",
+    totalArea: "---",
+    launchDate: "---",
+    launchPrice: "---",
+    currentPrice: "---",
+    cagr: "---",
+    rentalYield: "---",
+  };
 
-  // const projectDoc = await db.collection("assetData").doc(projectComparisonData.project1.value).get();
-  // const projectOptions = projectDoc.data().configurations;
+  try {
+    const mainProject = projectData;
 
-  return template({
-    PROJECT_NAME: projectData.projectName || "Unnamed Project",
+    // Helper functions for formatting
+    const formatPercentage = (value) => {
+      if (!value) return "---";
+      return typeof value === "number" ? `${value.toFixed(2)}%` : `${value}%`;
+    };
 
-    PERFORMANCE_DATA: projectData.performanceData || {
-      metrics: [
-        {
-          name: "IRR",
-          value: "18.25%",
-          description: "Internal Rate of Return",
-        },
-        {
-          name: "CAGR",
-          value: "9.8%",
-          description: "Compound Annual Growth Rate",
-        },
-        {
-          name: "ROI",
-          value: "12.5%",
-          description: "Return on Investment",
-        },
-        {
-          name: "Payback Period",
-          value: "4.2 years",
-          description: "Time to recover investment",
-        },
-      ],
-      charts: {
-        monthlyReturns: "chart1.png",
-        yearlyGrowth: "chart2.png",
-        marketComparison: "chart3.png",
-      },
-    },
-  });
+    const formatCurrency = (value) => {
+      if (!value) return "---";
+      if (typeof value === "number") {
+        return value >= 10000000
+          ? `₹${(value / 10000000).toFixed(2)} Cr`
+          : `₹${(value / 100000).toFixed(1)} Lac`;
+      }
+      return value;
+    };
+
+    const formatPrice = (value) => {
+      if (!value) return "---";
+      if (typeof value === "number") {
+        return `₹${value.toLocaleString()}`;
+      }
+      return value;
+    };
+
+    const formatArea = (value) => {
+      if (!value) return "---";
+      return typeof value === "number" ? `${value} Sqft` : value;
+    };
+
+    const formatDate = (value) => {
+      if (!value) return "---";
+      return value.toString();
+    };
+
+    // Format main project data
+    const formatProjectData = (project) => ({
+      projectName: toCapitalizedWords(project.projectName) || "Project 1",
+      microMarket: project.micromarket || "---",
+      totalArea: project.projectLandArea || project.projectArea,
+      launchDate: formatDate(project.launchDate || project.startDate),
+      launchPrice: formatPrice(project.launchPrice || project.basePrice),
+      currentPrice: formatPrice(
+        project.commonPricePerSqft || project.currentPrice
+      ),
+      cagr: formatPercentage(project.cagr),
+      rentalYield: formatPercentage(
+        project.rentalYield || project.rentalReturn
+      ),
+    });
+
+    const mainProjectFormatted = formatProjectData(mainProject);
+
+    // Fetch similar projects data
+    const similarProjects = [];
+    const similarProjectIds = [];
+
+    // Extract similar project IDs - they are stored directly as string values
+    if (mainProject.similarProjects) {
+      // Extract project IDs directly from the similarProjects object
+      for (let i = 1; i <= 3; i++) {
+        const projectId = mainProject.similarProjects[`project${i}`];
+        if (projectId && typeof projectId === "string") {
+          similarProjectIds.push(projectId);
+        }
+      }
+    }
+
+    // Also check for SimilarProjects (capital S) as fallback
+    if (mainProject.SimilarProjects && similarProjectIds.length === 0) {
+      for (let i = 1; i <= 3; i++) {
+        const projectId = mainProject.SimilarProjects[`project${i}`];
+        if (projectId && typeof projectId === "string") {
+          similarProjectIds.push(projectId);
+        }
+      }
+    }
+
+    // Also check if passed directly in projectData parameter
+    if (projectData?.similarProjects && similarProjectIds.length === 0) {
+      for (let i = 1; i <= 3; i++) {
+        const projectId = projectData.similarProjects[`project${i}`];
+        if (projectId && typeof projectId === "string") {
+          similarProjectIds.push(projectId);
+        }
+      }
+    }
+
+    // Fetch each similar project
+    for (const projectId of similarProjectIds.slice(0, 3)) {
+      // Limit to 3 projects
+      try {
+        const similarProjectDoc = await db
+          .collection("assetData")
+          .doc(projectId)
+          .get();
+        if (similarProjectDoc.exists) {
+          const similarProjectData = similarProjectDoc.data();
+          similarProjects.push(formatProjectData(similarProjectData));
+        }
+      } catch (error) {
+        console.error(`Error fetching similar project ${projectId}:`, error);
+        similarProjects.push(defaultProjectData);
+      }
+    }
+
+    // Ensure we have exactly 3 similar projects for the template
+    // while (similarProjects.length < 3) {
+    //   similarProjects.push(defaultProjectData);
+    // }
+
+    return template({
+      PROJECT_NAME:
+        mainProject.projectName ||
+        projectData?.projectName ||
+        "Unnamed Project",
+      MAIN_PROJECT: mainProjectFormatted,
+      SIMILAR_PROJECTS: similarProjects,
+    });
+  } catch (error) {
+    console.error("Error processing performance page:", error);
+    // Return default data if there's an error
+    return template({
+      PROJECT_NAME: projectData?.projectName || "Unnamed Project",
+      MAIN_PROJECT: mainProjectFormatted,
+      SIMILAR_PROJECTS: [],
+    });
+  }
 }
 
 // Process and render the evaluation page
@@ -1014,13 +1137,13 @@ function renderEvaluationPage(projectData) {
     })
     .join("");
 
-  console.log("Processed evaluation data:", {
-    originalData: thingsNearProjectData,
-    processedData,
-    tableRowsHTML,
+  // // console.log("Processed evaluation data:", {
+  //   originalData: thingsNearProjectData,
+  //   processedData,
+  //   tableRowsHTML,
 
-    availableFactors: Object.keys(thingsNearProjectData),
-  });
+  //   availableFactors: Object.keys(thingsNearProjectData),
+  // });
 
   return template({
     PROJECT_NAME: projectData.projectName || "Unnamed Project",
@@ -1135,12 +1258,12 @@ function renderProjectRiskPage(projectData) {
     .join("");
 
   // Log processed data for debugging
-  console.log("Risk Dashboard Data Processing:", {
-    originalRiskData: riskData,
-    sortedRisks,
+  // // console.log("Risk Dashboard Data Processing:", {
+  //   originalRiskData: riskData,
+  //   sortedRisks,
 
-    generatedCardsCount: sortedRisks.length,
-  });
+  //   generatedCardsCount: sortedRisks.length,
+  // });
 
   return template({
     PROJECT_NAME: projectData.projectName || "Unnamed Project",
@@ -1154,45 +1277,46 @@ function renderProjectRiskPage(projectData) {
 async function renderGoogleReviewsPage(projectData) {
   const template = await loadTemplate("GoogleReviews");
   return template({
-    projectName: projectData?.projectName || "Sample Project",
+    projectName:
+      toCapitalizedWords(projectData?.projectName) || "Sample Project",
     reviews: {
       overallRating: projectData?.googleReviews?.overallRating || 4.25,
       totalReviews: projectData?.googleReviews?.totalReviews || 52,
       ratingDistribution: {
         5: {
           count:
-            projectData?.googleReviews?.ratingDistribution?.[5]?.count || 125,
+            projectData?.googleReviews?.ratingDistribution?.[5]?.count || null,
           percentage:
             projectData?.googleReviews?.ratingDistribution?.[5]?.percentage ||
-            27,
+            null,
         },
         4: {
           count:
-            projectData?.googleReviews?.ratingDistribution?.[4]?.count || 125,
+            projectData?.googleReviews?.ratingDistribution?.[4]?.count || null,
           percentage:
             projectData?.googleReviews?.ratingDistribution?.[4]?.percentage ||
-            40,
+            null,
         },
         3: {
           count:
-            projectData?.googleReviews?.ratingDistribution?.[3]?.count || 125,
+            projectData?.googleReviews?.ratingDistribution?.[3]?.count || null,
           percentage:
             projectData?.googleReviews?.ratingDistribution?.[3]?.percentage ||
-            25,
+            null,
         },
         2: {
           count:
-            projectData?.googleReviews?.ratingDistribution?.[2]?.count || 125,
+            projectData?.googleReviews?.ratingDistribution?.[2]?.count || null,
           percentage:
             projectData?.googleReviews?.ratingDistribution?.[2]?.percentage ||
-            5,
+            null,
         },
         1: {
           count:
-            projectData?.googleReviews?.ratingDistribution?.[1]?.count || 125,
+            projectData?.googleReviews?.ratingDistribution?.[1]?.count || null,
           percentage:
             projectData?.googleReviews?.ratingDistribution?.[1]?.percentage ||
-            10,
+            null,
         },
       },
       positiveReviews: projectData?.googleReviews?.positiveReviews || [
@@ -1210,36 +1334,37 @@ async function renderGoogleReviewsPage(projectData) {
         { category: "Sales", rating: 5 },
         { category: "Sales", rating: 5 },
       ],
-      recentReviews: projectData?.googleReviews?.recentReviews || [
-        {
-          rating: 5,
-          content:
-            "Absolute gold mine to invest in.. Really liked the integrated township plan by Tata and Birla.. They would be launching super luxurious Villaments in July - August 2024.",
-          author: "Rajan Yadav",
-          date: "9th May",
-        },
-        {
-          rating: 4,
-          content:
-            "Absolute gold mine to invest in.. Really liked the integrated township plan by Tata and Birla.. They would be launching super luxurious Villaments in July - August 2024.",
-          author: "Rajan Yadav",
-          date: "9th May",
-        },
-        {
-          rating: 3,
-          content:
-            "Absolute gold mine to invest in.. Really liked the integrated township plan by Tata and Birla.. They would be launching super luxurious Villaments in July - August 2024.",
-          author: "Rajan Yadav",
-          date: "9th May",
-        },
-        {
-          rating: 1,
-          content:
-            "Absolute gold mine to invest in.. Really liked the integrated township plan by Tata and Birla.. They would be launching super luxurious Villaments in July - August 2024.",
-          author: "Rajan Yadav",
-          date: "9th May",
-        },
-      ],
+      recentReviews: projectData?.googleReviews?.recentReviews ||
+        projectData?.googleReviews?.sampleReviews || [
+          {
+            rating: 5,
+            content:
+              "Absolute gold mine to invest in.. Really liked the integrated township plan by Tata and Birla.. They would be launching super luxurious Villaments in July - August 2024.",
+            author: "Rajan Yadav",
+            date: "9th May",
+          },
+          {
+            rating: 4,
+            content:
+              "Absolute gold mine to invest in.. Really liked the integrated township plan by Tata and Birla.. They would be launching super luxurious Villaments in July - August 2024.",
+            author: "Rajan Yadav",
+            date: "9th May",
+          },
+          {
+            rating: 3,
+            content:
+              "Absolute gold mine to invest in.. Really liked the integrated township plan by Tata and Birla.. They would be launching super luxurious Villaments in July - August 2024.",
+            author: "Rajan Yadav",
+            date: "9th May",
+          },
+          {
+            rating: 1,
+            content:
+              "Absolute gold mine to invest in.. Really liked the integrated township plan by Tata and Birla.. They would be launching super luxurious Villaments in July - August 2024.",
+            author: "Rajan Yadav",
+            date: "9th May",
+          },
+        ],
     },
   });
 }
@@ -1250,7 +1375,7 @@ async function renderMicromarketDemandAnalysisPage(micromarketData) {
   return template({
     projectName: micromarketData?.projectName || "Sample Project",
     TRUEESTATE_SCORE: micromarketData?.demandImpactScore || 8,
-    micromarketData: micromarketData?.micromarketData || {
+    data: micromarketData?.demandAnalysis || {
       demandAnalysis: {
         currentDemand: "16%",
         futureDemand: "24%",
@@ -1293,93 +1418,444 @@ async function renderMicromarketDemandAnalysisPage(micromarketData) {
 }
 
 // Process and render the micromarket supply analysis page 1
-async function renderMicromarketSupplyAnalysis1Page(micromarketData) {
-  const template = await loadTemplate("MicromarketSupplyAnalysis1");
-  return template({
-    projectName: micromarketData?.projectName || "Sample Project",
-    TRUEESTATE_SCORE: micromarketData?.supplyImpactScore || 8,
-    supplyData: micromarketData?.supplyData || {
-      parameters: [
-        {
-          name: "Devanahalli Business Park",
-          distance: "5 kms",
-          area: "28 mn Sqft",
-        },
-        {
-          name: "Airport Township",
-          distance: "5 kms",
-          area: "28 mn Sqft",
-        },
-        {
-          name: "KIADB Hardware Tech Park",
-          distance: "5 kms",
-          area: "28 mn Sqft",
-        },
-        {
-          name: "KIADB Aerospace Industry",
-          distance: "5 kms",
-          area: "28 mn Sqft",
-        },
-        {
-          name: "Prestige Tech cloud",
-          distance: "5 kms",
-          area: "28 mn Sqft",
-        },
-      ],
-      totalArea: "221 mn Sqft",
-      bubbleData: {
-        expectedDemand: "26.52 Lac",
-        readyToMove: "26.52 Lac",
-        underConstruction: "26.52 Lac",
-        delta: "26.52 Lac",
-      },
-    },
+async function renderMicromarketSupplyAnalysis1Page(projectData) {
+  const template = await loadTemplate("MircomarketSupplyAnalysis1");
+
+  const microMarket = projectData.micromarket;
+
+  if (!microMarket) {
+    return template({
+      projectName: "Sample Project",
+      TRUEESTATE_SCORE: 8,
+      supplyAnalysis: getEmptySupplyAnalysis(),
+    });
+  }
+
+  try {
+    // Fetch all projects with the same micromarket
+    const projectsSnapshot = await db
+      .collection("assetData")
+      .where("micromarket", "==", microMarket)
+      .get();
+
+    const projects = [];
+    projectsSnapshot.forEach((doc) => {
+      projects.push({ id: doc.id, ...doc.data() });
+    });
+
+    // Calculate supply analysis
+    const supplyAnalysis = calculateSupplyAnalysis(projects);
+
+    return template({
+      projectName: projectData?.projectName || "Sample Project",
+      TRUEESTATE_SCORE: projectData?.supplyImpactScore || 8,
+      supplyAnalysis: supplyAnalysis,
+    });
+  } catch (error) {
+    console.error("Error fetching micromarket data:", error);
+    return template({
+      projectName: projectData?.projectName || "Sample Project",
+      TRUEESTATE_SCORE: projectData?.supplyImpactScore || 8,
+      supplyAnalysis: getEmptySupplyAnalysis(),
+    });
+  }
+}
+
+function calculateSupplyAnalysis(projects) {
+  // Initialize counters using valid Handlebars property names
+  const tierCounts = {
+    premium: { bhk1: 0, bhk2: 0, bhk3: 0, bhk4: 0, total: 0 },
+    economy: { bhk1: 0, bhk2: 0, bhk3: 0, bhk4: 0, total: 0 },
+    mass: { bhk1: 0, bhk2: 0, bhk3: 0, bhk4: 0, total: 0 },
+  };
+
+  let totalProjects = 0;
+
+  // BHK mapping for valid Handlebars property names
+  const bhkMapping = {
+    "1BHK": "bhk1",
+    "2BHK": "bhk2",
+    "3BHK": "bhk3",
+    "4BHK": "bhk4",
+  };
+
+  // Process each project
+  projects.forEach((project) => {
+    const developerTier = project.devTier;
+    const configurations = project.data || [];
+
+    // Determine tier based on developerTier
+    let tier;
+    if (developerTier === "A") {
+      tier = "premium";
+    } else if (developerTier === "B" || developerTier === "C") {
+      tier = "economy";
+    } else if (developerTier === "D") {
+      tier = "mass";
+    } else {
+      // Skip projects without valid developerTier
+      return;
+    }
+
+    // Process configurations for this project
+    configurations.forEach((config) => {
+      const bhkType = config.configuration || config.type;
+
+      // Standardize BHK format
+      let standardBHK;
+      if (bhkType && typeof bhkType === "string") {
+        const bhkMatch = bhkType.match(/(\d+)\s*BHK/i);
+        if (bhkMatch) {
+          standardBHK = `${bhkMatch[1]}BHK`;
+        }
+      } else if (typeof bhkType === "number") {
+        standardBHK = `${bhkType}BHK`;
+      }
+
+      // Count units for each configuration
+      const units = config.units || config.totalUnits || 1;
+
+      if (standardBHK && bhkMapping[standardBHK]) {
+        const bhkKey = bhkMapping[standardBHK];
+        tierCounts[tier][bhkKey] += units;
+        tierCounts[tier].total += units;
+        totalProjects += units;
+      }
+    });
+
+    // If no configurations found, count as 1 unit (fallback)
+    if (!configurations.length) {
+      tierCounts[tier].total += 1;
+      totalProjects += 1;
+    }
   });
+
+  // Calculate percentages
+  const supplyAnalysis = {
+    premium: {},
+    economy: {},
+    mass: {},
+    totals: {},
+  };
+
+  // Calculate percentages for each tier and BHK type
+  ["premium", "economy", "mass"].forEach((tier) => {
+    ["bhk1", "bhk2", "bhk3", "bhk4"].forEach((bhkKey) => {
+      const percentage =
+        totalProjects > 0
+          ? ((tierCounts[tier][bhkKey] / totalProjects) * 100).toFixed(1)
+          : "0.0";
+
+      supplyAnalysis[tier][bhkKey] = {
+        count: tierCounts[tier][bhkKey],
+        percentage: `${percentage}%`,
+      };
+    });
+
+    // Calculate tier total percentage
+    const tierPercentage =
+      totalProjects > 0
+        ? ((tierCounts[tier].total / totalProjects) * 100).toFixed(1)
+        : "0.0";
+
+    supplyAnalysis[tier].total = {
+      count: tierCounts[tier].total,
+      percentage: `${tierPercentage}%`,
+    };
+  });
+
+  // Calculate column totals (by BHK type across all tiers)
+  ["bhk1", "bhk2", "bhk3", "bhk4"].forEach((bhkKey) => {
+    const totalBHKCount =
+      tierCounts.premium[bhkKey] +
+      tierCounts.economy[bhkKey] +
+      tierCounts.mass[bhkKey];
+    const totalBHKPercentage =
+      totalProjects > 0
+        ? ((totalBHKCount / totalProjects) * 100).toFixed(1)
+        : "0.0";
+
+    supplyAnalysis.totals[bhkKey] = {
+      count: totalBHKCount,
+      percentage: `${totalBHKPercentage}%`,
+    };
+  });
+
+  // Calculate total tier percentages (row totals)
+  const totalPremiumPercentage =
+    totalProjects > 0
+      ? ((tierCounts.premium.total / totalProjects) * 100).toFixed(1)
+      : "0.0";
+  const totalEconomyPercentage =
+    totalProjects > 0
+      ? ((tierCounts.economy.total / totalProjects) * 100).toFixed(1)
+      : "0.0";
+  const totalMassPercentage =
+    totalProjects > 0
+      ? ((tierCounts.mass.total / totalProjects) * 100).toFixed(1)
+      : "0.0";
+
+  // Add total row percentages to each tier
+  supplyAnalysis.premium.total = {
+    count: tierCounts.premium.total,
+    percentage: `${totalPremiumPercentage}%`,
+  };
+
+  supplyAnalysis.economy.total = {
+    count: tierCounts.economy.total,
+    percentage: `${totalEconomyPercentage}%`,
+  };
+
+  supplyAnalysis.mass.total = {
+    count: tierCounts.mass.total,
+    percentage: `${totalMassPercentage}%`,
+  };
+
+  // Grand total
+  supplyAnalysis.totals.grandTotal = {
+    count: totalProjects,
+    percentage: "100.0%",
+  };
+
+  // Add total column summary
+  supplyAnalysis.totals.total = {
+    count: totalProjects,
+    percentage: "100.0%",
+  };
+
+  return supplyAnalysis;
+}
+
+function getEmptySupplyAnalysis() {
+  const empty = {
+    count: 0,
+    percentage: "0.0%",
+  };
+
+  return {
+    premium: {
+      bhk1: { ...empty },
+      bhk2: { ...empty },
+      bhk3: { ...empty },
+      bhk4: { ...empty },
+      total: { ...empty },
+    },
+    economy: {
+      bhk1: { ...empty },
+      bhk2: { ...empty },
+      bhk3: { ...empty },
+      bhk4: { ...empty },
+      total: { ...empty },
+    },
+    mass: {
+      bhk1: { ...empty },
+      bhk2: { ...empty },
+      bhk3: { ...empty },
+      bhk4: { ...empty },
+      total: { ...empty },
+    },
+    totals: {
+      bhk1: { ...empty },
+      bhk2: { ...empty },
+      bhk3: { ...empty },
+      bhk4: { ...empty },
+      total: { count: 0, percentage: "100.0%" },
+      grandTotal: { count: 0, percentage: "100.0%" },
+    },
+  };
 }
 
 // Process and render the micromarket supply analysis page 2
-async function renderMicromarketSupplyAnalysis2Page(micromarketData) {
+async function renderMicromarketSupplyAnalysis2Page(projectData) {
   const template = await loadTemplate("MicromarketSupplyAnalysis2");
-  return template({
-    TRUEESTATE_SCORE: micromarketData?.supplyImpactScore || 8,
 
-    supplyData2: micromarketData?.supplyData2 || {
-      parameters: [
-        {
-          name: "Devanahalli Business Park",
-          distance: "5 kms",
-          area: "28 mn Sqft",
-        },
-        {
-          name: "Airport Township",
-          distance: "5 kms",
-          area: "28 mn Sqft",
-        },
-        {
-          name: "KIADB Hardware Tech Park",
-          distance: "5 kms",
-          area: "28 mn Sqft",
-        },
-        {
-          name: "KIADB Aerospace Industry",
-          distance: "5 kms",
-          area: "28 mn Sqft",
-        },
-        {
-          name: "Prestige Tech cloud",
-          distance: "5 kms",
-          area: "28 mn Sqft",
-        },
-      ],
-      totalArea: "221 mn Sqft",
-      bubbleData: {
-        expectedDemand: "26.52 Lac",
-        readyToMove: "26.52 Lac",
-        underConstruction: "26.52 Lac",
-        delta: "26.52 Lac",
-      },
-    },
+  const microMarket = projectData.micromarket;
+
+  if (!microMarket) {
+    return template({
+      TRUEESTATE_SCORE: projectData?.supplyImpactScore || 8,
+      supplySegmentAnalysis: getEmptySegmentAnalysis(),
+      supplyData2: getDefaultSupplyData2(),
+    });
+  }
+
+  try {
+    // Fetch all projects with the same micromarket
+    const projectsSnapshot = await db
+      .collection("assetData")
+      .where("micromarket", "==", microMarket)
+      .get();
+
+    const projects = [];
+    projectsSnapshot.forEach((doc) => {
+      projects.push({ id: doc.id, ...doc.data() });
+    });
+
+    // Calculate supply segment analysis
+    const supplySegmentAnalysis = calculateSupplySegmentAnalysis(projects);
+    console.log(supplySegmentAnalysis, "data for dev 2");
+
+    return template({
+      TRUEESTATE_SCORE: projectData?.supplyImpactScore || 8,
+      supplySegmentAnalysis: supplySegmentAnalysis,
+      supplyData2: projectData?.supplyData2 || getDefaultSupplyData2(),
+    });
+  } catch (error) {
+    console.error("Error fetching micromarket data:", error);
+    return template({
+      TRUEESTATE_SCORE: projectData?.supplyImpactScore || 8,
+      supplySegmentAnalysis: getEmptySegmentAnalysis(),
+      supplyData2: getDefaultSupplyData2(),
+    });
+  }
+}
+
+function calculateSupplySegmentAnalysis(projects) {
+  // Initialize counters for each segment
+  const segmentCounts = {
+    luxury: 0, // Developer Tier A
+    premium: 0, // Developer Tier B & C
+    economy: 0, // Developer Tier D and others
+  };
+
+  let totalUnits = 0;
+
+  // Process each project
+  projects.forEach((project) => {
+    const developerTier = project.devTier;
+    const configurations = project.data || [];
+
+    // Calculate total units for this project
+    let projectUnits = 0;
+
+    if (configurations.length > 0) {
+      configurations.forEach((config) => {
+        const units = config.units || config.totalUnits || 1;
+        projectUnits += units;
+      });
+    } else {
+      // Fallback: if no configurations, count as 1 unit
+      projectUnits = 1;
+    }
+
+    // Categorize by developer tier
+    if (developerTier === "A") {
+      segmentCounts.luxury += projectUnits;
+    } else if (developerTier === "B" || developerTier === "C") {
+      segmentCounts.premium += projectUnits;
+    } else if (developerTier === "D") {
+      segmentCounts.economy += projectUnits;
+    }
+    // Skip projects without valid developer tier
+
+    totalUnits += projectUnits;
   });
+
+  // Calculate percentages
+  const luxuryPercentage =
+    totalUnits > 0
+      ? ((segmentCounts.luxury / totalUnits) * 100).toFixed(1)
+      : "0.0";
+
+  const premiumPercentage =
+    totalUnits > 0
+      ? ((segmentCounts.premium / totalUnits) * 100).toFixed(1)
+      : "0.0";
+
+  const economyPercentage =
+    totalUnits > 0
+      ? ((segmentCounts.economy / totalUnits) * 100).toFixed(1)
+      : "0.0";
+
+  // Calculate low end (Economy) for total section
+  const lowEndPercentage = economyPercentage;
+
+  return {
+    luxury: {
+      units: segmentCounts.luxury,
+      unitsPercentage: `${luxuryPercentage}%`,
+      partPercentage: `${luxuryPercentage}%`,
+    },
+    premium: {
+      units: segmentCounts.premium,
+      unitsPercentage: `${premiumPercentage}%`,
+      partPercentage: `${premiumPercentage}%`,
+    },
+    economy: {
+      units: segmentCounts.economy,
+      unitsPercentage: `${economyPercentage}%`,
+      partPercentage: `${economyPercentage}%`,
+    },
+    total: {
+      lowEndPercentage: `${lowEndPercentage}%`,
+      totalUnits: totalUnits,
+      unitsPercentage: "100.0%",
+    },
+  };
+}
+
+function getEmptySegmentAnalysis() {
+  return {
+    luxury: {
+      units: 0,
+      unitsPercentage: "0.0%",
+      partPercentage: "0.0%",
+    },
+    premium: {
+      units: 0,
+      unitsPercentage: "0.0%",
+      partPercentage: "0.0%",
+    },
+    economy: {
+      units: 0,
+      unitsPercentage: "0.0%",
+      partPercentage: "0.0%",
+    },
+    total: {
+      lowEndPercentage: "0.0%",
+      totalUnits: 0,
+      unitsPercentage: "100.0%",
+    },
+  };
+}
+
+function getDefaultSupplyData2() {
+  return {
+    parameters: [
+      {
+        name: "Devanahalli Business Park",
+        distance: "5 kms",
+        area: "28 mn Sqft",
+      },
+      {
+        name: "Airport Township",
+        distance: "5 kms",
+        area: "28 mn Sqft",
+      },
+      {
+        name: "KIADB Hardware Tech Park",
+        distance: "5 kms",
+        area: "28 mn Sqft",
+      },
+      {
+        name: "KIADB Aerospace Industry",
+        distance: "5 kms",
+        area: "28 mn Sqft",
+      },
+      {
+        name: "Prestige Tech cloud",
+        distance: "5 kms",
+        area: "28 mn Sqft",
+      },
+    ],
+    totalArea: "221 mn Sqft",
+    bubbleData: {
+      expectedDemand: "26.52 Lac",
+      readyToMove: "26.52 Lac",
+      underConstruction: "26.52 Lac",
+      delta: "26.52 Lac",
+    },
+  };
 }
 
 // Process and render the micromarket rental analysis page
@@ -1411,56 +1887,82 @@ async function renderMicromarketResaleAnalysisPage(projectData) {
 }
 
 // Process and render the impact scores page
-async function renderImpactScoresPage(projectData) {
+async function renderImpactScoresPage(projectData, micromarketData) {
   const template = await loadTemplate("ImpactScores");
   const impact = (value) => {
     if (value >= 8) {
-      return "high";
+      return "High";
     } else if (value >= 4) {
-      return "medium";
-    } else {
-      return "low";
+      return "Medium";
+    } else if (value <= 3) {
+      return "Low";
     }
   };
   return template({
-    projectName: projectData?.projectName || "Sample Project",
-    ProjectOverViewImpactScore: projectData?.projectOverviewImpactScore || 8,
-    ProjectOverViewImpactScoreClass:
-      impact(projectData?.projectOverviewImpactScore) || "high",
-    ProjectAreaReviewImpactScore:
-      projectData?.projectAreaReviewImpactScore || 8,
-    ProjectAreaReviewImpactScoreClass:
-      impact(projectData?.projectAreaReviewImpactScore) || "high",
-    ProjectUnitDetailImpactScore:
-      projectData?.projectUnitDetailImpactScore || 8,
-    ProjectUnitDetailImpactScoreClass:
-      impact(projectData?.projectUnitDetailImpactScore) || "high",
-    ProjectPerformanceImpactScore:
-      projectData?.projectPerformanceImpactScore || 8,
-    ProjectPerformanceImpactScoreClass:
-      impact(projectData?.projectPerformanceImpactScore) || "high",
-    ProjectRiskImpactScore: projectData?.projectRiskImpactScore || 8,
-    ProjectRiskImpactScoreClass:
-      impact(projectData?.projectRiskImpactScore) || "high",
-    ProjectPricingImpactScore: projectData?.investmentDetailImpactScore || 8,
-    ProjectPricingImpactScoreClass:
-      impact(projectData?.investmentDetailImpactScore) || "high",
-    ProjectAmenitiesImpactScore: projectData?.projectAmenitiesImpactScore || 8,
-    ProjectAmenitiesImpactScoreClass:
-      impact(projectData?.projectAmenitiesImpactScore) || "high",
-    ProjectLocationImpactScore: projectData?.projectLocationImpactScore || 8,
-    ProjectLocationImpactScoreClass:
-      impact(projectData?.projectLocationImpactScore) || "high",
-    ProjectDeveloperImpactScore: projectData?.projectDeveloperImpactScore || 8,
-    ProjectDeveloperImpactScoreClass:
-      impact(projectData?.projectDeveloperImpactScore) || "high",
-    YearWiseCashflowImpactScore: projectData?.yearWiseCashflowImpactScore || 8,
-    YearWiseCashflowImpactScoreClass:
-      impact(projectData?.yearWiseCashflowImpactScore) || "high",
+    projectName: projectData?.projectName,
+    ProjectOverViewImpactScore: projectData?.projectOverviewImpactScore,
+    ProjectOverViewImpactScoreClass: impact(
+      projectData?.projectOverviewImpactScore
+    ),
+    ProjectAreaReviewImpactScore: projectData?.projectAreaReviewImpactScore,
+    ProjectAreaReviewImpactScoreClass: impact(
+      projectData?.projectAreaReviewImpactScore
+    ),
+    ProjectUnitDetailImpactScore: projectData?.projectUnitDetailImpactScore,
+    ProjectUnitDetailImpactScoreClass: impact(
+      projectData?.projectUnitDetailImpactScore
+    ),
+    ProjectPerformanceImpactScore: projectData?.projectPerformanceImpactScore,
+    ProjectPerformanceImpactScoreClass: impact(
+      projectData?.projectPerformanceImpactScore
+    ),
+    ProjectRiskImpactScore: projectData?.projectRiskImpactScore,
+    ProjectRiskImpactScoreClass: impact(projectData?.projectRiskImpactScore),
+    ProjectPricingImpactScore: projectData?.investmentDetailImpactScore,
+    ProjectPricingImpactScoreClass: impact(
+      projectData?.investmentDetailImpactScore
+    ),
+    ProjectAmenitiesImpactScore: projectData?.projectAmenitiesImpactScore,
+    ProjectAmenitiesImpactScoreClass: impact(
+      projectData?.projectAmenitiesImpactScore
+    ),
+    ProjectLocationImpactScore: projectData?.projectLocationImpactScore,
+    ProjectLocationImpactScoreClass: impact(
+      projectData?.projectLocationImpactScore
+    ),
+    ProjectDeveloperImpactScore: projectData?.projectDeveloperImpactScore,
+    ProjectDeveloperImpactScoreClass: impact(
+      projectData?.projectDeveloperImpactScore
+    ),
+    YearWiseCashflowImpactScore: projectData?.yearWiseCashflowImpactScore,
+    YearWiseCashflowImpactScoreClass: impact(
+      projectData?.yearWiseCashflowImpactScore
+    ),
     FutureAreaDevelopmentImpactScore:
-      projectData?.futureAreaDevelopmentImpactScore || 8,
-    FutureAreaDevelopmentImpactScoreClass:
-      impact(projectData?.futureAreaDevelopmentImpactScore) || "high",
+      projectData?.futureAreaDevelopmentImpactScore,
+    FutureAreaDevelopmentImpactScoreClass: impact(
+      projectData?.futureAreaDevelopmentImpactScore
+    ),
+    MicromarketDemandAnalysisImpactScore:
+      micromarketData?.MicromarketDemandAnalysisImpactScore,
+    MicromarketDemandAnalysisImpactScoreClass: impact(
+      micromarketData?.MicromarketDemandAnalysisImpactScore
+    ),
+    MicromarketDemandAnalysisImpactScore:
+      micromarketData?.MicromarketDemandAnalysisImpactScore,
+    MicromarketSupplyAnalysisImpactScoreClass: impact(
+      micromarketData?.MicromarketSupplyAnalysisImpactScore
+    ),
+    MicromarketRentalAnalysisImpactScore:
+      micromarketData?.MicromarketRentalAnalysisImpactScore,
+    MicromarketRentalAnalysisImpactScoreClass: impact(
+      micromarketData?.MicromarketRentalAnalysisImpactScore
+    ),
+    MicromarketResaleAnalysisImpactScore:
+      micromarketData?.MicromarketResaleAnalysisImpactScore,
+    MicromarketResaleAnalysisImpactScoreClass: impact(
+      micromarketData?.MicromarketResaleAnalysisImpactScore
+    ),
     impactScores: projectData?.impactScores || {
       overallScore: 8,
       categories: [
@@ -1502,19 +2004,19 @@ async function printObjectToPDF(doc, obj, indent = 0) {
       doc.fontSize(14).text(`${indentStr}Images:`);
       for (const imageUrl of value) {
         try {
-          console.log("Processing image URL:", imageUrl);
+          // // console.log("Processing image URL:", imageUrl);
           // Extract the path from the Firebase Storage URL
           const pathMatch = imageUrl.match(/\/o\/(.+?)\?/);
           if (!pathMatch) {
             throw new Error("Invalid Firebase Storage URL format");
           }
           const path = decodeURIComponent(pathMatch[1]);
-          console.log("Extracted path:", path);
+          // // console.log("Extracted path:", path);
 
           // Get the file from Firebase Storage
           const file = bucket.file(path);
           const [fileContent] = await file.download();
-          console.log("File downloaded successfully");
+          // // console.log("File downloaded successfully");
 
           // Convert WebP to JPEG using sharp
           const convertedBuffer = await sharp(fileContent)
@@ -1569,7 +2071,7 @@ function renderHtmlTemplate(projectName) {
 function renderProjectDetailsTemplate(projectData) {
   // Extract images from all nested objects
   const allImages = extractImagesFromNestedObjects(projectData);
-  console.log(`Found ${allImages.length} images in the project data`);
+  // // console.log(`Found ${allImages.length} images in the project data`);
 
   let html = `
   <!DOCTYPE html>
@@ -1919,7 +2421,7 @@ function renderProjectDetailsTemplate(projectData) {
 // PDF download route with Investment Report title
 app.get("/download-pdf", async (req, res) => {
   try {
-    console.log("Received PDF request");
+    // // console.log("Received PDF request");
     const projectId = req.query.projectId;
     const debugMode = req.query.debug === "true";
     const viewOnly = req.query.view === "true"; // New parameter to control behavior
@@ -1928,7 +2430,7 @@ app.get("/download-pdf", async (req, res) => {
       return res.status(400).send("Project ID is required");
     }
 
-    console.log("Fetching project data for ID:", projectId);
+    // console.log("Fetching project data for ID:", projectId);
 
     // Fetch project data from Firestore
     const projectDoc = await db.collection("assetData").doc(projectId).get();
@@ -1938,13 +2440,13 @@ app.get("/download-pdf", async (req, res) => {
     }
 
     const projectData = projectDoc.data();
-    const projectName = projectData.projectName || "Unnamed Project";
+    const projectName = projectData.projectName;
 
-    console.log("Found project:", projectName);
+    // console.log("Found project:", projectName);
 
     // Extract all images from the project data
     const allImages = extractImagesFromNestedObjects(projectData);
-    console.log(`Found ${allImages.length} total images in the project data`);
+    // console.log(`Found ${allImages.length} total images in the project data`);
 
     // Process all images to get signed URLs if needed
     const processedImages = [];
@@ -1966,7 +2468,7 @@ app.get("/download-pdf", async (req, res) => {
         }
       }
     }
-    console.log(projectData.micromarket);
+    // console.log(projectData.micromarket);
 
     // Fetch micromarket data
     const micromarketQuery = db
@@ -1975,7 +2477,7 @@ app.get("/download-pdf", async (req, res) => {
     const querySnapshot = await micromarketQuery.get();
     const micromarketDoc = querySnapshot.docs[0];
     const micromarketData = micromarketDoc ? micromarketDoc.data() : null;
-    console.log("Micromarket data:", micromarketData);
+    // console.log("Micromarket data:", micromarketData);
 
     const tenure = 20;
     const holdingPeriod = 4;
@@ -2014,19 +2516,19 @@ app.get("/download-pdf", async (req, res) => {
     });
 
     const data2 = {
-      booking_amt: response.data.booking_amount,
-      intrest: response.data.monthly_cf.reduce((sum, currentArray) => {
+      booking_amt: response?.data?.booking_amount,
+      intrest: response?.data?.monthly_cf.reduce((sum, currentArray) => {
         return sum + parseFloat(currentArray[4]); // total interest
       }, 0),
-      principal: response.data.monthly_cf.reduce((sum, currentArray) => {
+      principal: response.data?.monthly_cf.reduce((sum, currentArray) => {
         return sum + parseFloat(currentArray[5]); // total principal
       }, 0),
       constructionCompletionDate: response?.data?.constructionCompletionDate, // handover date
       finalPrice: sellingCost, // final selling cost
       selectedCharge, // transfer fee or stamp duty & reg charges
-      charges_value: response.data.charges_value, // value of the above charge
-      possessionAmount: response.data.possession_amount,
-      amounttNotDisbursed: response.data.amount_not_disbursed, // loan amount not disbursed till last
+      charges_value: response?.data?.charges_value, // value of the above charge
+      possessionAmount: response?.data?.possession_amount,
+      amounttNotDisbursed: response?.data?.amount_not_disbursed, // loan amount not disbursed till last
     };
 
     // Render each page from the templates
@@ -2059,7 +2561,9 @@ app.get("/download-pdf", async (req, res) => {
       data2,
       response
     );
-    const pEDevelopmentHtml = renderPEDevelopmentPage(projectData);
+    const pEDevelopmentHtml = renderPEDevelopmentPage(
+      micromarketData?.proposed_existing_development?.land_use_categories
+    );
     const aboutHtml = renderAboutPage(projectData);
     const contactUsHtml = renderContactUsPage(projectData);
     const masterPlanHtml = renderMasterPlanPage(projectData, firstImageUrl);
@@ -2072,18 +2576,21 @@ app.get("/download-pdf", async (req, res) => {
     const micromarketDemandAnalysisHtml =
       await renderMicromarketDemandAnalysisPage(micromarketData);
     const micromarketSupplyAnalysis1Html =
-      await renderMicromarketSupplyAnalysis1Page(micromarketData);
+      await renderMicromarketSupplyAnalysis1Page(projectData);
     const micromarketSupplyAnalysis2Html =
-      await renderMicromarketSupplyAnalysis2Page(micromarketData);
+      await renderMicromarketSupplyAnalysis2Page(projectData);
     const micromarketRentalAnalysisHtml =
       await renderMicromarketRentalAnalysisPage(projectData);
     const micromarketResaleAnalysisHtml =
       await renderMicromarketResaleAnalysisPage(projectData);
-    const impactScoresHtml = await renderImpactScoresPage(projectData);
+    const impactScoresHtml = await renderImpactScoresPage(
+      projectData,
+      micromarketData
+    );
 
     // Try a completely different approach - generate individual PDFs for each page and then merge them
     try {
-      console.log("Attempting to generate PDF using multi-page approach...");
+      // console.log("Attempting to generate PDF using multi-page approach...");
 
       // Create pages directory if it doesn't exist
       const pagesDir = path.join(__dirname, "pages");
@@ -2150,10 +2657,12 @@ app.get("/download-pdf", async (req, res) => {
         );
       }
 
-      fs.writeFileSync(
-        path.join(pagesDir, "googleReviews.html"),
-        await googleReviewsHtml
-      );
+      if (projectData?.developerReview) {
+        fs.writeFileSync(
+          path.join(pagesDir, "googleReviews.html"),
+          await googleReviewsHtml
+        );
+      }
       fs.writeFileSync(
         path.join(pagesDir, "investmentHighlight.html"),
         await investmentHighlightHtml
@@ -2163,23 +2672,33 @@ app.get("/download-pdf", async (req, res) => {
         await yearlyCashflowHtml
       );
 
-      if (micromarketData) {
+      if (micromarketData?.proposed_existing_development?.land_use_categories) {
         fs.writeFileSync(
           path.join(pagesDir, "P&Edevelopment.html"),
           await pEDevelopmentHtml
         );
+      }
+      if (projectData.assetType != "plot") {
         fs.writeFileSync(
+          path.join(pagesDir, "MircomarketSupplyAnalysis1.html"),
+          await micromarketSupplyAnalysis1Html
+        );
+      }
+
+      fs.writeFileSync(
+        path.join(pagesDir, "micromarketSupplyAnalysis2.html"),
+        await micromarketSupplyAnalysis2Html
+      );
+
+      if(micromarketData?.demandAnalysis){
+      fs.writeFileSync(
           path.join(pagesDir, "micromarketDemandAnalysis.html"),
           await micromarketDemandAnalysisHtml
         );
-        fs.writeFileSync(
-          path.join(pagesDir, "micromarketSupplyAnalysis1.html"),
-          await micromarketSupplyAnalysis1Html
-        );
-        fs.writeFileSync(
-          path.join(pagesDir, "micromarketSupplyAnalysis2.html"),
-          await micromarketSupplyAnalysis2Html
-        );
+      }
+
+      if (micromarketData) {
+        
         fs.writeFileSync(
           path.join(pagesDir, "micromarketRentalAnalysis.html"),
           await micromarketRentalAnalysisHtml
@@ -2231,7 +2750,7 @@ app.get("/download-pdf", async (req, res) => {
             // Check if the HTML file exists before trying to generate PDF
             const htmlPath = path.join(pagesDir, htmlFile);
             if (!fs.existsSync(htmlPath)) {
-              console.log(`Skipping ${htmlFile} - file does not exist`);
+              // console.log(`Skipping ${htmlFile} - file does not exist`);
               return;
             }
 
@@ -2245,7 +2764,7 @@ app.get("/download-pdf", async (req, res) => {
             // Wait for fonts to load
             await page.evaluateOnNewDocument(() => {
               document.fonts.ready.then(() => {
-                console.log("Fonts loaded");
+                // console.log("Fonts loaded");
               });
             });
 
@@ -2333,8 +2852,8 @@ app.get("/download-pdf", async (req, res) => {
             "micromarketDemandAnalysis.pdf"
           );
           await generatePDF(
-            "micromarketSupplyAnalysis1.html",
-            "micromarketSupplyAnalysis1.pdf"
+            "mircomarketSupplyAnalysis1.html",
+            "mircomarketSupplyAnalysis1.pdf"
           );
           await generatePDF(
             "micromarketSupplyAnalysis2.html",
@@ -2477,7 +2996,7 @@ app.get("/download-pdf", async (req, res) => {
             filename,
             projectId
           );
-          console.log("PDF saved to Firebase:", result);
+          // console.log("PDF saved to Firebase:", result);
         } catch (saveErr) {
           console.error("Error saving to Firebase:", saveErr);
         }
@@ -2517,7 +3036,7 @@ async function savePDFToFirebase(pdfBuffer, filename, projectId) {
       return res.status(400).send("Project ID is required");
     }
 
-    console.log("Fetching project data for ID:", projectId);
+    // console.log("Fetching project data for ID:", projectId);
 
     // Fetch project data from Firestore
     const projectDoc = await db.collection("assetData").doc(projectId).get();
@@ -2667,5 +3186,5 @@ app.get("/makeallpdf", async (req, res) => {
 
 // Start server
 app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+  // console.log(`Server is running on port ${port}`);
 });
