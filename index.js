@@ -17,7 +17,7 @@ const {
   formatCurrency,
   toCapitalizedWords,
 } = require("./common.js");
-const { fetchAllAssetData } = require("./script.js");
+const { fetchAllAssetData, testRout } = require("./script.js");
 
 const app = express();
 const port = 3000;
@@ -2712,7 +2712,7 @@ async function savePDFToFirebase(pdfBuffer, filename, projectId) {
     // Get a signed URL for the uploaded PDF
     const [signedUrl] = await file.getSignedUrl({
       action: "read",
-      expires: Date.now() + 7 * 24 * 60 * 60 * 1000, // URL expires in 7 days
+      expires: Date.now() + 50 * 365 * 24 * 60 * 60 * 1000, // URL expires in 50 years
     });
 
     // Save the PDF metadata to Firestore
@@ -2831,6 +2831,16 @@ app.get("/makeallpdf", async (req, res) => {
   } catch (error) {
     console.error("Error in makeallpdf route:", error);
     res.status(500).send("Failed to generate PDFs");
+  }
+});
+
+app.get("/test", async (req, res) => {
+  try {
+    testRout(db, admin);
+    res.status(200).send("Test route started");
+  } catch (error) {
+    console.error("Error in test route:", error);
+    res.status(500).send("Failed to fetch project data");
   }
 });
 
