@@ -1,5 +1,43 @@
-
+function getTierDisplayName(tier) {
+  const tierNames = {
+    premium: 'Premium Tier',
+    economy: 'Economy Tier', 
+    mass: 'Mass Tier'
+  };
+  return tierNames[tier] || tier;
+}
 //import { isString } from "highcharts";
+export function toCapitalizedWords(str) {
+  if (!str) return;
+  str = str.trim();
+
+  // Split the string into parts: normal words and those within parentheses
+  const parts = str.split(/(\([^)]*\))/);  // This regex splits on parentheses while keeping them
+
+  const capitalizedParts = parts.map(part => {
+    // If the part is a word or a space, capitalize it
+    if (part && !part.startsWith('(') && !part.endsWith(')')) {
+      const words = part.split(/\s+/);
+      const capitalizedWords = words.map(word => {
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+      });
+      return capitalizedWords.join(' ');
+    }
+    // If the part is inside parentheses, split it by spaces and capitalize as well
+    if (part.startsWith('(') && part.endsWith(')')) {
+      const insideParentheses = part.slice(1, -1); // Remove the parentheses
+      const wordsInParentheses = insideParentheses.split(/\s+/);
+      const capitalizedWordsInParentheses = wordsInParentheses.map(word => {
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+      });
+      return `(${capitalizedWordsInParentheses.join(' ')})`; // Reattach parentheses
+    }
+    return part; // If it's not a word or parentheses, leave it as is
+  });
+
+  return capitalizedParts.join('');
+}
+
 
 export function formatCost(price) {
   if(!price && price!==0) return;
