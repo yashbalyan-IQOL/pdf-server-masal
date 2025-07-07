@@ -367,7 +367,7 @@ function renderInvestmentHighlightPage(projectData, data2, response) {
     TOTAL_INVESTMENT: formatCurrency(response?.data?.total_investment),
     TOTAL_RETURN: formatCurrency(response?.data?.total_returns),
     asset: assetContext,
-    TRUEESTATE_SCORE: response?.data?.impact_score || 1,
+    TRUEESTATE_SCORE: response?.data?.impact_score || null,
   });
 }
 
@@ -582,12 +582,38 @@ function renderYearlyCashflowPage(projectData, data2, response) {
 // Process and render the P&E development page
 function renderPEDevelopmentPage(micromarketData) {
   const template = loadTemplate("P&Edevelopment");
-  // console.log(micromarketData?.proposed_existing_development?.land_use_categories,"PEDevelopmentData");
+  
+  // Limit data to first 8 rows
+  let processedData = micromarketData || "-";
+  
+  if (micromarketData) {
+    // Create a deep copy to avoid mutating original data
+    processedData = JSON.parse(JSON.stringify(micromarketData));
+    
+    // Limit different possible array structures to first 8 items
+    if (processedData.proposed_existing_development?.land_use_categories) {
+      processedData.proposed_existing_development.land_use_categories = 
+        processedData.proposed_existing_development.land_use_categories.slice(0, 8);
+    }
+    
+    // Add other possible array properties that might need limiting
+    if (processedData.data && Array.isArray(processedData.data)) {
+      processedData.data = processedData.data.slice(0, 8);
+    }
+    
+    if (processedData.rows && Array.isArray(processedData.rows)) {
+      processedData.rows = processedData.rows.slice(0, 8);
+    }
+    
+    if (processedData.developments && Array.isArray(processedData.developments)) {
+      processedData.developments = processedData.developments.slice(0, 8);
+    }
+  }
+  
   return template({
-    data: micromarketData || "-",
+    data: processedData,
   });
 }
-
 // Process and render the about page
 function renderAboutPage(projectData) {
   const template = loadTemplate("about");
@@ -630,7 +656,7 @@ function renderMasterPlanPage(projectData, masterPlanImage) {
     MASTER_PLAN_IMAGE: masterPlanUrl,
     PENDING_PHASES: projectData?.pendingPhases || "---",
     GREEN_ZONE: projectData?.greenZone || "---",
-    TRUEESTATE_SCORE: projectData?.projectOverviewImpactScore || 8,
+    TRUEESTATE_SCORE: projectData?.projectOverviewImpactScore || '-',
   });
 }
 
@@ -640,8 +666,51 @@ function renderUnitLevelPage(projectData, unitLevelImage) {
   // Process the data first
   const assetType = projectData?.assetType || "apartment";
 
+  // Handle configurations differently for each asset type
+  const getConfigurations = () => {
+    return projectData.data.map((item, index) => {
+      const configFromData = item.configuration;
+      const configFromArray = projectData.configurations[index];
+      
+      if (assetType === "apartment") {
+        // For apartments, prioritize configuration from data, then array, then create BHK format
+        if (configFromData) {
+          return `${configFromData}BHK`;
+        } else if (configFromArray) {
+          return `${configFromArray}BHK`;
+        } else {
+          return `${index + 1}BHK`;
+        }
+      } else if (assetType === "plot") {
+        // For plots, use Plot + number format
+        if (configFromData) {
+          return `${configFromData}`;
+        } else if (configFromArray) {
+          return `${configFromArray}`;
+        } else {
+          return `Plot ${index + 1}`;
+        }
+      } else if (assetType === "villa") {
+        // For villas, prioritize configuration from data, then array, then create Villa format
+        if (configFromData) {
+          return `${configFromData}BHK`;
+        } else if (configFromArray) {
+          return `${configFromArray}BHK`;
+        } else {
+          return `${index + 1} BHK Villa`;
+        }
+      } else {
+        // Default fallback for other asset types
+        return configFromData || configFromArray || `Config ${index + 1}`;
+      }
+    });
+  };
+
+  // Get configurations (with duplicates allowed)
+  const configurations = getConfigurations();
+
   const processedConfigs = projectData.data.map((item, index) => {
-    const configName = projectData.configurations[index];
+    const configName = configurations[index];
 
     if (assetType === "apartment") {
       const superBuiltUpArea = item.superBuiltUpArea || 0;
@@ -653,31 +722,55 @@ function renderUnitLevelPage(projectData, unitLevelImage) {
 
       return {
         type: configName,
-        saleableArea: `${superBuiltUpArea} Sqft`,
-        carpetArea: `${carpetArea} Sqft`,
+        saleableArea: `${superBuiltUpArea}`,
+        carpetArea: `${carpetArea}`,
         loading: `${loading}%`,
         pricePerSqftSBU: `₹${Math.round(
           pricePerSqftSBU
-        ).toLocaleString()} /Sq ft`,
+        ).toLocaleString()}`,
         pricePerSqftCA: `₹${Math.round(
           pricePerSqftCA
-        ).toLocaleString()} /Sq ft`,
+        ).toLocaleString()}`,
         carParking: item.carParking || "---",
         totalPrice: `₹${(item.totalPrice / 10000000).toFixed(2)} Crs`,
         strategy: item.strategy || "---",
-        recommendation: item.recommendation || "---",
+        recommendation: item.truEstateScore || "---",
+      };
+    } else if (assetType === "villa") {
+      const builtUpArea = item.builtUpArea || 0;
+      const plotArea = item.plotArea || 0;
+      const carpetArea = item.carpetArea || Math.round(builtUpArea * 0.8);
+      const pricePerSqftBuiltUp = builtUpArea > 0 ? item.totalPrice / builtUpArea : 0;
+      const pricePerSqftPlot = plotArea > 0 ? item.totalPrice / plotArea : 0;
+
+      return {
+        type: configName,
+        builtUpArea: `${builtUpArea}`,
+        plotArea: `${plotArea}`,
+        carpetArea: `${carpetArea}`,
+        pricePerSqftBuiltUp: `₹${Math.round(
+          pricePerSqftBuiltUp
+        ).toLocaleString()}`,
+        pricePerSqftPlot: `₹${Math.round(
+          pricePerSqftPlot
+        ).toLocaleString()}`,
+        carParking: item.carParking || "---",
+        totalPrice: `₹${(item.totalPrice / 10000000).toFixed(2)} Crs`,
+        strategy: item.strategy || "---",
+        recommendation: item.truEstateScore || "---",
       };
     } else {
+      // Plot logic
       const plotArea = item.plotArea || 0;
       const pricePerSqft = plotArea > 0 ? item.totalPrice / plotArea : 0;
 
       return {
         type: configName,
-        plotArea: `${plotArea} Sqft`,
-        pricePerSqft: `₹${Math.round(pricePerSqft).toLocaleString()} /Sq ft`,
+        plotArea: `${plotArea}`,
+        pricePerSqft: `₹${Math.round(pricePerSqft).toLocaleString()}`,
         totalPrice: `₹${(item.totalPrice / 10000000).toFixed(2)} Crs`,
-        strategy: item.strategy || "---",
-        recommendation: item.recommendation || "---",
+        strategy: item.strategy || "--",
+        recommendation: item.truEstateScore || "--",
       };
     }
   });
@@ -685,7 +778,7 @@ function renderUnitLevelPage(projectData, unitLevelImage) {
   // Create rows and columns data structure instead of HTML strings
   const apartmentTableData = [
     { label: "Saleable Area", key: "saleableArea", isScore: false },
-    { label: "Carpet Area", key: "carpetArea", isScore: false },
+    { label: "Carpet Area (Sqft)", key: "carpetArea", isScore: false },
     { label: "Loading", key: "loading", isScore: false },
     { label: "Price / Sqft of SBU", key: "pricePerSqftSBU", isScore: false },
     { label: "Price / Sqft of CA", key: "pricePerSqftCA", isScore: false },
@@ -695,21 +788,36 @@ function renderUnitLevelPage(projectData, unitLevelImage) {
     { label: "TruEstate Recommendation", key: "recommendation", isScore: true },
   ];
 
+  const villaTableData = [
+    { label: "Built Up Area (Acrs)", key: "builtUpArea", isScore: false },
+    { label: "Plot Area (Sqft)", key: "plotArea", isScore: false },
+    { label: "Carpet Area (Sqft)", key: "carpetArea", isScore: false },
+    { label: "Price / Sqft of Built Up", key: "pricePerSqftBuiltUp", isScore: false },
+    { label: "Price / Sqft of Plot", key: "pricePerSqftPlot", isScore: false },
+    { label: "Car Parking", key: "carParking", isScore: false },
+    { label: "Total Price", key: "totalPrice", isScore: false },
+    { label: "Strategy", key: "strategy", isScore: false },
+    { label: "TruEstate Recommendation", key: "recommendation", isScore: true },
+  ];
+
   const plotTableData = [
-    { label: "Plot Area", key: "plotArea", isScore: false },
+    { label: "Plot Area (Sqft)", key: "plotArea", isScore: false },
     { label: "Price / Sqft", key: "pricePerSqft", isScore: false },
     { label: "Total Price", key: "totalPrice", isScore: false },
     { label: "Strategy", key: "strategy", isScore: false },
     { label: "TruEstate Recommendation", key: "recommendation", isScore: true },
   ];
 
-  const tableData =
-    assetType === "apartment" ? apartmentTableData : plotTableData;
+  const tableData = assetType === "apartment" 
+    ? apartmentTableData 
+    : assetType === "villa" 
+    ? villaTableData 
+    : plotTableData;
 
   return template({
     PROJECT_NAME: projectData.projectName || "Project Plan",
     UNIT_LEVEL_IMAGE: unitLevelImage || "../assets/images/unitLevel.png",
-    CONFIGURATIONS: projectData.configurations,
+    CONFIGURATIONS: configurations,
     TABLE_DATA: tableData,
     PROCESSED_CONFIGS: processedConfigs,
     ASSET_TYPE: assetType,
@@ -1148,7 +1256,7 @@ function renderEvaluationPage(projectData) {
   return template({
     PROJECT_NAME: projectData.projectName || "Unnamed Project",
     TABLE_ROWS_HTML: tableRowsHTML,
-    TRUEESTATE_SCORE: projectData?.projectAreaReviewImpactScore || 8,
+    TRUEESTATE_SCORE: projectData?.projectAreaReviewImpactScore || '-',
     EVALUATION_DATA_JSON: JSON.stringify(processedData), // Keep this for any remaining client-side needs
   });
 }
@@ -1374,7 +1482,7 @@ async function renderMicromarketDemandAnalysisPage(micromarketData) {
   const template = await loadTemplate("micromarketDemandAnalysis");
   return template({
     projectName: micromarketData?.projectName || "Sample Project",
-    TRUEESTATE_SCORE: micromarketData?.demandImpactScore || 8,
+    TRUEESTATE_SCORE: micromarketData?.demandImpactScore || '-',
     data: micromarketData?.demandAnalysis || {
       demandAnalysis: {
         currentDemand: "16%",
@@ -1426,7 +1534,7 @@ async function renderMicromarketSupplyAnalysis1Page(projectData) {
   if (!microMarket) {
     return template({
       projectName: "Sample Project",
-      TRUEESTATE_SCORE: 8,
+      TRUEESTATE_SCORE: '-',
       supplyAnalysis: getEmptySupplyAnalysis(),
     });
   }
@@ -1448,14 +1556,14 @@ async function renderMicromarketSupplyAnalysis1Page(projectData) {
 
     return template({
       projectName: projectData?.projectName || "Sample Project",
-      TRUEESTATE_SCORE: projectData?.supplyImpactScore || 8,
+      TRUEESTATE_SCORE: projectData?.supplyImpactScore || '-',
       supplyAnalysis: supplyAnalysis,
     });
   } catch (error) {
     console.error("Error fetching micromarket data:", error);
     return template({
       projectName: projectData?.projectName || "Sample Project",
-      TRUEESTATE_SCORE: projectData?.supplyImpactScore || 8,
+      TRUEESTATE_SCORE: projectData?.supplyImpactScore || '-',
       supplyAnalysis: getEmptySupplyAnalysis(),
     });
   }
@@ -1673,7 +1781,7 @@ async function renderMicromarketSupplyAnalysis2Page(projectData) {
 
   if (!microMarket) {
     return template({
-      TRUEESTATE_SCORE: projectData?.supplyImpactScore || 8,
+      TRUEESTATE_SCORE: projectData?.supplyImpactScore || '-',
       supplySegmentAnalysis: getEmptySegmentAnalysis(),
       supplyData2: getDefaultSupplyData2(),
     });
@@ -1696,14 +1804,14 @@ async function renderMicromarketSupplyAnalysis2Page(projectData) {
     console.log(supplySegmentAnalysis, "data for dev 2");
 
     return template({
-      TRUEESTATE_SCORE: projectData?.supplyImpactScore || 8,
+      TRUEESTATE_SCORE: projectData?.supplyImpactScore || '-',
       supplySegmentAnalysis: supplySegmentAnalysis,
       supplyData2: projectData?.supplyData2 || getDefaultSupplyData2(),
     });
   } catch (error) {
     console.error("Error fetching micromarket data:", error);
     return template({
-      TRUEESTATE_SCORE: projectData?.supplyImpactScore || 8,
+      TRUEESTATE_SCORE: projectData?.supplyImpactScore || '-',
       supplySegmentAnalysis: getEmptySegmentAnalysis(),
       supplyData2: getDefaultSupplyData2(),
     });
@@ -2212,7 +2320,7 @@ app.get("/download-pdf", async (req, res) => {
       response
     );
     const pEDevelopmentHtml = renderPEDevelopmentPage(
-      micromarketData?.proposed_existing_development?.land_use_categories
+      micromarketData
     );
     const aboutHtml = renderAboutPage(projectData);
     const contactUsHtml = renderContactUsPage(projectData);
@@ -2347,17 +2455,41 @@ app.get("/download-pdf", async (req, res) => {
         );
       }
 
-      if (micromarketData) {
-        
-        fs.writeFileSync(
-          path.join(pagesDir, "micromarketRentalAnalysis.html"),
-          await micromarketRentalAnalysisHtml
-        );
-        fs.writeFileSync(
-          path.join(pagesDir, "micromarketResaleAnalysis.html"),
-          await micromarketResaleAnalysisHtml
-        );
-      }
+      if (micromarketData && 
+    micromarketData["CAT A"] && 
+    micromarketData["CAT B"] && 
+    micromarketData["CAT C"] &&
+    Object.keys(micromarketData["CAT A"]).length > 0 &&
+    Object.keys(micromarketData["CAT B"]).length > 0 &&
+    Object.keys(micromarketData["CAT C"]).length > 0) {
+  
+  try {
+    // Ensure the pages directory exists
+    if (!fs.existsSync(pagesDir)) {
+      fs.mkdirSync(pagesDir, { recursive: true });
+    }
+
+    // Generate HTML content (assuming these are async functions)
+    const rentalAnalysisHtml = await micromarketRentalAnalysisHtml;
+    const resaleAnalysisHtml = await micromarketResaleAnalysisHtml;
+
+    // Write files with error handling
+    fs.writeFileSync(
+      path.join(pagesDir, "micromarketRentalAnalysis.html"),
+      rentalAnalysisHtml
+    );
+    
+    fs.writeFileSync(
+      path.join(pagesDir, "micromarketResaleAnalysis.html"),
+      resaleAnalysisHtml
+    );
+
+    console.log("Micromarket analysis files written successfully");
+  } catch (error) {
+    console.error("Error writing micromarket analysis files:", error);
+    throw error; // Re-throw if you want calling function to handle it
+  }
+}
 
       fs.writeFileSync(
         path.join(pagesDir, "impactScores.html"),
@@ -2367,10 +2499,12 @@ app.get("/download-pdf", async (req, res) => {
         path.join(pagesDir, "recommendedStrategy.html"),
         await recommendedStrategyHtml
       );
+      if(projectData.projectComparison){
       fs.writeFileSync(
         path.join(pagesDir, "projectComparison.html"),
         await projectComparisonHtml
       );
+    }
       fs.writeFileSync(path.join(pagesDir, "about.html"), await aboutHtml);
       fs.writeFileSync(
         path.join(pagesDir, "contactUs.html"),
