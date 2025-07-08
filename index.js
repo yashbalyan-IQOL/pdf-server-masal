@@ -407,8 +407,8 @@ function renderYearlyCashflowPage(projectData, data2, response) {
       TABLE_HEADERS: "<th>No Data Available</th>",
       TABLE_ROWS:
         "<tr><td class='parameter-cell'>No cashflow data available</td><td>-</td></tr>",
-      TOTAL_YEARS: 0,
-      ESTATE_SCORE: 0,
+      TOTAL_YEARS: '-',
+      ESTATE_SCORE: '-',
     });
   }
 
@@ -520,7 +520,7 @@ function renderYearlyCashflowPage(projectData, data2, response) {
     return formattedPrice;
   };
 
-  // Generate column headers for exactly 5 years
+  // Generate column headers for exactly 5 years + Total column
   const shortMonth = new Date().toLocaleString("default", { month: "short" });
   const prevShortMonth = new Date(
     new Date().setMonth(new Date().getMonth() - 1)
@@ -536,6 +536,8 @@ function renderYearlyCashflowPage(projectData, data2, response) {
       columnHeaders.push(`Jan-Dec ${index + 25}`);
     }
   }
+  // Add Total column header
+  columnHeaders.push("Total");
 
   // Generate table rows HTML
   const tableRowsHTML = rows
@@ -546,6 +548,7 @@ function renderYearlyCashflowPage(projectData, data2, response) {
       const isLastRow = rowIndex === rows.length - 1;
       const rowClass = isLastRow ? "net-cash-row" : "";
 
+      // Generate cells for the 5 years
       const cellsHTML = row.values
         .slice(0, MAX_YEARS)
         .map((cell) => {
@@ -554,18 +557,27 @@ function renderYearlyCashflowPage(projectData, data2, response) {
         })
         .join("");
 
+      // Calculate total for this row
+      const total = row.values.slice(0, MAX_YEARS).reduce((sum, value) => sum + (value || 0), 0);
+      const formattedTotal = formatCost(total);
+
       return `
       <tr class="${rowClass}">
         <td class="parameter-cell">${row.header}</td>
         ${cellsHTML}
+        <td class="total-cell"><strong>${formattedTotal}</strong></td>
       </tr>
     `;
     })
     .join("");
 
-  // Generate column headers HTML
+  // Generate column headers HTML (including Total column)
   const headerHTML = columnHeaders
-    .map((header) => `<th>${header}</th>`)
+    .map((header, index) => {
+      // Make the Total column header bold
+      const headerClass = index === columnHeaders.length - 1 ? 'total-header' : '';
+      return `<th class="${headerClass}">${header}</th>`;
+    })
     .join("");
 
   return template({
@@ -707,7 +719,7 @@ function renderUnitLevelPage(projectData, unitLevelImage) {
   };
 
   // Get configurations (with duplicates allowed)
-  const configurations = getConfigurations();
+  const configurations = getConfigurations().reverse();
 
   const processedConfigs = projectData.data.map((item, index) => {
     const configName = configurations[index];
